@@ -56,11 +56,29 @@ void AKeyframeAnimationController::Tick(float DeltaTime)
 	* Case 02: Reverse Skip (Playhead enters previous keyframe
 	* Case 03: Reverse (playhead rewinds towards previous [t += -dt])
 	* Case 04: Paused (playhead stays put [t += 0])
-	* Case 05: Forward (playhead advances towards next keyframe [5 += +dt])
+	* Case 05: Forward (playhead advances towards next keyframe [t += +dt])
 	* Case 06: Forward Skip (playhead enters next keyframe)
 	* Case 07: Forward Terminus (playhead passes clip end)
 	*/
+	
+	// Case 01
+	if (clipTime < 0) {
+		UE_LOG(LogTemp, Warning, TEXT("REVERSE TERMINUS"));
+	}
+	// Case 02
 
-
+	// Case 03
+	
+	// Case 04
+	if (playbackDirection == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Playback is paused!"));
+	}
+	
+	// Case 05
+	if (playbackDirection == 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Playing clip forward"));
+	}
 }
 

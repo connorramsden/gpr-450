@@ -44,7 +44,7 @@ public:
 	float keyframeParameter;
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
-	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
+	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
 	uint32 playbackDirection;
 
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
