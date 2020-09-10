@@ -14,25 +14,25 @@ KeyframeAnimation::~KeyframeAnimation()
 ///////////// KEYFRAME START /////////////
 
 // Default Constructor
-Keyframe::Keyframe()
+FKeyframe::FKeyframe()
 {
 }
 
 // Initialize a keyframe
-Keyframe::Keyframe(const float duration, const uint32 value_x)
+FKeyframe::FKeyframe(const float duration, const uint32 value_x)
 {
 	// Set duration
-	kfDuration = duration;
+	keyframeDuration = duration;
 	// Set duration inverse
-	kfDurationInv = 1 / duration;
+	keyframeDurationInv = 1 / duration;
 	// Set value
-	kfData = value_x;
+	keyframeData = value_x;
 
 	return;
 }
 
 // Default Deconstructor
-Keyframe::~Keyframe()
+FKeyframe::~FKeyframe()
 {
 }
 
@@ -41,27 +41,27 @@ Keyframe::~Keyframe()
 ///////////// KEYFRAME POOL  START /////////////
 
 // Default KPool Constructor
-KeyframePool::KeyframePool()
+FKeyframePool::FKeyframePool()
 {
 }
 
 // Allocate Keyframe Pool
-KeyframePool::KeyframePool(const uint32 count)
+FKeyframePool::FKeyframePool(const uint32 count)
 {
 	// Allocate array of keyframes
-	kpPool.SetNumUninitialized(count);
+	keyframePool.SetNumUninitialized(count);
 	// Set keyframe count
-	kpCount = count;
+	keyframePoolCount = count;
 
 	return;
 }
 
 // Release keyframe pool
-KeyframePool::~KeyframePool()
+FKeyframePool::~FKeyframePool()
 {
-	for (uint32 i = 0; i < kpCount; ++i) {
+	for (uint32 i = 0; i < keyframePoolCount; ++i) {
 		// NOTE: Might break, depending on how RemoveAt works. Does it resize array?
-		kpPool.RemoveAt(i);
+		keyframePool.RemoveAt(i);
 	}
 
 	return;
@@ -71,26 +71,25 @@ KeyframePool::~KeyframePool()
 
 ///////////// CLIP START /////////////
 
-Clip::Clip()
+FClip::FClip()
 {
 }
 
-Clip::Clip(const FString clipName, const KeyframePool* keyframePool, const uint32 firstKeyframeIndex, const uint32 finalKeyframeIndex)
+FClip::FClip(FString newClipName, const FKeyframePool* keyframePool, const uint32 firstKeyframeIndex, const uint32 finalKeyframeIndex)
 {
-	kName = clipName;
-
+	clipName = newClipName;
 }
 
-Clip::~Clip()
+FClip::~FClip()
 {
 }
 
-float Clip::CalculateDuration()
+float FClip::CalculateDuration()
 {
 	return 0.0f;
 }
 
-float Clip::DistributeDuration(const float newClipDuration)
+float FClip::DistributeDuration(const float newClipDuration)
 {
 	return 0.0f;
 }
@@ -100,19 +99,19 @@ float Clip::DistributeDuration(const float newClipDuration)
 
 ///////////// CLIP POOL START /////////////
 
-ClipPool::ClipPool()
+FClipPool::FClipPool()
 {
 }
 
-ClipPool::ClipPool(const uint32 count)
+FClipPool::FClipPool(const uint32 count)
 {
 }
 
-ClipPool::~ClipPool()
+FClipPool::~FClipPool()
 {
 }
 
-uint32 ClipPool::GetClipIndexInPool(FString clipName)
+uint32 FClipPool::GetClipIndexInPool(FString clipName)
 {
 	return uint32();
 }
