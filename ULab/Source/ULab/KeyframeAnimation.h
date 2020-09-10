@@ -23,21 +23,21 @@ struct ULAB_API FKeyframe
 public:
 	// Index in pool of keyframes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		uint32 keyframeIndex;
+	int keyframeIndex;
 	// Interval of time for which this keyframe is active. Cannot be zero
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		float keyframeDuration;
+	float keyframeDuration;
 	// Reciprocal of kDuration
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		float keyframeDurationInv;
+	float keyframeDurationInv;
 	// Value of the sample described by a keyframe. Just an integer for example purposes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		uint32 keyframeData;
+	int keyframeData;
 
 	// Default Contructor
 	FKeyframe();
 	// Initialize a keyframe
-	FKeyframe(const float duration, const uint32 value_x);
+	FKeyframe(const float duration, const int value_x);
 	// Release a keyframe
 	~FKeyframe();
 };
@@ -49,16 +49,16 @@ struct ULAB_API FKeyframePool
 public:
 	// Array of all keyframes in the pool
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Pool Components")
-		TArray<FKeyframe> keyframePool;
+	TArray<FKeyframe> keyframePool;
 
 	// Number of keyframes in the pool
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Pool Components")
-		uint32 keyframePoolCount;
+	int keyframePoolCount;
 
 	// Default KPool Constructor
 	FKeyframePool();
 	// Allocate Keyframe Pool
-	FKeyframePool(const uint32 count);
+	FKeyframePool(const int count);
 	// Release keyframe pool
 	~FKeyframePool();
 };
@@ -71,24 +71,39 @@ struct ULAB_API FClip
 public:
 	// Identifies the clip
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		FString clipName;
+	FString clipName;
+
 	// Index in clip pool
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		uint32 clipIndex;
+	int clipIndex;
 	// Duration of the clip; can be calculated as sum of all referenced keyframes or set first & distribute. Cannot be 0
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		float clipDuration;
+	float clipDuration;
+	// Inverse of clipDuration
+	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
+	float clipDurationInv;
+	// Number of keyframes referenced by clip
+	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
+	int keyframeCount;
+	// index of first keyframe in pool ref'd by clip
+	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
+	int firstKeyframe;
+	// index of final keyframe in pool ref'd by clip
+	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
+	int lastKeyframe;
+	// The pool of keyframes containing those included in this set.
+	FKeyframePool keyframePool;
 
 	// Default Clip Constructor
 	FClip();
 	// Initialize Clip with First and Last indices
-	FClip(FString newClipName, const FKeyframePool* keyframePool, const uint32 firstKeyframeIndex, const uint32 finalKeyframeIndex);
+	FClip(FString newClipName, const FKeyframePool keyframePool, const int firstKeyframeIndex, const int finalKeyframeIndex);
 	// Release Clip
 	~FClip();
 
 	// Calculate clip duration as sum of keyframes' durations
-	float CalculateDuration();
-	float DistributeDuration(const float newClipDuration);
+	void CalculateDuration();
+	void DistributeDuration(const float newClipDuration);
 };
 
 USTRUCT()
@@ -99,19 +114,19 @@ struct ULAB_API FClipPool
 public:
 	// Array of Clips
 	UPROPERTY(VisibleAnywhere, Category = "Clip Pool Components")
-		TArray<FClip> clipPool;
+	TArray<FClip> clipPool;
 
 	// Number of Clips
 	UPROPERTY(VisibleAnywhere, Category = "Clip Pool Components")
-		uint32 clipCount;
+	int clipCount;
 
 	// Default ClipPool Constructor
 	FClipPool();
 	// Allocate Clip Pool
-	FClipPool(const uint32 count);
+	FClipPool(const int count);
 	// Release Clip Pool
 	~FClipPool();
 
 	// Get Clip Index from Pool
-	uint32 GetClipIndexInPool(FString clipName);
+	int GetClipIndexInPool(FString clipName);
 };

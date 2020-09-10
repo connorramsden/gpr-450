@@ -19,12 +19,12 @@ FKeyframe::FKeyframe()
 }
 
 // Initialize a keyframe
-FKeyframe::FKeyframe(const float duration, const uint32 value_x)
+FKeyframe::FKeyframe(const float duration, const int value_x)
 {
 	// Set duration
 	keyframeDuration = duration;
 	// Set duration inverse
-	keyframeDurationInv = 1 / duration;
+	keyframeDurationInv = 1.0f / duration;
 	// Set value
 	keyframeData = value_x;
 
@@ -46,9 +46,9 @@ FKeyframePool::FKeyframePool()
 }
 
 // Allocate Keyframe Pool
-FKeyframePool::FKeyframePool(const uint32 count)
+FKeyframePool::FKeyframePool(const int count)
 {
-	// Allocate array of keyframes
+	// Allocate array of keyframes (not sure if this function works. Might have to initialize manually)
 	keyframePool.SetNumUninitialized(count);
 	// Set keyframe count
 	keyframePoolCount = count;
@@ -59,12 +59,6 @@ FKeyframePool::FKeyframePool(const uint32 count)
 // Release keyframe pool
 FKeyframePool::~FKeyframePool()
 {
-	for (uint32 i = 0; i < keyframePoolCount; ++i) {
-		// NOTE: Might break, depending on how RemoveAt works. Does it resize array?
-		keyframePool.RemoveAt(i);
-	}
-
-	return;
 }
 
 ///////////// KEYFRAME POOL END /////////////
@@ -75,23 +69,51 @@ FClip::FClip()
 {
 }
 
-FClip::FClip(FString newClipName, const FKeyframePool* keyframePool, const uint32 firstKeyframeIndex, const uint32 finalKeyframeIndex)
+FClip::FClip(FString newClipName, const FKeyframePool newPool, const int firstKeyframeIndex, const int finalKeyframeIndex)
 {
+	// Set name
 	clipName = newClipName;
+	// Set referenced keyframe pool
+	keyframePool = newPool;
+	// Set first KF index
+	firstKeyframe = firstKeyframeIndex;
+	// Set last KF index
+	lastKeyframe = finalKeyframeIndex;
+
+	return;
 }
 
 FClip::~FClip()
 {
 }
 
-float FClip::CalculateDuration()
+void FClip::CalculateDuration()
 {
-	return 0.0f;
+	// Sum the duration of all keyframes to calculate clip duration
+	for (int i = 0; i < keyframePool.keyframePoolCount; ++i) {
+		clipDuration += keyframePool.keyframePool[i].keyframeDuration;
+	}
+
+	// Calculate clip duration inverse
+	clipDurationInv = 1.0f / clipDuration;
+
+	return;
 }
 
-float FClip::DistributeDuration(const float newClipDuration)
+void FClip::DistributeDuration(const float newClipDuration)
 {
-	return 0.0f;
+	// Set duration directly
+	clipDuration = newClipDuration;
+	// Set inverse directly
+	clipDurationInv = 1.0f / newClipDuration;
+
+	// Distribute uniform duration across all keyframes
+	for (int i = 0; i < keyframePool.keyframePoolCount; ++i) {
+		keyframePool.keyframePool[i].keyframeDuration = clipDuration;
+		keyframePool.keyframePool[i].keyframeDurationInv = clipDurationInv;
+	}
+
+	return;
 }
 
 ///////////// CLIP END /////////////
@@ -103,17 +125,34 @@ FClipPool::FClipPool()
 {
 }
 
-FClipPool::FClipPool(const uint32 count)
+FClipPool::FClipPool(const int count)
 {
+	// IDK how this function works! Hopefully it just does!
+	clipPool.SetNumUninitialized(count);
+
+	// Set clip count
+	clipCount = count;
+
+	return;
 }
 
 FClipPool::~FClipPool()
 {
 }
 
-uint32 FClipPool::GetClipIndexInPool(FString clipName)
+int FClipPool::GetClipIndexInPool(FString clipName)
 {
-	return uint32();
+	int tempIndex = -1;
+
+	for (int i = 0; i < clipCount; ++i)
+	{
+		if (clipPool[i].clipName == clipName)
+		{
+			tempIndex = clipPool[i].clipIndex;
+		}
+	}
+
+	return tempIndex;
 }
 
 ///////////// CLIP POOL END /////////////
