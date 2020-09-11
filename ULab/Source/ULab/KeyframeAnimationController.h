@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
 #include "KeyframeAnimation.h"
 
 // Must be last include
 #include "KeyframeAnimationController.generated.h"
 
-UCLASS()
-class ULAB_API AKeyframeAnimationController : public AActor
+USTRUCT()
+struct ULAB_API FKeyframeAnimationController
 {
 	GENERATED_BODY()
 
@@ -51,16 +50,10 @@ public:
 		FClipPool clipPool;
 
 	// Sets default values for this actor's properties
-	AKeyframeAnimationController();
+	FKeyframeAnimationController();
 
 	// set starting clip, keyframe and state
-	AKeyframeAnimationController(FString ctrlName, FClipPool newPool, uint32 clipPoolIndex);
+	FKeyframeAnimationController(FString ctrlName, FClipPool newPool, uint32 clipPoolIndex);
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void ClipControllerUpdate(float DeltaTime);
 };

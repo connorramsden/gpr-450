@@ -103,6 +103,7 @@ public:
 
 	// Calculate clip duration as sum of keyframes' durations
 	void CalculateDuration();
+	// Uniformly set duration and inverse across entire pool
 	void DistributeDuration(const float newClipDuration);
 };
 
@@ -116,9 +117,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Clip Pool Components")
 		TArray<FClip> clipPool;
 
-	// Number of Clips
+	// Number of Clips in the Pool
 	UPROPERTY(EditAnywhere, Category = "Clip Pool Components")
-		int clipCount;
+		int clipCount = 0;
 
 	// Default ClipPool Constructor
 	FClipPool();

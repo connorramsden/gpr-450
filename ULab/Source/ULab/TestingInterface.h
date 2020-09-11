@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "KeyframeAnimation.h"
+#include "KeyframeAnimationController.h"
 
 #include "TestingInterface.generated.h"
 
@@ -20,6 +21,12 @@ public:
 	// The testing interface's Keyframe Pool (20+ keyframes!)
 	UPROPERTY(VisibleAnywhere, Category = "Testing Interface Components")
 		FKeyframePool keyframePool;
+	// The testing interface's Clip Pool! (5+ clips!)
+	UPROPERTY(VisibleAnywhere, Category = "Testing Interface Components")
+		FClipPool clipPool;
+	// One of the testing interface's Clip Controllers
+	UPROPERTY(VisibleAnywhere, Category = "Testing Interface Components")
+		FKeyframeAnimationController clipControllerOne;
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,7 +35,4 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable, Category="Animation Functions")
-	void ButtonLogTest();
 };

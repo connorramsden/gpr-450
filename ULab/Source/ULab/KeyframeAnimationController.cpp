@@ -4,19 +4,13 @@
 #include "KeyframeAnimationController.h"
 
 // Sets default values
-AKeyframeAnimationController::AKeyframeAnimationController()
+FKeyframeAnimationController::FKeyframeAnimationController()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Set starting clip, keyframe and state
-AKeyframeAnimationController::AKeyframeAnimationController(FString ctrlName, FClipPool newPool, uint32 clipPoolIndex)
+FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FClipPool newPool, uint32 clipPoolIndex)
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	// Set controller name
 	name = ctrlName;
 	// Set clip pool
@@ -25,17 +19,9 @@ AKeyframeAnimationController::AKeyframeAnimationController(FString ctrlName, FCl
 	clipIndex = clipPoolIndex;
 }
 
-// Called when the game starts or when spawned
-void AKeyframeAnimationController::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 // Called every frame (Basically Unity Update)
-void AKeyframeAnimationController::Tick(float DeltaTime)
+void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
 	/* Step 01: Pre-resolution
 	* Apply time step
 	* One-time, single line of code, applied twice

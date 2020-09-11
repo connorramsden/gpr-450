@@ -16,17 +16,16 @@ void ATestingInterface::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Initialize a new pool of keyframes. Count should pull from UI elements.
+	keyframePool = FKeyframePool(20);
+
+	// Initialize a new pool of clips. Count should pull from UI elements.
+	clipPool = FClipPool(5);
 }
 
 // Called every frame
 void ATestingInterface::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-}
-
-void ATestingInterface::ButtonLogTest()
-{
-	UE_LOG(LogTemp, Warning, TEXT("UI BUTTON CLICKED!"));
 }
 
