@@ -16,7 +16,7 @@ public:
 	~KeyframeAnimation();
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FKeyframe
 {
 	GENERATED_BODY()
@@ -25,7 +25,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
 		int keyframeIndex;
 	// Interval of time for which this keyframe is active. Cannot be zero
-	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Components")
 		float keyframeDuration;
 	// Reciprocal of kDuration
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
@@ -42,13 +42,13 @@ public:
 	~FKeyframe();
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FKeyframePool
 {
 	GENERATED_BODY()
 public:
 	// Array of all keyframes in the pool
-	UPROPERTY(VisibleAnywhere, Category = "Keyframe Pool Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Pool Components")
 		TArray<FKeyframe> keyframePool;
 
 	// Number of keyframes in the pool
@@ -63,14 +63,14 @@ public:
 	~FKeyframePool();
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FClip
 {
 	GENERATED_BODY()
 
 public:
 	// Identifies the clip
-	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Components")
 		FString clipName;
 
 	// Index in clip pool
@@ -107,14 +107,14 @@ public:
 	void DistributeDuration(const float newClipDuration);
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FClipPool
 {
 	GENERATED_BODY()
 
 public:
 	// Array of Clips
-	UPROPERTY(VisibleAnywhere, Category = "Clip Pool Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Pool Components")
 		TArray<FClip> clipPool;
 
 	// Number of Clips in the Pool

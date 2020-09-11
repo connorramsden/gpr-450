@@ -6,10 +6,16 @@
 // Sets default values
 FKeyframeAnimationController::FKeyframeAnimationController()
 {
+	// Set default controller name
+	name = "Clip Controller";
+	// Initialize default Clip Pool
+	clipPool = FClipPool();
+	// Set default index to 0
+	clipIndex = 0;
 }
 
 // Set starting clip, keyframe and state
-FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FClipPool newPool, uint32 clipPoolIndex)
+FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex)
 {
 	// Set controller name
 	name = ctrlName;
@@ -34,7 +40,7 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 
 	/* Step 02: Resolve time
 	* While unresolved, continue to use playback behaviour to determine the NEW keyframe time & clip time
-	* Update behaviour should be looping such that when the clip reaches either end, 
+	* Update behaviour should be looping such that when the clip reaches either end,
 		it starts playing again from the opposite end in the same direction
 	* There are 7 cases to check for resolution. At least one will terminate the algorithm
 	* Case 01: Reverse Terminus (Playhead passes clip start)
@@ -45,35 +51,52 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	* Case 06: Forward Skip (playhead enters next keyframe)
 	* Case 07: Forward Terminus (playhead passes clip end)
 	*/
-	
+
 	// Case 01
-	if (clipTime < 0) {
+	if (clipTime < 0)
+	{
 		UE_LOG(LogTemp, Warning, TEXT("REVERSE TERMINUS"));
 	}
+
 	// Case 02
+	//if (keyframeTime <= clipPool.clipPool[keyframeIndex].firstKeyframe)
+	//{
+	//	// Decrement keyframe index
+	//	keyframeIndex--;
+	//}
 
 	// Case 03
-	if (playbackDirection == -1) {
-		UE_LOG(LogTemp, Warning, TEXT("Playback is in reverse!"))
+	if (currPlaybackDir == -1)
+	{
+		// t += -dt
+		keyframeTime += -DeltaTime;
 	}
-	
+
 	// Case 04
-	if (playbackDirection == 0)
+	if (currPlaybackDir == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Playback is paused!"));
+		// Playhead stays put
+		keyframeTime += 0;
 	}
-	
+
 	// Case 05
-	if (playbackDirection == 1)
+	if (currPlaybackDir == 1)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Playback is forward!"));
+		// t += +dt
+		keyframeTime += DeltaTime;
 	}
 
 	// Case 06
-
+	// If keyframe time exceeds final keyframe, proceed to next clip
+	//if (keyframeTime >= clipPool.clipPool[keyframeIndex].lastKeyframe)
+	//{
+	//	// Increment keyframe index
+	//	keyframeIndex++;
+	//}
 
 	// Case 07
-	// if (clipTime >= clipPool.clipPool[clipIndex].clipDuration) {
+	// if (clipTime >= clipPool.clipPool[clipIndex].clipDuration)
+	// {
 	// 	UE_LOG(LogTemp, Warning, TEXT("Forward Terminus Reached!"))
 	// }
 }

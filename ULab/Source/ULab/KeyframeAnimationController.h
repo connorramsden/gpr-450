@@ -8,7 +8,7 @@
 // Must be last include
 #include "KeyframeAnimationController.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FKeyframeAnimationController
 {
 	GENERATED_BODY()
@@ -19,11 +19,11 @@ public:
 		FString name;
 
 	// Index of clip to control in referenced pool
-	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-		uint32 clipIndex;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
+		int clipIndex;
 
 	// Current time relative to start of clip. Between 0 and current clip's duration
-	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		float clipTime;
 
 	// Normalized keyframe time. Should always be between 0 and 1
@@ -31,11 +31,11 @@ public:
 		float clipParameter;
 
 	// Index of current keyframe in referenced keyframe pool (clip references pool)
-	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-		uint32 keyframeIndex;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
+		int keyframeIndex;
 
 	// Current time relative to current keyframe; always between 0 and current keyframe duration
-	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		float keyframeTime;
 
 	// Normalized keyframe time. Always between 0 and 1
@@ -43,17 +43,24 @@ public:
 		float keyframeParameter;
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
-	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
-		uint32 playbackDirection;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
+		int currPlaybackDir;
 
-	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
+	// Previous behavior of playback. Defaults to 1 (Forward Play)
+	int prevPlaybackDir = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		FClipPool clipPool;
 
+public:
 	// Sets default values for this actor's properties
 	FKeyframeAnimationController();
 
 	// set starting clip, keyframe and state
-	FKeyframeAnimationController(FString ctrlName, FClipPool newPool, uint32 clipPoolIndex);
+	FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex);
 
 	void ClipControllerUpdate(float DeltaTime);
+
+	void ReverseSkip();
+	void ForwardSkip();
 };
