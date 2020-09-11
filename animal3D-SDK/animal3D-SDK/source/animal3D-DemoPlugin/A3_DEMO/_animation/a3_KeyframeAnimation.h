@@ -36,6 +36,7 @@
 extern "C"
 {
 #else	// !__cplusplus
+typedef union a3_Sample					a3_Sample;
 typedef struct a3_Keyframe					a3_Keyframe;
 typedef struct a3_KeyframePool				a3_KeyframePool;
 typedef struct a3_Clip						a3_Clip;
@@ -51,6 +52,18 @@ enum
 	a3keyframeAnimation_nameLenMax = 32,
 };
 
+// generic sample: value of function at time
+union a3_Sample
+{
+	// Sample vec2
+	a3vec2 sample;
+
+	struct
+	{
+		a3real time, value;
+	};
+};
+
 
 // description of single keyframe
 // metaphor: moment
@@ -58,6 +71,12 @@ struct a3_Keyframe
 {
 	// index in keyframe pool
 	a3ui32 index;
+
+	// duration and recip
+	a3real duration, durationInv;
+
+	// Replaces need for any type of value
+	a3_Sample sample, handle; // more here later :)
 };
 
 // pool of keyframe descriptors

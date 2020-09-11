@@ -17,9 +17,9 @@
 /*
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
-	
+
 	a3_KeyframeAnimationController.h
-	Keyframe animation clip controller. Basically a frame index manager. Very 
+	Keyframe animation clip controller. Basically a frame index manager. Very
 	limited in what one can do with this; could potentially be so much more.
 */
 
@@ -47,6 +47,24 @@ typedef struct a3_ClipController			a3_ClipController;
 struct a3_ClipController
 {
 	a3byte name[a3keyframeAnimation_nameLenMax];
+
+	// index of clip being played in selected clip pool
+	a3index clipIndex_pool;
+
+	// index of keyframe being processed in selected clip
+	// a3index keyframeIndex_clip;
+	a3index keyframeIndex0_clip, keyframeIndex1_clip;
+	a3index keyframeIndexP_clip, keyframeIndexN_clip;
+
+	// current time...
+	a3real keyframeTime, keyframeParam;
+
+
+	// referenced clip and keyframe
+	a3_Clip const* clipPtr;
+	// a3_Keyframe const* keyframePtr;
+	a3_Keyframe const* keyframe0Ptr, * keyframe1Ptr;
+	a3_Keyframe const* keyframePPtr, * keyframeNPtr;
 };
 
 
@@ -61,6 +79,8 @@ a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt);
 // set clip to play
 a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* clipPool, const a3ui32 clipIndex_pool);
 
+// evaluate the current value at time
+a3i32 a3clipControllerEvaluate(a3_ClipController const* clipCtrl, a3_Sample* sample_out);
 
 //-----------------------------------------------------------------------------
 
