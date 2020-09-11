@@ -29,7 +29,6 @@ AKeyframeAnimationController::AKeyframeAnimationController(FString ctrlName, FCl
 void AKeyframeAnimationController::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame (Basically Unity Update)
@@ -68,6 +67,9 @@ void AKeyframeAnimationController::Tick(float DeltaTime)
 	// Case 02
 
 	// Case 03
+	if (playbackDirection == -1) {
+		UE_LOG(LogTemp, Warning, TEXT("Playback is in reverse!"))
+	}
 	
 	// Case 04
 	if (playbackDirection == 0)
@@ -78,7 +80,15 @@ void AKeyframeAnimationController::Tick(float DeltaTime)
 	// Case 05
 	if (playbackDirection == 1)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Playing clip forward"));
+		UE_LOG(LogTemp, Warning, TEXT("Playback is forward!"));
 	}
+
+	// Case 06
+
+
+	// Case 07
+	// if (clipTime >= clipPool.clipPool[clipIndex].clipDuration) {
+	// 	UE_LOG(LogTemp, Warning, TEXT("Forward Terminus Reached!"))
+	// }
 }
 

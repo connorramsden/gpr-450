@@ -17,38 +17,38 @@ class ULAB_API AKeyframeAnimationController : public AActor
 public:
 	// Identifies controller by name. NOT the name of the clip
 	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
-	FString name;
+		FString name;
 
 	// Index of clip to control in referenced pool
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	uint32 clipIndex;
+		uint32 clipIndex;
 
 	// Current time relative to start of clip. Between 0 and current clip's duration
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	float clipTime;
+		float clipTime;
 
 	// Normalized keyframe time. Should always be between 0 and 1
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	float clipParameter;
+		float clipParameter;
 
 	// Index of current keyframe in referenced keyframe pool (clip references pool)
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	uint32 keyframeIndex;
+		uint32 keyframeIndex;
 
 	// Current time relative to current keyframe; always between 0 and current keyframe duration
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	float keyframeTime;
+		float keyframeTime;
 
 	// Normalized keyframe time. Always between 0 and 1
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	float keyframeParameter;
+		float keyframeParameter;
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
 	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
-	uint32 playbackDirection;
+		uint32 playbackDirection;
 
-	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	FClipPool clipPool;
+	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
+		FClipPool clipPool;
 
 	// Sets default values for this actor's properties
 	AKeyframeAnimationController();
