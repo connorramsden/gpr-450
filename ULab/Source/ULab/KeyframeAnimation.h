@@ -118,7 +118,7 @@ public:
 
 	// Number of Clips in the Pool
 	UPROPERTY(EditAnywhere, Category = "Clip Pool Components")
-		int count = 0;
+		int count = -1;
 
 	// Default ClipPool Constructor
 	FClipPool();

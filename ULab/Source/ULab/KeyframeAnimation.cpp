@@ -15,6 +15,8 @@ KeyframeAnimation::~KeyframeAnimation()
 // Default Constructor
 FKeyframe::FKeyframe()
 {
+	// index initialized in the Keyframe Pool
+
 	// Arbitrary duration between 1 and 10 ticks
 	duration = FMath::RandRange(1.0f, 10.0f);
 	// Calculate duration inverse
@@ -38,9 +40,7 @@ FKeyframe::FKeyframe(const float newDuration, const int value_x)
 
 // Default Deconstructor
 FKeyframe::~FKeyframe()
-{
-	// Do I need anything here? No pointers.
-}
+{}
 
 ///////////// KEYFRAME END /////////////
 
@@ -49,7 +49,7 @@ FKeyframe::~FKeyframe()
 // Default KPool Constructor
 FKeyframePool::FKeyframePool()
 {
-	// Default initialization to 20
+	// Default initialization to 20 Keyframes
 	for (int i = 0; i < 20; ++i)
 	{
 		// Increment keyframe pool count
@@ -91,7 +91,7 @@ FKeyframePool::FKeyframePool(const int count)
 // Release keyframe pool
 FKeyframePool::~FKeyframePool()
 {
-	// Do I have anything to deconstruct? Might need to free pool memory?
+	// Need to de-allocate array
 }
 
 ///////////// KEYFRAME POOL END /////////////
@@ -107,11 +107,17 @@ FClip::FClip()
 	// Initialize default keyframe pool (NOTE: Might not work the way I want it to!)
 	keyframePool = FKeyframePool();
 
+	// Set count
+	count = keyframePool.poolCount;
+
 	// NOTE: Might need to fix these default values, we'll see
 	// Set first keyframe index to 0
 	firstKeyframe = 0;
 	// Last index should be 19 (since we have 20 keyframes in a default init)
 	lastKeyframe = 19;
+
+	// Calculate Duration based on keyframePool
+	CalculateDuration();
 
 	return;
 }
@@ -123,18 +129,21 @@ FClip::FClip(FString newClipName, const FKeyframePool newPool, const int firstKe
 	name = newClipName;
 	// Set referenced keyframe pool
 	keyframePool = newPool;
+	// Set count
+	count = keyframePool.poolCount;
 	// Set first KF index
 	firstKeyframe = firstKeyframeIndex;
 	// Set last KF index
 	lastKeyframe = finalKeyframeIndex;
 
+	// Calculate Duration based on keyframePool
+	CalculateDuration();
+
 	return;
 }
 
 FClip::~FClip()
-{
-	// Do I need to deallocate anything from the Clip?
-}
+{}
 
 // Calculate clip duration as sum of keyframes' durations
 void FClip::CalculateDuration()
@@ -190,6 +199,8 @@ FClipPool::FClipPool(const int newCount)
 		FClip tempClip = FClip();
 		// Set the clip index to the current count
 		tempClip.index = count;
+		// Adjust clip name based on index
+		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
 
 		// Add the temp clip to the pool
 		pool.Add(tempClip);

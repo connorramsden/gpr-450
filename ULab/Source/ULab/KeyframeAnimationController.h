@@ -60,6 +60,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		FClipPool clipPool;
 
+protected:
+	bool bIsResolved = false;
+
 public:
 	// Sets default values for this actor's properties
 	FKeyframeAnimationController();
@@ -68,7 +71,4 @@ public:
 	FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex);
 
 	void ClipControllerUpdate(float DeltaTime);
-
-	void ReverseSkip();
-	void ForwardSkip();
 };

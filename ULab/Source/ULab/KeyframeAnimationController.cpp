@@ -35,8 +35,11 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	* Utilizes numerical integration for time itself
 	*/
 
-	keyframeTime += DeltaTime;
-	clipTime += DeltaTime;
+	// keyframeTime += DeltaTime;
+	// clipTime += DeltaTime;
+
+	// Reset is resolved to false
+	bIsResolved = false;
 
 	/* Step 02: Resolve time
 	* While unresolved, continue to use playback behaviour to determine the NEW keyframe time & clip time
@@ -58,5 +61,10 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	// 2. Check possible cases for each play dir. 
 	//		-> fwdrev: same interval in [0,  d);
 	//		-> surpassed interval in either (-inf, 0), or [d, inf); terminus
+
+	// Loop while unresolved
+	// while (!bIsResolved)
+	// {
+	// }
 }
 

@@ -50,10 +50,14 @@ void ATestingInterface::Tick(float DeltaTime)
 // Select current clip controller to edit
 void ATestingInterface::SetCurrentController(int newIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("New Controller: %i"), newIndex);
-
 	// NOTE: Needs out of bounds error handling
 	currentController = clipControllerPool[newIndex];
+
+	// Acquire current controller's current clip
+	int tempClipIndex = currentController.clipIndex;
+
+	// Update current clip to current controller's current clip
+	currentClip = currentController.clipPool.pool[tempClipIndex];
 }
 
 // Play / Pause / Change Direction of Controller Playback
