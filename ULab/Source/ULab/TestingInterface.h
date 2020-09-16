@@ -25,17 +25,17 @@ public:
 	ATestingInterface();
 
 	// The testing interface's Keyframe Pool (20+ keyframes!)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
 		FKeyframePool keyframePool;
 	// The testing interface's Clip Pool! (5+ clips!)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
 		FClipPool clipPool;
 	// The testing interface's ClipController Pool
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
 		TArray<FKeyframeAnimationController> clipControllerPool;
 
 	// The current controller the user is editing
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
 		FKeyframeAnimationController currentController;
 
 	// The current clip the user is controlling
@@ -50,9 +50,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Select current clip controller to edit
-	UFUNCTION(BlueprintCallable)
-		void SetCurrentController(int newIndex);
+	// TIME CONTROL BEGIN //
 
 	// Change Direction of Controller Playback
 	UFUNCTION(BlueprintCallable)
@@ -62,11 +60,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void TogglePlayPause();
 
+	// Allows for Slow Motion
+	UFUNCTION(BlueprintCallable)
+		void SetTimeMultiplier(float newMultiplier);
+
+	// TIME CONTROL END
+
+	// Select current clip controller to edit
+	UFUNCTION(BlueprintCallable)
+		void SetCurrentController(int newIndex);
+
 	// Select current clip to control
 	UFUNCTION(BlueprintCallable)
 		void SetCurrentClip(FString newClip);
 
-	// Allows for Slow Motion
 	UFUNCTION(BlueprintCallable)
-		void SetTimeMultiplier(float newMultiplier);
+		FORCEINLINE int GetNumControllers() const { return NUM_CONTROLLERS; }
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE float GetTimeMult() const { return timeMult; }
 };

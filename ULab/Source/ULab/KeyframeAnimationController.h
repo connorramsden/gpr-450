@@ -15,9 +15,11 @@ struct ULAB_API FKeyframeAnimationController
 
 public:
 	// Identifies controller by name. NOT the name of the clip
-	UPROPERTY(EditAnywhere, Category = "Clip Controller Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components", meta = (AllowPrivateAccess = "true"))
 		FString name;
 
+	// CLIP DATA BEGIN//
+	
 	// Index of clip to control in referenced pool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		int clipIndex;
@@ -30,6 +32,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
 		float clipParameter;
 
+	// CLIP DATA END //
+
+	// KEYFRAME DATA BEGIN //
+
 	// Index of current keyframe in referenced keyframe pool (clip references pool)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		int keyframeIndex;
@@ -41,6 +47,8 @@ public:
 	// Normalized keyframe time. Always between 0 and 1
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
 		float keyframeParameter;
+
+	// KEYFRAME DATA END //
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")

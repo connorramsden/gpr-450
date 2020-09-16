@@ -18,7 +18,7 @@ ATestingInterface::ATestingInterface()
 	// Initialize clip controllers
 	for (int i = 0; i < NUM_CONTROLLERS; ++i)
 	{
-		FString tempName = "Clip Controller";
+		FString tempName = "Clip Controller " + FString::FromInt(i);
 		clipControllerPool.Add(FKeyframeAnimationController(tempName, clipPool, 0));
 	}
 
@@ -50,6 +50,8 @@ void ATestingInterface::Tick(float DeltaTime)
 // Select current clip controller to edit
 void ATestingInterface::SetCurrentController(int newIndex)
 {
+	UE_LOG(LogTemp, Warning, TEXT("New Controller: %i"), newIndex);
+
 	// NOTE: Needs out of bounds error handling
 	currentController = clipControllerPool[newIndex];
 }
@@ -94,14 +96,14 @@ void ATestingInterface::SetCurrentClip(FString newClip)
 	int newClipIndex = currentController.clipPool.GetClipIndexInPool(newClip);
 
 	// Set current clip to the acquired index in current controller's pool
-	currentClip = currentController.clipPool.clipPool[newClipIndex];
+	currentClip = currentController.clipPool.pool[newClipIndex];
 }
 
 // Set time multiplier for Slow Motion
 void ATestingInterface::SetTimeMultiplier(float newMult)
 {
 	// Error handling for time multiplier
-	if (newMult > 0.0f && newMult <= 1.0f)
+	if (newMult > 0.0f && newMult <= 2.0f)
 	{
 		timeMult = newMult;
 	}

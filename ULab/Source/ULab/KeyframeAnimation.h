@@ -23,21 +23,21 @@ struct ULAB_API FKeyframe
 public:
 	// Index in pool of keyframes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		int keyframeIndex;
+		int index;
 	// Interval of time for which this keyframe is active. Cannot be zero
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Components")
-		float keyframeDuration;
+		float duration;
 	// Reciprocal of kDuration
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		float keyframeDurationInv;
+		float durationInv;
 	// Value of the sample described by a keyframe. Just an integer for example purposes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		int keyframeData;
+		int data;
 
 	// Default Contructor
 	FKeyframe();
 	// Initialize a keyframe
-	FKeyframe(const float duration, const int value_x);
+	FKeyframe(const float newDuration, const int value_x);
 	// Release a keyframe
 	~FKeyframe();
 };
@@ -49,11 +49,11 @@ struct ULAB_API FKeyframePool
 public:
 	// Array of all keyframes in the pool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Pool Components")
-		TArray<FKeyframe> keyframePool;
+		TArray<FKeyframe> pool;
 
 	// Number of keyframes in the pool
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Pool Components")
-		int keyframePoolCount;
+		int poolCount = -1;
 
 	// Default KPool Constructor
 	FKeyframePool();
@@ -70,21 +70,20 @@ struct ULAB_API FClip
 
 public:
 	// Identifies the clip
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Components")
-		FString clipName;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Components", meta = (AllowPrivateAccess = "true"))
+		FString name;
 	// Index in clip pool
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		int clipIndex;
+		int index;
 	// Duration of the clip; can be calculated as sum of all referenced keyframes or set first & distribute. Cannot be 0
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		float clipDuration;
+		float duration;
 	// Inverse of clipDuration
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		float clipDurationInv;
+		float durationInv;
 	// Number of keyframes referenced by clip
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		int keyframeCount;
+		int count;
 	// index of first keyframe in pool ref'd by clip
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
 		int firstKeyframe;
@@ -115,16 +114,16 @@ struct ULAB_API FClipPool
 public:
 	// Array of Clips
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Pool Components")
-		TArray<FClip> clipPool;
+		TArray<FClip> pool;
 
 	// Number of Clips in the Pool
 	UPROPERTY(EditAnywhere, Category = "Clip Pool Components")
-		int clipCount = 0;
+		int count = 0;
 
 	// Default ClipPool Constructor
 	FClipPool();
 	// Allocate Clip Pool
-	FClipPool(const int count);
+	FClipPool(const int newCount);
 	// Release Clip Pool
 	~FClipPool();
 

@@ -52,52 +52,11 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	* Case 07: Forward Terminus (playhead passes clip end)
 	*/
 
-	// Case 01
-	if (clipTime < 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("REVERSE TERMINUS"));
-	}
-
-	// Case 02
-	//if (keyframeTime <= clipPool.clipPool[keyframeIndex].firstKeyframe)
-	//{
-	//	// Decrement keyframe index
-	//	keyframeIndex--;
-	//}
-
-	// Case 03
-	if (currPlaybackDir == -1)
-	{
-		// t += -dt
-		keyframeTime += -DeltaTime;
-	}
-
-	// Case 04
-	if (currPlaybackDir == 0)
-	{
-		// Playhead stays put
-		keyframeTime += 0;
-	}
-
-	// Case 05
-	if (currPlaybackDir == 1)
-	{
-		// t += +dt
-		keyframeTime += DeltaTime;
-	}
-
-	// Case 06
-	// If keyframe time exceeds final keyframe, proceed to next clip
-	//if (keyframeTime >= clipPool.clipPool[keyframeIndex].lastKeyframe)
-	//{
-	//	// Increment keyframe index
-	//	keyframeIndex++;
-	//}
-
-	// Case 07
-	// if (clipTime >= clipPool.clipPool[clipIndex].clipDuration)
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("Forward Terminus Reached!"))
-	// }
+	// Dan's notes from grading:
+	// WHILE is important. Need a resolution loop (& resolution variable?)
+	// 1. Check play direction: forward (3 sub-cases), reverse (3 sub-cases), paused (1)
+	// 2. Check possible cases for each play dir. 
+	//		-> fwdrev: same interval in [0,  d);
+	//		-> surpassed interval in either (-inf, 0), or [d, inf); terminus
 }
 
