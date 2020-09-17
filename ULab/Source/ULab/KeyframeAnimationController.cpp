@@ -6,6 +6,8 @@
 // Sets default values
 FKeyframeAnimationController::FKeyframeAnimationController()
 {
+	// UE_LOG(LogTemp, Warning, TEXT("Clip Controller Constructor"));
+
 	// Set default controller name
 	name = "Clip Controller";
 
@@ -41,6 +43,8 @@ FKeyframeAnimationController::FKeyframeAnimationController()
 // Set starting clip, keyframe and state
 FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Clip Controller Constructor"));
+
 	// Set controller name
 	name = ctrlName;
 
@@ -120,7 +124,6 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Playback is REVERSE for %s"), *name);
 				break;
-
 			}
 			// Evaulate Paused
 			case(0):

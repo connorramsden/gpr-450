@@ -38,9 +38,8 @@ class ULAB_API ATestingInterface : public AActor
 	// The current clip the user is controlling
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
 		FClip currentClip;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
-		int currentControllerIndex = -1;
+	
+	int currentControllerIndex = -1;
 
 	protected:
 	// Called when the game starts or when spawned
@@ -66,12 +65,9 @@ class ULAB_API ATestingInterface : public AActor
 
 	// TIME CONTROL END
 
-	void SetCurrentController();
-
 	// Select current clip controller to edit
 	UFUNCTION(BlueprintCallable)
 		void SetCurrentController(int newIndex);
-
 
 	// Select current clip to control
 	UFUNCTION(BlueprintCallable)
@@ -81,4 +77,6 @@ class ULAB_API ATestingInterface : public AActor
 		FORCEINLINE int GetNumControllers() const { return NUM_CONTROLLERS; }
 	UFUNCTION(BlueprintCallable)
 		FORCEINLINE float GetTimeMult() const { return timeMult; }
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE FKeyframeAnimationController & GetCurrentController() { return clipControllerPool[currentControllerIndex]; }
 };

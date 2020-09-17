@@ -46,10 +46,6 @@ void ATestingInterface::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Re-set current controller (this sucks but it doesn't really work without this)
-	// If I don't do this, currentController exists only as a snapshot
-	SetCurrentController();
-
 	// Create a custom DeltaTime utilizing time multiplier
 	float customDeltaTime = timeMult * DeltaTime;
 	
@@ -60,24 +56,12 @@ void ATestingInterface::Tick(float DeltaTime)
 	}
 }
 
-void ATestingInterface::SetCurrentController()
-{
-	// NOTE: Needs out of bounds error handling
-	// currentController = clipControllerPool[currentControllerIndex];
-	// 
-	// // Acquire current controller's current clip
-	// int tempClipIndex = currentController.clipIndex;
-	// 
-	// // Update current clip to current controller's current clip
-	// currentClip = currentController.clipPool.pool[tempClipIndex];
-}
-
 // Select current clip controller to edit
 void ATestingInterface::SetCurrentController(int newIndex)
 {
 	currentControllerIndex = newIndex;
 
-	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+	FKeyframeAnimationController currCtrl = GetCurrentController();
 
 	int tempClipIndex = currCtrl.clipIndex;
 	currentClip = currCtrl.clipPool.pool[tempClipIndex];
@@ -86,7 +70,7 @@ void ATestingInterface::SetCurrentController(int newIndex)
 // Play / Pause / Change Direction of Controller Playback
 void ATestingInterface::SetControllerPlayback(int newPlaybackState)
 {
-	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+	FKeyframeAnimationController currCtrl = GetCurrentController();
 
 	// Error handling for new playback state
 	if (newPlaybackState < -1 || newPlaybackState > 1)
@@ -104,7 +88,7 @@ void ATestingInterface::SetControllerPlayback(int newPlaybackState)
 // Toggle Play/Pause State of Current Controller
 void ATestingInterface::TogglePlayPause()
 {
-	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+	FKeyframeAnimationController currCtrl = GetCurrentController();
 
 	// If the playback state is NOT paused
 	if (currCtrl.currPlaybackDir != 0)
@@ -123,7 +107,7 @@ void ATestingInterface::TogglePlayPause()
 // Select current clip to control
 void ATestingInterface::SetCurrentClip(FString newClip)
 {
-	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+	FKeyframeAnimationController currCtrl = GetCurrentController();
 
 	// Acquire index of the new controlled clip
 	int newClipIndex = currCtrl.clipPool.GetClipIndexInPool(newClip);
