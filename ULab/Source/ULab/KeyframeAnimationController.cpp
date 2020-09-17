@@ -32,6 +32,10 @@ FKeyframeAnimationController::FKeyframeAnimationController()
 
 	// INIT KEYFRAME DATA END //
 
+	// Init Current Playback Direction to Paused
+	currPlaybackDir = 0;
+	// Init Previous Playback Direction to Forward
+	prevPlaybackDir = 1;
 }
 
 // Set starting clip, keyframe and state
@@ -61,6 +65,11 @@ FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FCl
 	keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
 
 	// INIT KEYFRAME DATA END //
+
+	// Init Current Playback Direction to Paused
+	currPlaybackDir = 0;
+	// Init Previous Playback Direction to Forward
+	prevPlaybackDir = 1;
 }
 
 // Called every frame (Basically Unity Update)
@@ -100,25 +109,31 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	//		-> fwdrev: same interval in [0,  d);
 	//		-> surpassed interval in either (-inf, 0), or [d, inf); terminus
 
-	UE_LOG(LogTemp, Warning, TEXT("Current playback dir: %i"), currPlaybackDir);
-
 	// Loop while unresolved
-	while (!bIsResolved)
+	while (bIsResolved == false)
 	{
 		// Evaluate playback direction
 		switch (currPlaybackDir)
 		{
 			// Evaluate Reverse
-		case(-1):
-			UE_LOG(LogTemp, Warning, TEXT("Playback is REVERSE"));
-			break;
+			case(-1):
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Playback is REVERSE for %s"), *name);
+				break;
+
+			}
 			// Evaulate Paused
-		case(0):
-			UE_LOG(LogTemp, Warning, TEXT("Playback is PAUSED"));
-			break;
-		case(1):
-			UE_LOG(LogTemp, Warning, TEXT("Playback is FORWARD"));
-			break;
+			case(0):
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Playback is PAUSED for %s"), *name);
+				break;
+			}
+			// Evaluate Forward
+			case(1):
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Playback is FORWARD for %s"), *name);
+				break;
+			}
 		}
 
 		// TEMP, MARK AS RESOLVED

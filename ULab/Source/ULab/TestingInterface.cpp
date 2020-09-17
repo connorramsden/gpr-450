@@ -18,8 +18,17 @@ ATestingInterface::ATestingInterface()
 	// Initialize clip controllers
 	for (int i = 0; i < NUM_CONTROLLERS; ++i)
 	{
+		// Set up clip controller's name with index
 		FString tempName = "Clip Controller " + FString::FromInt(i);
-		clipControllerPool.Add(FKeyframeAnimationController(tempName, clipPool, 0));
+
+		// Set up the clip to control at random (0 and max clip pool count)
+		int clipToControl = FMath::RandRange(0, clipPool.count - 1);
+
+		// Initialize a temporary Clip Controller
+		FKeyframeAnimationController tempController = FKeyframeAnimationController(tempName, clipPool, clipToControl);
+
+		// Add the controller to the pool
+		clipControllerPool.Add(tempController);
 	}
 
 	// Set default controller to first controller
@@ -37,9 +46,13 @@ void ATestingInterface::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Re-set current controller (this sucks but it doesn't really work without this)
+	// If I don't do this, currentController exists only as a snapshot
+	SetCurrentController();
+
 	// Create a custom DeltaTime utilizing time multiplier
 	float customDeltaTime = timeMult * DeltaTime;
-
+	
 	// Update all Clip Controllers in parallel
 	for (int i = 0; i < NUM_CONTROLLERS; ++i)
 	{
@@ -47,22 +60,34 @@ void ATestingInterface::Tick(float DeltaTime)
 	}
 }
 
+void ATestingInterface::SetCurrentController()
+{
+	// NOTE: Needs out of bounds error handling
+	// currentController = clipControllerPool[currentControllerIndex];
+	// 
+	// // Acquire current controller's current clip
+	// int tempClipIndex = currentController.clipIndex;
+	// 
+	// // Update current clip to current controller's current clip
+	// currentClip = currentController.clipPool.pool[tempClipIndex];
+}
+
 // Select current clip controller to edit
 void ATestingInterface::SetCurrentController(int newIndex)
 {
-	// NOTE: Needs out of bounds error handling
-	currentController = clipControllerPool[newIndex];
+	currentControllerIndex = newIndex;
 
-	// Acquire current controller's current clip
-	int tempClipIndex = currentController.clipIndex;
+	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
 
-	// Update current clip to current controller's current clip
-	currentClip = currentController.clipPool.pool[tempClipIndex];
+	int tempClipIndex = currCtrl.clipIndex;
+	currentClip = currCtrl.clipPool.pool[tempClipIndex];
 }
 
 // Play / Pause / Change Direction of Controller Playback
 void ATestingInterface::SetControllerPlayback(int newPlaybackState)
 {
+	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+
 	// Error handling for new playback state
 	if (newPlaybackState < -1 || newPlaybackState > 1)
 	{
@@ -70,17 +95,19 @@ void ATestingInterface::SetControllerPlayback(int newPlaybackState)
 	}
 
 	// Set previous direction to current direction
-	currentController.prevPlaybackDir = currentController.currPlaybackDir;
+	currCtrl.prevPlaybackDir = currCtrl.currPlaybackDir;
 
 	// Set current direction to new direction
-	currentController.currPlaybackDir = newPlaybackState;
+	currCtrl.currPlaybackDir = newPlaybackState;
 }
 
 // Toggle Play/Pause State of Current Controller
 void ATestingInterface::TogglePlayPause()
 {
+	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+
 	// If the playback state is NOT paused
-	if (currentController.currPlaybackDir != 0)
+	if (currCtrl.currPlaybackDir != 0)
 	{
 		// Set playback state to paused. Updates prev & curr dir.
 		SetControllerPlayback(0);
@@ -89,18 +116,20 @@ void ATestingInterface::TogglePlayPause()
 	else
 	{
 		// Set playback dir to previous direction (forward / backwards, etc.)
-		SetControllerPlayback(currentController.prevPlaybackDir);
+		SetControllerPlayback(currCtrl.prevPlaybackDir);
 	}
 }
 
 // Select current clip to control
 void ATestingInterface::SetCurrentClip(FString newClip)
 {
+	FKeyframeAnimationController currCtrl = clipControllerPool[currentControllerIndex];
+
 	// Acquire index of the new controlled clip
-	int newClipIndex = currentController.clipPool.GetClipIndexInPool(newClip);
+	int newClipIndex = currCtrl.clipPool.GetClipIndexInPool(newClip);
 
 	// Set current clip to the acquired index in current controller's pool
-	currentClip = currentController.clipPool.pool[newClipIndex];
+	currentClip = currCtrl.clipPool.pool[newClipIndex];
 }
 
 // Set time multiplier for Slow Motion

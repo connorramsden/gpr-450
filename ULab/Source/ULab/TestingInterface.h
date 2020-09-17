@@ -13,7 +13,7 @@ UCLASS(BlueprintType)
 class ULAB_API ATestingInterface : public AActor
 {
 	GENERATED_BODY()
-protected:
+	protected:
 	const int NUM_KFPOOL = 20;
 	const int NUM_CLIPPOOL = 5;
 	const int NUM_CONTROLLERS = 3;
@@ -21,7 +21,7 @@ protected:
 	// Init timeMult to default value
 	float timeMult = 1.0f;
 
-public:
+	public:
 	// Sets default values for this actor's properties
 	ATestingInterface();
 
@@ -35,19 +35,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
 		TArray<FKeyframeAnimationController> clipControllerPool;
 
-	// The current controller the user is editing
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
-		FKeyframeAnimationController currentController;
-
 	// The current clip the user is controlling
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
 		FClip currentClip;
 
-protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
+		int currentControllerIndex = -1;
+
+	protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
+	public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -67,9 +66,12 @@ public:
 
 	// TIME CONTROL END
 
+	void SetCurrentController();
+
 	// Select current clip controller to edit
 	UFUNCTION(BlueprintCallable)
 		void SetCurrentController(int newIndex);
+
 
 	// Select current clip to control
 	UFUNCTION(BlueprintCallable)

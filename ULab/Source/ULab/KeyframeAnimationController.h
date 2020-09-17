@@ -19,7 +19,7 @@ public:
 		FString name;
 
 	// CLIP DATA BEGIN//
-	
+
 	// Index of clip to control in referenced pool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		int clipIndex;
@@ -52,14 +52,14 @@ public:
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		int currPlaybackDir = 0;
+		int currPlaybackDir;
 
 	// Previous behavior of playback. Defaults to 1 (Forward Play)
-	int prevPlaybackDir = 1;
+	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
+	int prevPlaybackDir;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		FClipPool clipPool;
-
 protected:
 	bool bIsResolved = false;
 
