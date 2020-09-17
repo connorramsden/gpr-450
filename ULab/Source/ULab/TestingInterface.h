@@ -18,7 +18,8 @@ protected:
 	const int NUM_CLIPPOOL = 5;
 	const int NUM_CONTROLLERS = 3;
 
-	float timeMult;
+	// Init timeMult to default value
+	float timeMult = 1.0f;
 
 public:
 	// Sets default values for this actor's properties

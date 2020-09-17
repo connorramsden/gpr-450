@@ -116,6 +116,9 @@ FClip::FClip()
 	// Last index should be 19 (since we have 20 keyframes in a default init)
 	lastKeyframe = 19;
 
+	// Init duration to 0
+	duration = 0;
+
 	// Calculate Duration based on keyframePool
 	CalculateDuration();
 
@@ -135,6 +138,9 @@ FClip::FClip(FString newClipName, const FKeyframePool newPool, const int firstKe
 	firstKeyframe = firstKeyframeIndex;
 	// Set last KF index
 	lastKeyframe = finalKeyframeIndex;
+
+	// Init duration to 0
+	duration = 0;
 
 	// Calculate Duration based on keyframePool
 	CalculateDuration();
@@ -185,7 +191,21 @@ void FClip::DistributeDuration(const float newClipDuration)
 
 // Default Clip Pool Constructor
 FClipPool::FClipPool()
-{}
+{
+	// Assumes default initialization size is 5 clips
+	for (int i = 0; i < 5; ++i)
+	{
+		count++;
+
+		FClip tempClip = FClip();
+		tempClip.index = count;
+		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
+
+		pool.Add(tempClip);
+	}
+
+	return;
+}
 
 // Specialized Clip Pool Constructor
 FClipPool::FClipPool(const int newCount)

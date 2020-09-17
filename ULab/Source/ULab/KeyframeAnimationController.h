@@ -52,7 +52,7 @@ public:
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		int currPlaybackDir;
+		int currPlaybackDir = 0;
 
 	// Previous behavior of playback. Defaults to 1 (Forward Play)
 	int prevPlaybackDir = 1;

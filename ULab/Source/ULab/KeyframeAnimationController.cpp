@@ -8,10 +8,30 @@ FKeyframeAnimationController::FKeyframeAnimationController()
 {
 	// Set default controller name
 	name = "Clip Controller";
+
+	// INIT CLIP DATA BEGIN //
+
 	// Initialize default Clip Pool
 	clipPool = FClipPool();
 	// Set default index to 0
 	clipIndex = 0;
+	// Initialize clip time to 0
+	clipTime = 0;
+
+	// Initialize clip parameter (normalized keyframe time)
+	clipParameter = clipTime / clipPool.pool[clipIndex].duration;
+
+	// INIT CLIP DATA END //
+
+	// INIT KEYFRAME DATA BEGIN //
+
+	// Initialize to first keyframe of current clip pool
+	keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
+	keyframeTime = 0;
+	keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+
+	// INIT KEYFRAME DATA END //
+
 }
 
 // Set starting clip, keyframe and state
@@ -19,10 +39,28 @@ FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FCl
 {
 	// Set controller name
 	name = ctrlName;
+
+	// INIT CLIP DATA BEGIN //
+
 	// Set clip pool
 	clipPool = newPool;
 	// Set default clip index
 	clipIndex = clipPoolIndex;
+	// Initialize clip time to 0
+	clipTime = 0;
+	// Initialize clip parameter (normalized keyframe time)
+	clipParameter = clipTime / clipPool.pool[clipIndex].duration;
+
+	// INIT CLIP DATA END //
+
+	// INIT KEYFRAME DATA BEGIN //
+
+	// Initialize to first keyframe of current clip pool
+	keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
+	keyframeTime = 0;
+	keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+
+	// INIT KEYFRAME DATA END //
 }
 
 // Called every frame (Basically Unity Update)
@@ -35,8 +73,8 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	* Utilizes numerical integration for time itself
 	*/
 
-	// keyframeTime += DeltaTime;
-	// clipTime += DeltaTime;
+	keyframeTime += DeltaTime;
+	clipTime += DeltaTime;
 
 	// Reset is resolved to false
 	bIsResolved = false;
@@ -62,9 +100,29 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	//		-> fwdrev: same interval in [0,  d);
 	//		-> surpassed interval in either (-inf, 0), or [d, inf); terminus
 
+	UE_LOG(LogTemp, Warning, TEXT("Current playback dir: %i"), currPlaybackDir);
+
 	// Loop while unresolved
-	// while (!bIsResolved)
-	// {
-	// }
+	while (!bIsResolved)
+	{
+		// Evaluate playback direction
+		switch (currPlaybackDir)
+		{
+			// Evaluate Reverse
+		case(-1):
+			UE_LOG(LogTemp, Warning, TEXT("Playback is REVERSE"));
+			break;
+			// Evaulate Paused
+		case(0):
+			UE_LOG(LogTemp, Warning, TEXT("Playback is PAUSED"));
+			break;
+		case(1):
+			UE_LOG(LogTemp, Warning, TEXT("Playback is FORWARD"));
+			break;
+		}
+
+		// TEMP, MARK AS RESOLVED
+		bIsResolved = true;
+	}
 }
 
