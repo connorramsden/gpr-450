@@ -43,8 +43,6 @@ FKeyframeAnimationController::FKeyframeAnimationController()
 // Set starting clip, keyframe and state
 FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Clip Controller Constructor"));
-
 	// Set controller name
 	name = ctrlName;
 
@@ -79,6 +77,13 @@ FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FCl
 // Called every frame (Basically Unity Update)
 void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 {
+	// Check our pause case first. Exit if paused.
+	if (currPlaybackDir == 0)
+		return;
+
+	// Adjust time step by playback direction
+	DeltaTime *= currPlaybackDir;
+
 	/* Step 01: Pre-resolution
 	* Apply time step
 	* One-time, single line of code, applied twice
@@ -89,8 +94,9 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	keyframeTime += DeltaTime;
 	clipTime += DeltaTime;
 
-	// Reset is resolved to false
-	bIsResolved = false;
+	// Acquire current clip for case evaluations
+	FClip currClip = GetCurrentClip();
+	FKeyframe currKeyframe = GetCurrentKeyframe();
 
 	/* Step 02: Resolve time
 	* While unresolved, continue to use playback behaviour to determine the NEW keyframe time & clip time
@@ -106,55 +112,61 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	* Case 07: Forward Terminus (playhead passes clip end)
 	*/
 
-	// Dan's notes from grading:
-	// WHILE is important. Need a resolution loop (& resolution variable?)
-	// 1. Check play direction: forward (3 sub-cases), reverse (3 sub-cases), paused (1)
-	// 2. Check possible cases for each play dir. 
-	//		-> fwdrev: same interval in [0,  d);
-	//		-> surpassed interval in either (-inf, 0), or [d, inf); terminus
-
-	// Loop while unresolved
-	while (bIsResolved == false)
+	// Check play direction
+	switch (currPlaybackDir)
 	{
-		// Evaluate playback direction
-		switch (currPlaybackDir)
+		// Evaluate Reverse (Three Cases)
+		case(-1):
 		{
-			// Evaluate Reverse (Three Cases)
-			case(-1):
+			// Reverse Skip
+			if (keyframeTime < 0)
 			{
-				// Reversing by delta time
-				if (keyframeTime > GetKeyframeDuration())
+				// Decrement the keyframe index (return to previous keyframe)
+				keyframeIndex--;
+
+				// Check if KFIndex has gone below current clip's set of keyframes
+				if (keyframeIndex < currClip.firstKeyframe)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("True Reverse"));
-					keyframeTime -= DeltaTime;
-					clipTime -= DeltaTime;
-					// Mark as resolved
-					bIsResolved = true;
-				}
-				else if (keyframeTime <= GetKeyframeDuration())
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Reverse Skip"));
+					// Set current keyframe to last keyframe
+					keyframeIndex = currClip.lastKeyframe;
+					// Set clip time to duration + parameter
+					clipTime = currClip.duration + keyframeParameter;
 				}
 
-				break;
+				// Set keyframe time to the top of the pool
+				keyframeTime = currKeyframe.duration + keyframeParameter;
 			}
-			// Evaulate Paused (One Case)
-			case(0):
-			{
-				keyframeTime += 0.0f;
-				clipTime += 0.0f;
 
-				bIsResolved = true;
-				break;
-			}
-			// Evaluate Forward (Three Cases)s
-			case(1):
+			break;
+		}
+		// Evaluate Forward (Three Cases)
+		case(1):
+		{
+			// Check if keyframe time exceeds keyframe duration
+			if (keyframeTime > currClip.duration)
 			{
-				// Temp resolve
-				bIsResolved = true;
-				break;
+				// Increment the keyframe index (move to next keyframe)
+				keyframeIndex++;
+
+				// Flip keyframe time over to the next keyframe
+				keyframeTime -= currClip.duration;
+
+				// Forward Terminus (keyframe index exceeds last clip
+				if (keyframeIndex > currClip.lastKeyframe)
+				{
+					// Move back to the first clip
+					keyframeIndex = currClip.firstKeyframe;
+					// reset clip time to start of keyframe time
+					clipTime = keyframeTime;
+				}
 			}
+
+			break;
 		}
 	}
+
+	// Establish parameters without clamping. Similar to calculating inverse / normals
+	clipParameter = clipTime / currClip.duration;
+	keyframeParameter = keyframeTime / currKeyframe.duration;
 }
 

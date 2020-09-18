@@ -24,11 +24,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		int clipIndex;
 
-	// Current time relative to start of clip. Between 0 and current clip's duration
+	// Current time relative to start of clip. Between [0, current clip's duration)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		float clipTime;
 
-	// Normalized keyframe time. Should always be between 0 and 1
+	// Normalized keyframe time. Should always be between [0, 1)
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
 		float clipParameter;
 
@@ -40,11 +40,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		int keyframeIndex;
 
-	// Current time relative to current keyframe; always between 0 and current keyframe duration
+	// Current time relative to current keyframe; always between [0, current keyframe duration)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		float keyframeTime;
 
-	// Normalized keyframe time. Always between 0 and 1
+	// Normalized keyframe time. Always between [0, 1)
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
 		float keyframeParameter;
 
@@ -58,6 +58,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
 	int prevPlaybackDir;
 
+	// The pool of clips that this Controller controls
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
 		FClipPool clipPool;
 protected:
@@ -65,9 +66,12 @@ protected:
 
 private:
 	// Return the current clip from the clip pool
-	FORCEINLINE FClip GetCurrentClip() const { return clipPool.pool[clipIndex]; }
+	FORCEINLINE FClip & GetCurrentClip() { return clipPool.pool[clipIndex]; }
+	// Return the current Keyframe referenced by the current Clip
+	FORCEINLINE FKeyframe & GetCurrentKeyframe() { return GetCurrentClip().keyframePool.pool[keyframeIndex]; }
+	// FORCEINLINE FKeyframe SetCurrentKeyframe(FKeyframe & newFrame) {GetCurrentClip().keyra }
 	// Return the current keyframe's duration
-	FORCEINLINE float GetKeyframeDuration() const { return GetCurrentClip().keyframePool.pool[keyframeIndex].duration; }
+	FORCEINLINE float GetKeyframeDuration() { return GetCurrentKeyframe().duration; }
 
 public:
 	// Sets default values for this actor's properties
