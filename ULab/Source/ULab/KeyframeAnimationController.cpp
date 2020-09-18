@@ -20,20 +20,22 @@ FKeyframeAnimationController::FKeyframeAnimationController()
 	// Initialize clip time to 0
 	clipTime = 0;
 
-	// Initialize clip parameter (normalized keyframe time)
-	clipParameter = clipTime / clipPool.pool[clipIndex].duration;
+	if (clipPool.pool.Num() > 0)
+	{
+		// Initialize clip parameter (normalized keyframe time)
+		clipParameter = clipTime / clipPool.pool[clipIndex].duration;
 
-	// INIT CLIP DATA END //
+		// INIT CLIP DATA END //
 
-	// INIT KEYFRAME DATA BEGIN //
+		// INIT KEYFRAME DATA BEGIN //
 
-	// Initialize to first keyframe of current clip pool
-	keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
-	keyframeTime = 0;
-	keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+		// Initialize to first keyframe of current clip pool
+		keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
+		keyframeTime = 0;
+		keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
 
-	// INIT KEYFRAME DATA END //
-
+		// INIT KEYFRAME DATA END //
+	}
 	// Init Current Playback Direction to Paused
 	currPlaybackDir = 0;
 	// Init Previous Playback Direction to Forward
@@ -54,18 +56,22 @@ FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FCl
 	clipIndex = clipPoolIndex;
 	// Initialize clip time to 0
 	clipTime = 0;
-	// Initialize clip parameter (normalized keyframe time)
-	clipParameter = clipTime / clipPool.pool[clipIndex].duration;
 
-	// INIT CLIP DATA END //
+	if (clipPool.pool.Num() >= 0)
+	{
+		// Initialize clip parameter (normalized keyframe time)
+		clipParameter = clipTime / clipPool.pool[clipIndex].duration;
 
-	// INIT KEYFRAME DATA BEGIN //
 
-	// Initialize to first keyframe of current clip pool
-	keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
-	keyframeTime = 0;
-	keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+		// INIT CLIP DATA END //
 
+		// INIT KEYFRAME DATA BEGIN //
+
+		// Initialize to first keyframe of current clip pool
+		keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
+		keyframeTime = 0;
+		keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+	}
 	// INIT KEYFRAME DATA END //
 
 	// Init Current Playback Direction to Paused

@@ -9,10 +9,9 @@ ATestingInterface::ATestingInterface()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Initialize a new pool of keyframes. Count should pull from UI elements.
 	keyframePool = FKeyframePool(NUM_KFPOOL);
 
-	// Initialize a new pool of clips. Count should pull from UI elements.
+	// Temp clip pool
 	clipPool = FClipPool(NUM_CLIPPOOL);
 
 	// Initialize clip controllers
@@ -30,15 +29,40 @@ ATestingInterface::ATestingInterface()
 		// Add the controller to the pool
 		clipControllerPool.Add(tempController);
 	}
+}
 
-	// Set default controller to first controller
-	SetCurrentController(0);
+ATestingInterface::~ATestingInterface()
+{
 }
 
 // Called when the game starts or when spawned
 void ATestingInterface::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// Acquire attached data handler
+	dataHandler = this->FindComponentByClass<UDataHandler>();
+
+	TArray<FClipInstruction> tempInstructions = dataHandler->instructions;
+
+	// Iterate through data handlers instructions and initialize clips
+	for (int i = 0; i < tempInstructions.Num(); ++i)
+	{
+		FString tempName = tempInstructions[i].clipName;
+		float tempDuration = tempInstructions[i].clipDuration;
+		int tempFrame0 = tempInstructions[i].firstFrame;
+		int tempFrame1 = tempInstructions[i].lastFrame;
+		// we'll handle transitions later
+		
+		// Initialize a new clip from clip instruction
+		FClip tempClip = FClip(tempName, FKeyframePool(tempFrame1), tempFrame0, tempFrame1);
+
+		// Add clip to clip pool
+		clipPool.pool.Add(tempClip);
+	}
+
+	// Set default controller to first controller
+	SetCurrentController(0);
 }
 
 // Called every frame

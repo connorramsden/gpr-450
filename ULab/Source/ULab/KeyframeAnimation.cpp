@@ -196,11 +196,11 @@ FClipPool::FClipPool()
 	for (int i = 0; i < 5; ++i)
 	{
 		count++;
-
+	
 		FClip tempClip = FClip();
 		tempClip.index = count;
 		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
-
+	
 		pool.Add(tempClip);
 	}
 

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "KeyframeAnimation.h"
 #include "KeyframeAnimationController.h"
+#include "DataHandler.h"
 
 #include "TestingInterface.generated.h"
 
@@ -24,6 +25,7 @@ class ULAB_API ATestingInterface : public AActor
 	public:
 	// Sets default values for this actor's properties
 	ATestingInterface();
+	~ATestingInterface();
 
 	// The testing interface's Keyframe Pool (20+ keyframes!)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components", meta = (AllowPrivateAccess = "true"))
@@ -38,6 +40,9 @@ class ULAB_API ATestingInterface : public AActor
 	// The current clip the user is controlling
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Testing Interface Components")
 		FClip currentClip;
+
+	// Data Handler Child Object
+	UDataHandler * dataHandler;
 	
 	int currentControllerIndex = -1;
 
