@@ -5,44 +5,42 @@
 #include <Math/UnrealMath.h>
 
 KeyframeAnimation::KeyframeAnimation()
-{
-}
+{}
 
 KeyframeAnimation::~KeyframeAnimation()
-{
-}
+{}
 
 ///////////// KEYFRAME START /////////////
 
 // Default Constructor
 FKeyframe::FKeyframe()
 {
+	// index initialized in the Keyframe Pool
+
 	// Arbitrary duration between 1 and 10 ticks
-	keyframeDuration = FMath::RandRange(1.0f, 10.0f);
+	duration = FMath::RandRange(1.0f, 10.0f);
 	// Calculate duration inverse
-	keyframeDurationInv = 1.0f / keyframeDuration;
+	durationInv = 1.0f / duration;
 	// Randomly select 'Data' (Will be more concrete in future update)
-	keyframeData = FMath::Rand();
+	data = FMath::Rand();
 }
 
 // Initialize a keyframe
-FKeyframe::FKeyframe(const float duration, const int value_x)
+FKeyframe::FKeyframe(const float newDuration, const int value_x)
 {
 	// Set duration
-	keyframeDuration = duration;
+	duration = newDuration;
 	// Calculate duration inverse
-	keyframeDurationInv = 1.0f / duration;
+	durationInv = 1.0f / duration;
 	// Set Data value (Will not be integer in future update)
-	keyframeData = value_x;
+	data = value_x;
 
 	return;
 }
 
 // Default Deconstructor
 FKeyframe::~FKeyframe()
-{
-	// Do I need anything here? No pointers.
-}
+{}
 
 ///////////// KEYFRAME END /////////////
 
@@ -51,21 +49,19 @@ FKeyframe::~FKeyframe()
 // Default KPool Constructor
 FKeyframePool::FKeyframePool()
 {
-	// Default initialization to 20
+	// Default initialization to 20 Keyframes
 	for (int i = 0; i < 20; ++i)
 	{
 		// Increment keyframe pool count
-		keyframePoolCount++;
+		poolCount++;
 
 		// Assign a temporary keyframe a duration between 1 and 10, and a random piece of 'data'
 		FKeyframe tempFrame = FKeyframe(FMath::RandRange(1.0f, 10.0f), FMath::Rand());
 		// Set the temporary keyframe's index to the current keyframe count
-		tempFrame.keyframeIndex = keyframePoolCount;
+		tempFrame.index = poolCount;
 
 		// Add the temporary keyframe to the pool
-		keyframePool.Add(tempFrame);
-
-		// Do I need to clean up temp frame? It is not a pointer...
+		pool.Add(tempFrame);
 	}
 
 	return;
@@ -73,22 +69,20 @@ FKeyframePool::FKeyframePool()
 
 // Allocate Keyframe Pool
 FKeyframePool::FKeyframePool(const int count)
-{	
+{
 	// Allocate array of keyframes (not sure if this function works. Might have to initialize manually)
 	for (int i = 0; i < count; ++i)
 	{
 		// Increment keyframe pool count
-		keyframePoolCount++;
+		poolCount++;
 
 		// Assign a temporary keyframe a duration between 1 and 10, and a random piece of 'data'
 		FKeyframe tempFrame = FKeyframe(FMath::RandRange(1.0f, 10.0f), FMath::Rand());
 		// Set the temporary keyframe's index to the current keyframe count
-		tempFrame.keyframeIndex = keyframePoolCount;
+		tempFrame.index = poolCount;
 
 		// Add the temporary keyframe to the pool
-		keyframePool.Add(tempFrame);
-
-		// Do I need to clean up temp frame? It is not a pointer...
+		pool.Add(tempFrame);
 	}
 
 	return;
@@ -97,7 +91,7 @@ FKeyframePool::FKeyframePool(const int count)
 // Release keyframe pool
 FKeyframePool::~FKeyframePool()
 {
-	// Do I have anything to deconstruct? Might need to free pool memory?
+	// Need to de-allocate array
 }
 
 ///////////// KEYFRAME POOL END /////////////
@@ -108,16 +102,25 @@ FKeyframePool::~FKeyframePool()
 FClip::FClip()
 {
 	// Set default clip name
-	clipName = "New Clip";
+	name = "New Clip";
 
 	// Initialize default keyframe pool (NOTE: Might not work the way I want it to!)
 	keyframePool = FKeyframePool();
+
+	// Set count
+	count = keyframePool.poolCount;
 
 	// NOTE: Might need to fix these default values, we'll see
 	// Set first keyframe index to 0
 	firstKeyframe = 0;
 	// Last index should be 19 (since we have 20 keyframes in a default init)
 	lastKeyframe = 19;
+
+	// Init duration to 0
+	duration = 0;
+
+	// Calculate Duration based on keyframePool
+	CalculateDuration();
 
 	return;
 }
@@ -126,32 +129,39 @@ FClip::FClip()
 FClip::FClip(FString newClipName, const FKeyframePool newPool, const int firstKeyframeIndex, const int finalKeyframeIndex)
 {
 	// Set name
-	clipName = newClipName;
+	name = newClipName;
 	// Set referenced keyframe pool
 	keyframePool = newPool;
+	// Set count
+	count = keyframePool.poolCount;
 	// Set first KF index
 	firstKeyframe = firstKeyframeIndex;
 	// Set last KF index
 	lastKeyframe = finalKeyframeIndex;
 
+	// Init duration to 0
+	duration = 0;
+
+	// Calculate Duration based on keyframePool
+	CalculateDuration();
+
 	return;
 }
 
 FClip::~FClip()
-{
-	// Do I need to deallocate anything from the Clip?
-}
+{}
 
 // Calculate clip duration as sum of keyframes' durations
 void FClip::CalculateDuration()
 {
 	// Sum the duration of all keyframes to calculate clip duration
-	for (int i = 0; i < keyframePool.keyframePoolCount; ++i) {
-		clipDuration += keyframePool.keyframePool[i].keyframeDuration;
+	for (int i = 0; i < keyframePool.poolCount; ++i)
+	{
+		duration += keyframePool.pool[i].duration;
 	}
 
 	// Calculate clip duration inverse
-	clipDurationInv = 1.0f / clipDuration;
+	durationInv = 1.0f / duration;
 
 	return;
 }
@@ -160,14 +170,15 @@ void FClip::CalculateDuration()
 void FClip::DistributeDuration(const float newClipDuration)
 {
 	// Set duration directly
-	clipDuration = newClipDuration;
+	duration = newClipDuration;
 	// Set inverse directly
-	clipDurationInv = 1.0f / newClipDuration;
+	durationInv = 1.0f / newClipDuration;
 
 	// Distribute uniform duration across all keyframes
-	for (int i = 0; i < keyframePool.keyframePoolCount; ++i) {
-		keyframePool.keyframePool[i].keyframeDuration = clipDuration;
-		keyframePool.keyframePool[i].keyframeDurationInv = clipDurationInv;
+	for (int i = 0; i < keyframePool.poolCount; ++i)
+	{
+		keyframePool.pool[i].duration = duration;
+		keyframePool.pool[i].durationInv = durationInv;
 	}
 
 	return;
@@ -181,23 +192,38 @@ void FClip::DistributeDuration(const float newClipDuration)
 // Default Clip Pool Constructor
 FClipPool::FClipPool()
 {
+	// Assumes default initialization size is 5 clips
+	for (int i = 0; i < 5; ++i)
+	{
+		count++;
+	
+		FClip tempClip = FClip();
+		tempClip.index = count;
+		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
+	
+		pool.Add(tempClip);
+	}
+
+	return;
 }
 
 // Specialized Clip Pool Constructor
-FClipPool::FClipPool(const int count)
+FClipPool::FClipPool(const int newCount)
 {
-	for (int i = 0; i < count; ++i)
+	for (int i = 0; i < newCount; ++i)
 	{
 		// Increment clip count
-		clipCount++;
+		count++;
 
 		// Create a default / blank Clip
 		FClip tempClip = FClip();
 		// Set the clip index to the current count
-		tempClip.clipIndex = clipCount;
+		tempClip.index = count;
+		// Adjust clip name based on index
+		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
 
 		// Add the temp clip to the pool
-		clipPool.Add(tempClip);
+		pool.Add(tempClip);
 	}
 
 	return;
@@ -213,12 +239,12 @@ int FClipPool::GetClipIndexInPool(FString clipName)
 {
 	int tempIndex = -1;
 
-	for (int i = 0; i < clipCount; ++i)
+	for (int i = 0; i < count; ++i)
 	{
 		// If the names match, set temp index
-		if (clipPool[i].clipName.Compare(clipName))
+		if (pool[i].name.Compare(clipName))
 		{
-			tempIndex = clipPool[i].clipIndex;
+			tempIndex = pool[i].index;
 			break;
 		}
 	}
