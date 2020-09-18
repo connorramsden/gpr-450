@@ -61,7 +61,7 @@ void ATestingInterface::SetCurrentController(int newIndex)
 {
 	currentControllerIndex = newIndex;
 
-	FKeyframeAnimationController currCtrl = GetCurrentController();
+	FKeyframeAnimationController & currCtrl = GetCurrentController();
 
 	int tempClipIndex = currCtrl.clipIndex;
 	currentClip = currCtrl.clipPool.pool[tempClipIndex];
@@ -70,7 +70,7 @@ void ATestingInterface::SetCurrentController(int newIndex)
 // Play / Pause / Change Direction of Controller Playback
 void ATestingInterface::SetControllerPlayback(int newPlaybackState)
 {
-	FKeyframeAnimationController currCtrl = GetCurrentController();
+	FKeyframeAnimationController & currCtrl = GetCurrentController();
 
 	// Error handling for new playback state
 	if (newPlaybackState < -1 || newPlaybackState > 1)
@@ -88,7 +88,7 @@ void ATestingInterface::SetControllerPlayback(int newPlaybackState)
 // Toggle Play/Pause State of Current Controller
 void ATestingInterface::TogglePlayPause()
 {
-	FKeyframeAnimationController currCtrl = GetCurrentController();
+	FKeyframeAnimationController & currCtrl = GetCurrentController();
 
 	// If the playback state is NOT paused
 	if (currCtrl.currPlaybackDir != 0)
@@ -107,7 +107,7 @@ void ATestingInterface::TogglePlayPause()
 // Select current clip to control
 void ATestingInterface::SetCurrentClip(FString newClip)
 {
-	FKeyframeAnimationController currCtrl = GetCurrentController();
+	FKeyframeAnimationController & currCtrl = GetCurrentController();
 
 	// Acquire index of the new controlled clip
 	int newClipIndex = currCtrl.clipPool.GetClipIndexInPool(newClip);

@@ -63,6 +63,12 @@ public:
 protected:
 	bool bIsResolved = false;
 
+private:
+	// Return the current clip from the clip pool
+	FORCEINLINE FClip GetCurrentClip() const { return clipPool.pool[clipIndex]; }
+	// Return the current keyframe's duration
+	FORCEINLINE float GetKeyframeDuration() const { return GetCurrentClip().keyframePool.pool[keyframeIndex].duration; }
+
 public:
 	// Sets default values for this actor's properties
 	FKeyframeAnimationController();

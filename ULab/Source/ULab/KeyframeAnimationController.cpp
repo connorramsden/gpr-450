@@ -98,7 +98,7 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 		it starts playing again from the opposite end in the same direction
 	* There are 7 cases to check for resolution. At least one will terminate the algorithm
 	* Case 01: Reverse Terminus (Playhead passes clip start)
-	* Case 02: Reverse Skip (Playhead enters previous keyframe
+	* Case 02: Reverse Skip (Playhead enters previous keyframe)
 	* Case 03: Reverse (playhead rewinds towards previous [t += -dt])
 	* Case 04: Paused (playhead stays put [t += 0])
 	* Case 05: Forward (playhead advances towards next keyframe [t += +dt])
@@ -119,28 +119,42 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 		// Evaluate playback direction
 		switch (currPlaybackDir)
 		{
-			// Evaluate Reverse
+			// Evaluate Reverse (Three Cases)
 			case(-1):
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Playback is REVERSE for %s"), *name);
+				// Reversing by delta time
+				if (keyframeTime > GetKeyframeDuration())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("True Reverse"));
+					keyframeTime -= DeltaTime;
+					clipTime -= DeltaTime;
+					// Mark as resolved
+					bIsResolved = true;
+				}
+				else if (keyframeTime <= GetKeyframeDuration())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Reverse Skip"));
+				}
+
 				break;
 			}
-			// Evaulate Paused
+			// Evaulate Paused (One Case)
 			case(0):
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Playback is PAUSED for %s"), *name);
+				keyframeTime += 0.0f;
+				clipTime += 0.0f;
+
+				bIsResolved = true;
 				break;
 			}
-			// Evaluate Forward
+			// Evaluate Forward (Three Cases)s
 			case(1):
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Playback is FORWARD for %s"), *name);
+				// Temp resolve
+				bIsResolved = true;
 				break;
 			}
 		}
-
-		// TEMP, MARK AS RESOLVED
-		bIsResolved = true;
 	}
 }
 
