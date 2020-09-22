@@ -1,3 +1,4 @@
+#include "..\a3_SpatialPose.h"
 /*
 	Copyright 2011-2020 Daniel S. Buckstein
 
@@ -68,7 +69,15 @@ inline a3i32 a3spatialPoseReset(a3_SpatialPose* spatialPose)
 {
 	if (spatialPose)
 	{
+		spatialPose->transform = a3mat4_identity;
+		spatialPose->orientation = a3vec3_zero;
+		spatialPose->scale = a3vec3_one;
+		spatialPose->translation = a3vec3_zero;
 
+		// formula in slides
+
+		// done
+		return 1;
 	}
 	return -1;
 }
@@ -88,8 +97,55 @@ inline a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_Spatial
 {
 	if (spatialPose_out && spatialPose_in)
 	{
+		// step 
+		// *spatialPose_out = *spatialPose_in
+		// spatialPose_out->transform = spatialPose_in->transform; // no other algo will do this :(
 
+		// Raw description of the change
+		spatialPose_out->orientation = spatialPose_in->orientation;
+		spatialPose_out->scale = spatialPose_in->scale;
+		spatialPose_out->translation = spatialPose_in->translation;
+
+		// lerp
+
+
+		// done
+
+		return 1;
 	}
+	return -1;
+}
+
+inline a3i32 a3spatialPoseConcat(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_lhs, const a3_SpatialPose * spatialPose_rhs)
+{
+	if (spatialPose_out && spatialPose_lhs && spatialPose_rhs)
+	{
+		// how do they concat?
+		// orientation ->	o_lhs + o_rhs
+		// scale ->			s_lhs * s_rhs (component-wise)
+		// translation ->	t_slhs + t_rhs
+
+		// done
+		return 1;
+	}
+
+	return -1;
+}	
+
+inline a3i32 a3spatialPoseLerp(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_0, const a3_SpatialPose * spatialPose_1, const a3real u)
+{
+	if (spatialPose_out && spatialPose_0 && spatialPose_1)
+	{
+		// how do they lerp?
+		// transform	->	can't / don't / won't 
+		// orientation	->	lerp(o0, o1, u)
+		// scale		->	lerp(s0, s1, u)
+		// translation	->	lerp(t0, t1, u)
+
+		// done
+		return 1;
+	}
+
 	return -1;
 }
 
