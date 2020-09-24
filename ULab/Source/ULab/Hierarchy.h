@@ -43,6 +43,9 @@ protected:
 public:
 	/** Might need other functions here, will build as necessary */
 
+
+public:
+	FORCEINLINE int GetNumNodes() const { return NumNodes; }
 public:
 	// Default Constructor
 	FHierarchy();

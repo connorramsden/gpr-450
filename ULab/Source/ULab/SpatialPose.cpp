@@ -20,16 +20,6 @@ FSpatialPose::FSpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslat
 	return;
 }
 
-FSpatialPose::FSpatialPose(FSpatialPose & Other)
-{
-	Transform = Other.Transform;
-	Orientation = Other.Orientation;
-	Scale = Other.Scale;
-	Translation = Other.Translation;
-
-	return;
-}
-
 FSpatialPose::~FSpatialPose()
 {
 	return;

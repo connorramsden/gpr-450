@@ -72,8 +72,6 @@ public:
 	FSpatialPose();
 	// Specialized SPose Constructor
 	FSpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslation);
-	// SPose Copy Constructor
-	FSpatialPose(FSpatialPose & Other);
 	// Default Spose Deconstructor
 	~FSpatialPose();
 
