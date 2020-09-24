@@ -72,7 +72,7 @@ void FSpatialPose::ResetPose()
 
 FMatrix PoseConvert(FSpatialPose & PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order)
 {
-	// Not really sure what I want to be doing here. Converting a pose to a matrix confuses me.
+	// COME BACK TO THIS!
 
 	return FMatrix();
 }
