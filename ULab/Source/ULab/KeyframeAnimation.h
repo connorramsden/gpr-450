@@ -11,7 +11,7 @@
 
 class ULAB_API KeyframeAnimation
 {
-	public:
+public:
 	KeyframeAnimation();
 	~KeyframeAnimation();
 };
@@ -20,7 +20,7 @@ USTRUCT(BlueprintType)
 struct ULAB_API FKeyframe
 {
 	GENERATED_BODY()
-	public:
+public:
 	// Index in pool of keyframes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
 		int index;
@@ -46,7 +46,7 @@ USTRUCT(BlueprintType)
 struct ULAB_API FKeyframePool
 {
 	GENERATED_BODY()
-	public:
+public:
 	// Array of all keyframes in the pool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Pool Components")
 		TArray<FKeyframe> pool;
@@ -68,7 +68,7 @@ struct ULAB_API FClip
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	// Identifies the clip
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Components", meta = (AllowPrivateAccess = "true"))
 		FString name;
@@ -111,7 +111,7 @@ struct ULAB_API FClipPool
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	// Array of Clips
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Pool Components")
 		TArray<FClip> pool;
