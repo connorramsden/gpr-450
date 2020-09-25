@@ -9,11 +9,12 @@
 
 #include "HierarchyState.generated.h"
 
-typedef TArray<USpatialPose *> SPosePool;
+typedef TArray<FSpatialPose> SPosePool;
+typedef SpatialPoseEulerOrder PoseOrder;
 
 // A simpe wrapper for a generic array of spatial poses
-UCLASS()
-class ULAB_API UHierarchyPose : public UObject
+USTRUCT(BlueprintType)
+struct ULAB_API FHierarchyPose
 {
 	GENERATED_BODY()
 
@@ -23,19 +24,19 @@ protected:
 public:
 	FORCEINLINE SPosePool GetPosePool() { return Pool; }
 public:
-	UHierarchyPose();
-	~UHierarchyPose();
+	FHierarchyPose();
+	~FHierarchyPose();
 };
 
-UCLASS()
-class ULAB_API UHierarchyPoseGroup : public UObject
+USTRUCT(BlueprintType)
+struct ULAB_API FHierarchyPoseGroup
 {
 	GENERATED_BODY()
 
 protected:
 	// The hierarchy associated with this spatial data (organization of poses)
 	// The pool itself describes the spatial properties of this hierarchy
-	UHierarchy * Hierarchy;
+	FHierarchy Hierarchy;
 
 	// Actual array of individual node poses
 	// Similar to a keyframe pol for all poses for this hierarhy & nodes
@@ -45,13 +46,13 @@ protected:
 	// An array of hierarchical poses (referencing ^ spatial poses)
 	// Similar to a keyframe pool for the whole hierarchy. 
 	// Organizes individual node poses.
-	TArray<UHierarchyPose *> HierarchicalPoses;
+	TArray<FHierarchyPose> HierarchicalPoses;
 
 	// Array of transforamtion channels for each node in the hierarchy
 	TArray<SpatialPoseChannel> Channels;
 
 	// Global flag for the pool that describes the concatenation order
-	SpatialPoseEulerOrder EulerOrder;
+	PoseOrder EulerOrder;
 
 	// # of Hierarchical Poses
 	int HPoseCount;
@@ -61,28 +62,33 @@ protected:
 	int SPoseCount;
 
 public:
-	UHierarchyPoseGroup();
-	~UHierarchyPoseGroup();
+	FORCEINLINE int GetHPoseCount() const { return HPoseCount; }
+	FORCEINLINE int GetSPoseCount() const { return SPoseCount; }
+
+public:
+	FHierarchyPoseGroup();
+	FHierarchyPoseGroup(FHierarchy NewHier, int NumPoses);
+	~FHierarchyPoseGroup();
 };
 
-UCLASS()
-class ULAB_API UHierarchyState : public UObject
+USTRUCT(BlueprintType)
+struct ULAB_API FHierarchyState
 {
 	GENERATED_BODY()
 
 protected:
-	UHierarchy * Hierarchy;
-	UHierarchyPose * SamplePose;
-	UHierarchyPose * LocalSpacePose;
-	UHierarchyPose * ObjectSpacePose;
+	FHierarchy Hierarchy;
+	FHierarchyPose SamplePose;
+	FHierarchyPose LocalSpacePose;
+	FHierarchyPose ObjectSpacePose;
 
 public:
-	FORCEINLINE UHierarchy * GetHierarchy() { return Hierarchy; }
-	FORCEINLINE UHierarchyPose * GetSample() { return SamplePose; }
-	FORCEINLINE UHierarchyPose * GetLocal() { return LocalSpacePose; }
-	FORCEINLINE UHierarchyPose * GetObject() { return ObjectSpacePose; }
+	FORCEINLINE FHierarchy GetHierarchy() { return Hierarchy; }
+	FORCEINLINE FHierarchyPose GetSample() { return SamplePose; }
+	FORCEINLINE FHierarchyPose GetLocal() { return LocalSpacePose; }
+	FORCEINLINE FHierarchyPose GetObject() { return ObjectSpacePose; }
 
 public:
-	UHierarchyState();
-	~UHierarchyState();
+	FHierarchyState();
+	~FHierarchyState();
 };

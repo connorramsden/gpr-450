@@ -3,24 +3,41 @@
 
 #include "HierarchyState.h"
 
-UHierarchyPose::UHierarchyPose()
+FHierarchyPose::FHierarchyPose()
 {}
 
-UHierarchyPose::~UHierarchyPose()
+FHierarchyPose::~FHierarchyPose()
 {}
 
-UHierarchyPoseGroup::UHierarchyPoseGroup()
+FHierarchyPoseGroup::FHierarchyPoseGroup()
+{
+	Hierarchy = FHierarchy();
+
+	SpatialPosePool = SPosePool();
+
+	HierarchicalPoses = TArray<FHierarchyPose>();
+
+	Channels = TArray<SpatialPoseChannel>();
+
+	EulerOrder = PoseOrder::PoseEulerOrder_xyz;
+
+	HPoseCount = 0;
+
+	SPoseCount = HPoseCount * Hierarchy.GetNumNodes();
+}
+
+FHierarchyPoseGroup::FHierarchyPoseGroup(FHierarchy NewHier, int NumPoses)
+{
+	
+}
+
+FHierarchyPoseGroup::~FHierarchyPoseGroup()
+{}
+
+FHierarchyState::FHierarchyState()
 {
 
 }
 
-UHierarchyPoseGroup::~UHierarchyPoseGroup()
-{}
-
-UHierarchyState::UHierarchyState()
-{
-
-}
-
-UHierarchyState::~UHierarchyState()
+FHierarchyState::~FHierarchyState()
 {}

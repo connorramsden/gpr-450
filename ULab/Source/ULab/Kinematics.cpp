@@ -2,18 +2,17 @@
 
 #include "Kinematics.h"
 
-void KinematicsSolveForward(UHierarchyState * State)
+void KinematicsSolveForward(FHierarchyState State)
 {
 	// Do partial but at root
-	KinematicsSolveForwardPartial(State, 0, State->GetHierarchy()->GetNumNodes());
+	KinematicsSolveForwardPartial(State, 0, State.GetHierarchy().GetNumNodes());
 
 	return;
 }
 
-void KinematicsSolveForwardPartial(UHierarchyState * State, int FirstIndex, int NodeCount)
+void KinematicsSolveForwardPartial(FHierarchyState State, int FirstIndex, int NodeCount)
 {
-	if (State->GetHierarchy() &&
-		FirstIndex < State->GetHierarchy()->GetNumNodes() && NodeCount)
+	if (FirstIndex < State.GetHierarchy().GetNumNodes() && NodeCount > 0)
 	{
 		// Implement FK algorithm
 		//	-> For all nodes starting at first index
@@ -25,25 +24,25 @@ void KinematicsSolveForwardPartial(UHierarchyState * State, int FirstIndex, int 
 		// Start at first index, iterate all nodes
 		for (int i = FirstIndex; i < NodeCount; ++i)
 		{
-			int ParentIndex = State->GetHierarchy()->GetNodeAtIndex(i)->GetParIndex();
+			int ParentIndex = State.GetHierarchy().GetNodeAtIndex(i).GetParIndex();
 
 			// Check if node has parent node
 			if (ParentIndex >= 0)
 			{
 				// Acquire parent object matrix
-				FMatrix ParentObjectMatrix = State->GetObject()->GetPosePool()[ParentIndex]->GetTransform();
+				FTransform ParentObjectMatrix = State.GetObject().GetPosePool()[ParentIndex].GetTransform();
 				// Aqcuire local matrix
-				FMatrix LocalMatrix = State->GetLocal()->GetPosePool()[i]->GetTransform();
+				FTransform LocalMatrix = State.GetLocal().GetPosePool()[i].GetTransform();
 
 				// Set object matrix to POM * LM
-				State->GetObject()->GetPosePool()[i]->SetTransform(ParentObjectMatrix * LocalMatrix);
+				State.GetObject().GetPosePool()[i].SetTransform(ParentObjectMatrix * LocalMatrix);
 			}
 			else
 			{
 				// Get local matrix
-				USpatialPose * LocalPose = State->GetLocal()->GetPosePool()[i];
+				FSpatialPose LocalPose = State.GetLocal().GetPosePool()[i];
 				// Spatial pose copy contructor
-				State->GetObject()->GetPosePool()[i] = LocalPose;
+				State.GetObject().GetPosePool()[i] = LocalPose;
 			}
 		}
 	}
@@ -51,8 +50,8 @@ void KinematicsSolveForwardPartial(UHierarchyState * State, int FirstIndex, int 
 	return;
 }
 
-void KinematicsSolveInverse(UHierarchyState * State)
+void KinematicsSolveInverse(FHierarchyState * State)
 {}
 
-void KinematicsSolveInversePartial(UHierarchyState * State, int FirstIndex, int NodeCount)
+void KinematicsSolveInversePartial(FHierarchyState * State, int FirstIndex, int NodeCount)
 {}

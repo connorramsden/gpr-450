@@ -5,22 +5,22 @@
 #include "CoreMinimal.h"
 #include "Hierarchy.generated.h"
 
-UCLASS()
-class ULAB_API UHNode : public UObject
+USTRUCT(BlueprintType)
+struct ULAB_API FHNode
 {
 	GENERATED_BODY()
 
 protected:
 	// A string identifying this node
-	UPROPERTY(VisibleAnywhere, Category = "Node Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Node Components")
 		FString Name;
 
 	// Index in Node Hierarchy
-	UPROPERTY(VisibleAnywhere, Category = "Node Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Node Components")
 		int Index;
 
 	// Index of parent node in hierarchy; should always be less than Index
-	UPROPERTY(VisibleAnywhere, Category = "Node Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Node Components")
 		int ParentIndex;
 
 public:
@@ -28,27 +28,26 @@ public:
 	FORCEINLINE int GetIndex() const { return Index; }
 	FORCEINLINE int GetParIndex() const { return ParentIndex; }
 	FORCEINLINE void SetName(FString NewName) { Name = NewName; }
+	FORCEINLINE void SetIndex(const int NewIndex) { Index = NewIndex; }
 	FORCEINLINE void SetParentIndex(const int NewParent) { ParentIndex = NewParent; }
 public:
 	// Default Constructor
-	UHNode();
-	// Specialized Constructor
-	UHNode(FString NewName, int NewIndex, int NewPIndex);
+	FHNode();
 	// Default Deconstructor
-	~UHNode();
+	~FHNode();
 };
 
-UCLASS()
-class ULAB_API UHierarchy : public UObject
+USTRUCT(BlueprintType)
+struct ULAB_API FHierarchy
 {
 	GENERATED_BODY()
 
 protected:
 	// Member nodes: array of nodes (empty / null if unused)
-	UPROPERTY(VisibleAnywhere, Category = "Hierarchy Components")
-		TArray<UHNode*> Nodes;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hierarchy Components")
+		TArray<FHNode> Nodes;
 	// Maximum number of nodes in Hierarchy (zero if unused)
-	UPROPERTY(VisibleAnywhere, Category = "Hierarchy Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hierarchy Components")
 		int NumNodes;
 
 public:
@@ -62,14 +61,13 @@ public:
 	bool IsChildNode(const int CIndex, const int OIndex);
 
 public:
-	FORCEINLINE UHNode * GetNodeAtIndex(int x) { return Nodes[x]; }
+	FORCEINLINE FHNode GetNodeAtIndex(int x) { return Nodes[x]; }
 	FORCEINLINE int GetNumNodes() const { return NumNodes; }
 public:
 	// Default Constructor
-	UHierarchy();
-	// Specialized Constructor
-	UHierarchy(int NewCount);
+	FHierarchy();
+	FHierarchy(int NewCount);
 	// Default Deconstructor
-	~UHierarchy();
+	~FHierarchy();
 };
 

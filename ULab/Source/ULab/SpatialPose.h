@@ -53,9 +53,9 @@ enum SpatialPoseChannel
 	PoseChannel_translate_xyz = PoseChannel_translate_xy | PoseChannel_translate_z,
 };
 
-UCLASS()
+USTRUCT()
 // Single pose for a single node
-class ULAB_API USpatialPose : public UObject
+struct ULAB_API FSpatialPose
 {
 	GENERATED_BODY()
 
@@ -70,17 +70,16 @@ protected:
 	// CTor/DTor
 public:
 	// Default SPose Constructor
-	USpatialPose();
-	// Specialized SPose Constructor
-	USpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslation);
+	FSpatialPose();
+	FSpatialPose(FVector Orientation, FVector Scale, FVector Translation);
 	// Default Spose Deconstructor
-	~USpatialPose();
+	~FSpatialPose();
 
 	// Getters & Setters
 public:
 	FORCEINLINE FTransform GetTransform() const { return Transform; }
 	FORCEINLINE FVector GetOrientation() const { return Orientation; }
-	FORCEINLINE FVector GetScale() const { return Scale; }	
+	FORCEINLINE FVector GetScale() const { return Scale; }
 	FORCEINLINE FVector GetTranslation() const { return Translation; }
 	FORCEINLINE void SetTransform(FTransform NewTransform) { Transform = NewTransform; }
 
@@ -99,10 +98,10 @@ public:
 };
 
 // Convert single node pose to matrix
-FMatrix PoseConvert(USpatialPose * PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order);
+FMatrix PoseConvert(FSpatialPose PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order);
 
 // Concat operation for single node pose
-USpatialPose * PoseConcat(USpatialPose * lhs, USpatialPose * rhs);
+FSpatialPose PoseConcat(FSpatialPose lhs, FSpatialPose rhs);
 
 // Lerp operation for single node pose (lerp by u value)
-USpatialPose * PoseLerp(USpatialPose * PoseZero, USpatialPose * PoseOne, float u);
+FSpatialPose PoseLerp(FSpatialPose PoseZero, FSpatialPose PoseOne, float u);

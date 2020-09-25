@@ -14,6 +14,8 @@ void AKinematicsInterface::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Initialize Skeleton
+	Skeleton = FHierarchy(NumSkeletonNodes);
 }
 
 // Called every frame

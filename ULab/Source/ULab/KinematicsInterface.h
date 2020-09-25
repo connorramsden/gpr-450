@@ -17,17 +17,22 @@ class ULAB_API AKinematicsInterface : public AActor
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CRAnimation")
-		UHierarchy * Skeleton;
+		FHierarchy Skeleton;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CRAnimation")
+		FHierarchyPoseGroup PosePool;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimDebug")
+		int NumSkeletonNodes;
 
 public:
 	// Sets default values for this actor's properties
 	AKinematicsInterface();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };
