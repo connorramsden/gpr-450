@@ -61,7 +61,7 @@ class ULAB_API USpatialPose : public UObject
 
 protected:
 	// 4x4 Matrix described by the pose, relative to parent space
-	FMatrix Transform;
+	FTransform Transform;
 	// Orientation: Three elements describing Euler angle orientation relative to parent space
 	// Scale:		Three elements describing scale relative to parent space
 	// Translation: Three elems describing the translation relative to parent space
@@ -78,11 +78,11 @@ public:
 
 	// Getters & Setters
 public:
-	FORCEINLINE FMatrix GetTransform() const { return Transform; }
+	FORCEINLINE FTransform GetTransform() const { return Transform; }
 	FORCEINLINE FVector GetOrientation() const { return Orientation; }
 	FORCEINLINE FVector GetScale() const { return Scale; }	
 	FORCEINLINE FVector GetTranslation() const { return Translation; }
-	FORCEINLINE void SetTransform(FMatrix NewTransform) { Transform = NewTransform; }
+	FORCEINLINE void SetTransform(FTransform NewTransform) { Transform = NewTransform; }
 
 public:
 	// Set rotation values for a single node pose
