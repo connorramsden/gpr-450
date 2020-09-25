@@ -2,7 +2,7 @@
 
 #include "SpatialPose.h"
 
-FSpatialPose::FSpatialPose()
+USpatialPose::USpatialPose()
 {
 	// This function achieves the same thing as a default constructor would
 	ResetPose();
@@ -10,7 +10,7 @@ FSpatialPose::FSpatialPose()
 	return;
 }
 
-FSpatialPose::FSpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslation)
+USpatialPose::USpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslation)
 {
 	Transform = FMatrix::Identity;
 	Orientation = NewRot;
@@ -20,33 +20,33 @@ FSpatialPose::FSpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslat
 	return;
 }
 
-FSpatialPose::~FSpatialPose()
+USpatialPose::~USpatialPose()
 {
 	return;
 }
 
-void FSpatialPose::SetRotation(float rx_degrees, float ry_degrees, float rz_degrees)
+void USpatialPose::SetRotation(float rx_degrees, float ry_degrees, float rz_degrees)
 {
 	Orientation = FVector(rx_degrees, ry_degrees, rz_degrees);
 
 	return;
 }
 
-void FSpatialPose::SetScale(float sx, float sy, float sz)
+void USpatialPose::SetScale(float sx, float sy, float sz)
 {
 	Scale = FVector(sx, sy, sz);
 
 	return;
 }
 
-void FSpatialPose::SetTranslation(float tx, float ty, float tz)
+void USpatialPose::SetTranslation(float tx, float ty, float tz)
 {
 	Translation = FVector(tx, ty, tz);
 
 	return;
 }
 
-void FSpatialPose::ResetPose()
+void USpatialPose::ResetPose()
 {
 	// Set transform to identity matrix
 	Transform = FMatrix::Identity;
@@ -60,35 +60,41 @@ void FSpatialPose::ResetPose()
 	return;
 }
 
-FMatrix PoseConvert(FSpatialPose & PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order)
+FMatrix PoseConvert(USpatialPose * PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order)
 {
 	// COME BACK TO THIS!
 
 	return FMatrix();
 }
 
-FSpatialPose PoseConcat(FSpatialPose & lhs, FSpatialPose & rhs)
+USpatialPose * PoseConcat(USpatialPose * lhs, USpatialPose * rhs)
 {
 	// Calculate new values
-	FVector ConcatRot = lhs.GetOrientation() + rhs.GetOrientation();
-	FVector ConcatScale = FVector::CrossProduct(lhs.GetScale(), rhs.GetScale());
-	FVector ConcatTranslation = lhs.GetTranslation() + rhs.GetTranslation();
+	FVector ConcatRot = lhs->GetOrientation() + rhs->GetOrientation();
+	FVector ConcatScale = FVector::CrossProduct(lhs->GetScale(), rhs->GetScale());
+	FVector ConcatTranslation = lhs->GetTranslation() + rhs->GetTranslation();
 
-	// Create the Spatial Pose to be returned
-	FSpatialPose OutPose(ConcatRot, ConcatScale, ConcatTranslation);
+	USpatialPose * OutPose = NewObject<USpatialPose>();
+	OutPose->SetRotation(ConcatRot.X, ConcatRot.Y, ConcatRot.Z);
+	OutPose->SetScale(ConcatScale.X, ConcatScale.Y, ConcatScale.Z);
+	OutPose->SetTranslation(ConcatTranslation.X, ConcatTranslation.Y, ConcatTranslation.Z);
 
+	// Return the newly created spatial pose
 	return OutPose;
 }
 
-FSpatialPose PoseLerp(FSpatialPose & PoseZero, FSpatialPose & PoseOne, float u)
+USpatialPose * PoseLerp(USpatialPose* PoseZero, USpatialPose *PoseOne, float u)
 {
 	// Calculate lerp'd values
-	FVector LerpRot = FMath::Lerp(PoseZero.GetOrientation(), PoseOne.GetOrientation(), u);
-	FVector LerpScale = FMath::Lerp(PoseZero.GetScale(), PoseOne.GetScale(), u);
-	FVector LerpTranslation = FMath::Lerp(PoseZero.GetTranslation(), PoseOne.GetTranslation(), u);
+	FVector LerpRot = FMath::Lerp(PoseZero->GetOrientation(), PoseOne->GetOrientation(), u);
+	FVector LerpScale = FMath::Lerp(PoseZero->GetScale(), PoseOne->GetScale(), u);
+	FVector LerpTranslation = FMath::Lerp(PoseZero->GetTranslation(), PoseOne->GetTranslation(), u);
 
-	// Create the Spatial Pose to be returned
-	FSpatialPose OutPose(LerpRot, LerpScale, LerpTranslation);
+	USpatialPose * OutPose = NewObject<USpatialPose>();
+	OutPose->SetRotation(LerpRot.X, LerpRot.Y, LerpRot.Z);
+	OutPose->SetScale(LerpScale.X, LerpScale.Y, LerpScale.Z);
+	OutPose->SetTranslation(LerpTranslation.X, LerpTranslation.Y, LerpTranslation.Z);
 
+	// Return the newly created spatial pose
 	return OutPose;
 }

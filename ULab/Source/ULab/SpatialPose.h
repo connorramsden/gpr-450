@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
 #include "SpatialPose.generated.h"
 
 UENUM()
@@ -52,9 +53,9 @@ enum SpatialPoseChannel
 	PoseChannel_translate_xyz = PoseChannel_translate_xy | PoseChannel_translate_z,
 };
 
-USTRUCT()
+UCLASS()
 // Single pose for a single node
-struct ULAB_API FSpatialPose
+class ULAB_API USpatialPose : public UObject
 {
 	GENERATED_BODY()
 
@@ -69,11 +70,11 @@ protected:
 	// CTor/DTor
 public:
 	// Default SPose Constructor
-	FSpatialPose();
+	USpatialPose();
 	// Specialized SPose Constructor
-	FSpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslation);
+	USpatialPose(FVector NewRot, FVector NewScale, FVector NewTranslation);
 	// Default Spose Deconstructor
-	~FSpatialPose();
+	~USpatialPose();
 
 	// Getters & Setters
 public:
@@ -81,6 +82,7 @@ public:
 	FORCEINLINE FVector GetOrientation() const { return Orientation; }
 	FORCEINLINE FVector GetScale() const { return Scale; }	
 	FORCEINLINE FVector GetTranslation() const { return Translation; }
+	FORCEINLINE void SetTransform(FMatrix NewTransform) { Transform = NewTransform; }
 
 public:
 	// Set rotation values for a single node pose
@@ -97,10 +99,10 @@ public:
 };
 
 // Convert single node pose to matrix
-FMatrix PoseConvert(FSpatialPose & PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order);
+FMatrix PoseConvert(USpatialPose * PoseIn, SpatialPoseChannel Channel, SpatialPoseEulerOrder Order);
 
 // Concat operation for single node pose
-FSpatialPose PoseConcat(FSpatialPose & lhs, FSpatialPose & rhs);
+USpatialPose * PoseConcat(USpatialPose * lhs, USpatialPose * rhs);
 
 // Lerp operation for single node pose (lerp by u value)
-FSpatialPose PoseLerp(FSpatialPose & PoseZero, FSpatialPose & PoseOne, float u);
+USpatialPose * PoseLerp(USpatialPose * PoseZero, USpatialPose * PoseOne, float u);

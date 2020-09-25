@@ -3,24 +3,24 @@
 
 #include "HierarchyState.h"
 
-FHierarchyPose::FHierarchyPose()
+UHierarchyPose::UHierarchyPose()
 {}
 
-FHierarchyPose::~FHierarchyPose()
+UHierarchyPose::~UHierarchyPose()
 {}
 
-FHierarchyPoseGroup::FHierarchyPoseGroup()
+UHierarchyPoseGroup::UHierarchyPoseGroup()
 {
 
 }
 
-FHierarchyPoseGroup::~FHierarchyPoseGroup()
+UHierarchyPoseGroup::~UHierarchyPoseGroup()
 {}
 
-FHierarchyState::FHierarchyState()
+UHierarchyState::UHierarchyState()
 {
 
 }
 
-FHierarchyState::~FHierarchyState()
+UHierarchyState::~UHierarchyState()
 {}

@@ -9,39 +9,43 @@
 
 #include "HierarchyState.generated.h"
 
+typedef TArray<USpatialPose *> SPosePool;
+
 // A simpe wrapper for a generic array of spatial poses
-USTRUCT()
-struct ULAB_API FHierarchyPose
+UCLASS()
+class ULAB_API UHierarchyPose : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	TArray<FSpatialPose> SpatialPose;
+	SPosePool Pool;
 
 public:
-	FHierarchyPose();
-	~FHierarchyPose();
+	FORCEINLINE SPosePool GetPosePool() { return Pool; }
+public:
+	UHierarchyPose();
+	~UHierarchyPose();
 };
 
-USTRUCT()
-struct ULAB_API FHierarchyPoseGroup
+UCLASS()
+class ULAB_API UHierarchyPoseGroup : public UObject
 {
 	GENERATED_BODY()
 
 protected:
 	// The hierarchy associated with this spatial data (organization of poses)
 	// The pool itself describes the spatial properties of this hierarchy
-	FHierarchy Hierarchy;
+	UHierarchy * Hierarchy;
 
 	// Actual array of individual node poses
 	// Similar to a keyframe pol for all poses for this hierarhy & nodes
 	// TLDR: Set of all poses for all nodes
-	TArray<FSpatialPose> SpatialPosePool;
+	SPosePool SpatialPosePool;
 
 	// An array of hierarchical poses (referencing ^ spatial poses)
 	// Similar to a keyframe pool for the whole hierarchy. 
 	// Organizes individual node poses.
-	TArray<FHierarchyPose> HierarchicalPoses;
+	TArray<UHierarchyPose *> HierarchicalPoses;
 
 	// Array of transforamtion channels for each node in the hierarchy
 	TArray<SpatialPoseChannel> Channels;
@@ -57,25 +61,28 @@ protected:
 	int SPoseCount;
 
 public:
-	FHierarchyPoseGroup();
-	~FHierarchyPoseGroup();
+	UHierarchyPoseGroup();
+	~UHierarchyPoseGroup();
 };
 
-USTRUCT()
-struct ULAB_API FHierarchyState
+UCLASS()
+class ULAB_API UHierarchyState : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	FHierarchy * Hierarchy;
-	FHierarchyPose * SamplePose;
-	FHierarchyPose * LocalSpacePose;
-	FHierarchyPose * ObjectSpacePose;
+	UHierarchy * Hierarchy;
+	UHierarchyPose * SamplePose;
+	UHierarchyPose * LocalSpacePose;
+	UHierarchyPose * ObjectSpacePose;
 
 public:
-	FORCEINLINE FHierarchy * GetHierarchy() const { return Hierarchy; }
+	FORCEINLINE UHierarchy * GetHierarchy() { return Hierarchy; }
+	FORCEINLINE UHierarchyPose * GetSample() { return SamplePose; }
+	FORCEINLINE UHierarchyPose * GetLocal() { return LocalSpacePose; }
+	FORCEINLINE UHierarchyPose * GetObject() { return ObjectSpacePose; }
 
 public:
-	FHierarchyState();
-	~FHierarchyState();
+	UHierarchyState();
+	~UHierarchyState();
 };

@@ -6,13 +6,13 @@
 #include "HierarchyState.h"
 
 // Forward Kinematics Algorithm
-void KinematicsSolveForward(FHierarchyState & State);
+void KinematicsSolveForward(UHierarchyState* State);
 
 // FK Algorithm starting at a specific joint
-void KinematicsSolveForwardPartial(FHierarchyState & State, int FirstIndex, int NodeCount);
+void KinematicsSolveForwardPartial(UHierarchyState * State, int FirstIndex, int NodeCount);
 
 // Inverse Kinematics Algorithm
-void KinematicsSolveInverse(FHierarchyState & State);
+void KinematicsSolveInverse(UHierarchyState * State);
 
 // IK Algorithm starting at a specific joint
-void KinematicsSolveInversePartial(FHierarchyState & State, int FirstIndex, int NodeCount);
+void KinematicsSolveInversePartial(UHierarchyState * State, int FirstIndex, int NodeCount);

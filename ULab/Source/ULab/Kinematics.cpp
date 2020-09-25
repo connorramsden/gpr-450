@@ -2,18 +2,18 @@
 
 #include "Kinematics.h"
 
-void KinematicsSolveForward(FHierarchyState & State)
+void KinematicsSolveForward(UHierarchyState * State)
 {
 	// Do partial but at root
-	KinematicsSolveForwardPartial(State, 0, State.GetHierarchy()->GetNumNodes());
+	KinematicsSolveForwardPartial(State, 0, State->GetHierarchy()->GetNumNodes());
 
 	return;
 }
 
-void KinematicsSolveForwardPartial(FHierarchyState & State, int FirstIndex, int NodeCount)
+void KinematicsSolveForwardPartial(UHierarchyState * State, int FirstIndex, int NodeCount)
 {
-	if (State.GetHierarchy() && 
-		FirstIndex < State.GetHierarchy()->GetNumNodes() && NodeCount)
+	if (State->GetHierarchy() &&
+		FirstIndex < State->GetHierarchy()->GetNumNodes() && NodeCount)
 	{
 		// Implement FK algorithm
 		//	-> For all nodes starting at first index
@@ -21,15 +21,38 @@ void KinematicsSolveForwardPartial(FHierarchyState & State, int FirstIndex, int 
 		//			-> object matrix = parent object matrix * local matrix
 		//		-> else
 		//			-> copy local matrix to object matrix
-		
 
+		// Start at first index, iterate all nodes
+		for (int i = FirstIndex; i < NodeCount; ++i)
+		{
+			int ParentIndex = State->GetHierarchy()->GetNodeAtIndex(i)->GetParIndex();
+
+			// Check if node has parent node
+			if (ParentIndex >= 0)
+			{
+				// Acquire parent object matrix
+				FMatrix ParentObjectMatrix = State->GetObject()->GetPosePool()[ParentIndex]->GetTransform();
+				// Aqcuire local matrix
+				FMatrix LocalMatrix = State->GetLocal()->GetPosePool()[i]->GetTransform();
+
+				// Set object matrix to POM * LM
+				State->GetObject()->GetPosePool()[i]->SetTransform(ParentObjectMatrix * LocalMatrix);
+			}
+			else
+			{
+				// Get local matrix
+				USpatialPose * LocalPose = State->GetLocal()->GetPosePool()[i];
+				// Spatial pose copy contructor
+				State->GetObject()->GetPosePool()[i] = LocalPose;
+			}
+		}
 	}
 
 	return;
 }
 
-void KinematicsSolveInverse(FHierarchyState & State)
+void KinematicsSolveInverse(UHierarchyState * State)
 {}
 
-void KinematicsSolveInversePartial(FHierarchyState & State, int FirstIndex, int NodeCount)
+void KinematicsSolveInversePartial(UHierarchyState * State, int FirstIndex, int NodeCount)
 {}
