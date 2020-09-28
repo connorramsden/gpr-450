@@ -60,3 +60,11 @@ void UHierarchy::Init(int NumNodesToCreate, TArray<FString> Names)
 
 	return;
 }
+
+void UHierarchy::SetNode(int Index, int NewPIndex, FString NewName)
+{
+	Nodes[Index]->SetPIndex(NewPIndex);
+	Nodes[Index]->SetName(NewName);
+
+	return;
+}

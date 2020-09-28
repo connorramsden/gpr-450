@@ -54,6 +54,15 @@ public:
 	~UHierarchy();
 
 public:
+	FORCEINLINE TArray<UHNode *> GetNodes() { return Nodes; }			// get the entire array of nodes
+	FORCEINLINE UHNode * GetNode(int Index) { return Nodes[Index]; }	// get a specific node by index
+	FORCEINLINE int GetNumNodes() { return NumNodes; }					// return the number of nodes in the pool
+
+public:
+	// Initialize Nodes with a number of nodes
 	void Init(int NodesToCreate);
+	// Initialize Nodes with a number of nodes and pre-set names
 	void Init(int NodesToCreate, TArray<FString> Names);
+	// Change the values of a Node at the given index
+	void SetNode(int Index, int NewPIndex, FString NewName);
 };

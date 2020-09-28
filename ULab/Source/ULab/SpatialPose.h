@@ -93,6 +93,12 @@ public: // Getters & Setters
 public:
 	void Init(FTransform TMat, FVector O, FVector S, FVector TVec);
 	void ResetPose();
-	void PoseCopy(USpatialPose & OtherPose);
-	void PoseConvert();
 };
+
+typedef SpatialPoseChannel PoseChannel;
+typedef SpatialPoseEulerOrder PoseOrder;
+
+USpatialPose * PoseCopy(USpatialPose & OtherPose);
+FMatrix PoseConvert(USpatialPose & PoseIn, PoseChannel Channel, PoseOrder Order);
+USpatialPose * PoseConcat(USpatialPose & lhs, USpatialPose & rhs);
+USpatialPose * PoseLerp(USpatialPose & Pose0, USpatialPose & Pose1, float u);
