@@ -102,8 +102,22 @@ enum a3_SpatialPoseChannel
 // single pose for a single node
 struct a3_SpatialPose
 {
+	// final matrix - derived from TRS - matrices don't blend well :(
 	a3mat4 transform;
-	a3vec4 orientation, angles, scale, translation;
+
+	// Final DQ - can be derived from all below or TR - they do animate
+	// dq = dual number, with real and dual part, each a quaternion
+	// default dq = "1": real = (0, 0, 0, 1), dual = (0, 0, 0, 0)
+	a3dualquat dq; // encodes: angle/axis rotation, translation
+
+	// quaternion - derived from Euler angles or angle/axis
+	// default quat = "1": (0, 0, 0, 1)
+	// a3quat orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
+
+	// raw description;
+	a3vec4 angles; // aka rotation
+	a3vec4 scale;
+	a3vec4 translation;
 };
 
 

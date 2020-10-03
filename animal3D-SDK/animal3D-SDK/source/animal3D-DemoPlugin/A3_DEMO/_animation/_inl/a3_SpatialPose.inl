@@ -71,9 +71,9 @@ inline a3i32 a3spatialPoseReset(a3_SpatialPose* spatialPose)
 	if (spatialPose)
 	{
 		spatialPose->transform = a3mat4_identity;
-		spatialPose->orientation = a3vec3_zero;
-		spatialPose->scale = a3vec3_one;
-		spatialPose->translation = a3vec3_zero;
+		spatialPose->orientation = a3vec4_zero;
+		spatialPose->scale = a3vec4_one;
+		spatialPose->translation = a3vec4_zero;
 
 		// formula in slides
 

@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "Hierarchy.h"
 #include "SpatialPose.h"
+#include <Math/DualQuat.h>
+
 #include "HierarchyState.generated.h"
 
 typedef TArray<USpatialPose *> SPosePool;
