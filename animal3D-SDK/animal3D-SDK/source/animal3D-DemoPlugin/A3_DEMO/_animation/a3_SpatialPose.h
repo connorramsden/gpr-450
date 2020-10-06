@@ -112,7 +112,7 @@ struct a3_SpatialPose
 
 	// quaternion - derived from Euler angles or angle/axis
 	// default quat = "1": (0, 0, 0, 1)
-	// a3quat orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
+	a3quat orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
 
 	// raw description;
 	a3vec4 angles; // aka rotation

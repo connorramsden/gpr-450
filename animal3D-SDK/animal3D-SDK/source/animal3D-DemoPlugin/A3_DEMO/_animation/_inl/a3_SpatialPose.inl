@@ -71,7 +71,7 @@ inline a3i32 a3spatialPoseReset(a3_SpatialPose* spatialPose)
 	if (spatialPose)
 	{
 		spatialPose->transform = a3mat4_identity;
-		spatialPose->orientation = a3vec4_zero;
+		spatialPose->orientation = a3quat_identity;
 		spatialPose->scale = a3vec4_one;
 		spatialPose->translation = a3vec4_zero;
 
