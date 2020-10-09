@@ -3,72 +3,66 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "UObject/NoExportTypes.h"
 #include "Hierarchy.generated.h"
 
-UCLASS(BlueprintType)
-class ULAB_API AHNode : public AActor
+/**
+ * Core of all hierarchical data
+ * Contains no spatial or temporal information
+ */
+UCLASS()
+class ULAB_API UHNode : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	// A string identifying this node
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Node Components")
-		FString Name;
+	// The node's Name
+	FString Name;
 
-	// Index in Node Hierarchy
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Node Components")
-		int Index;
-
-	// Index of parent node in hierarchy; should always be less than Index
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Node Components")
-		int ParentIndex;
+	// Index within the Tree
+	int Index;
+	// Parent's index within the tree
+	int ParentIndex;
 
 public:
-	FORCEINLINE FString GetName() const { return Name; }
-	FORCEINLINE int GetIndex() const { return Index; }
-	FORCEINLINE int GetParIndex() const { return ParentIndex; }
+	UHNode();
+
+public:
+	FORCEINLINE FString GetName() { return Name; }
+	FORCEINLINE int GetIndex() { return Index; }
+	FORCEINLINE int GetPIndex() { return ParentIndex; }
 	FORCEINLINE void SetName(FString NewName) { Name = NewName; }
-	FORCEINLINE void SetIndex(const int NewIndex) { Index = NewIndex; }
-	FORCEINLINE void SetParentIndex(const int NewParent) { ParentIndex = NewParent; }
-public:
-	// Default Constructor
-	AHNode();
-	// Default Deconstructor
-	~AHNode();
+	FORCEINLINE void SetIndex(int NewIndex) { Index = NewIndex; }
+	FORCEINLINE void SetPIndex(int NewPIndex) { ParentIndex = NewPIndex; }
 };
 
-USTRUCT(BlueprintType)
-struct ULAB_API FHierarchy
+/**
+ * Effectively a Node pool
+ * Nodes are sorted Tree-style, via depth
+ */
+
+UCLASS()
+class ULAB_API UHierarchy : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	// Member nodes: array of nodes (empty / null if unused)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hierarchy Components")
-		TArray<AHNode*> Nodes;
-	// Maximum number of nodes in Hierarchy (zero if unused)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Hierarchy Components")
-		int NumNodes;
+	TArray<UHNode *> Nodes;
+	int NumNodes;
+public:
+	UHierarchy();
+	~UHierarchy();
 
 public:
-	/** Replace the node at the given index with params */
-	void SetNode(const int NewIndex, const int NewPIndex, FString NewName);
-	/** Get the names of every node in the hierarchy */
-	TArray<FString> GetNodeNames();
-	/** Check if node is parent of other */
-	bool IsParentNode(const int PIndex, const int OIndex);
-	/** Check if node is child of other */
-	bool IsChildNode(const int CIndex, const int OIndex);
+	FORCEINLINE TArray<UHNode *> GetNodes() { return Nodes; }			// get the entire array of nodes
+	FORCEINLINE UHNode * GetNode(int Index) { return Nodes[Index]; }	// get a specific node by index
+	FORCEINLINE int GetNumNodes() { return NumNodes; }					// return the number of nodes in the pool
 
 public:
-	FORCEINLINE AHNode * GetNodeAtIndex(int x) { return Nodes[x]; }
-	FORCEINLINE int GetNumNodes() const { return NumNodes; }
-public:
-	// Default Constructor
-	FHierarchy();
-	FHierarchy(int NewCount);
-	// Default Deconstructor
-	~FHierarchy();
+	// Initialize Nodes with a number of nodes
+	void Init(int NodesToCreate);
+	// Initialize Nodes with a number of nodes and pre-set names
+	void Init(int NodesToCreate, TArray<FString> Names);
+	// Change the values of a Node at the given index
+	void SetNode(int Index, int NewPIndex, FString NewName);
 };
-

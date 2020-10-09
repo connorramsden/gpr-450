@@ -3,97 +3,129 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
+#include "UObject/NoExportTypes.h"
 #include "Hierarchy.h"
 #include "SpatialPose.h"
+#include <Math/DualQuat.h>
 
 #include "HierarchyState.generated.h"
 
-// A simpe wrapper for a generic array of spatial poses
-USTRUCT(BlueprintType)
-struct ULAB_API FHierarchyPose
+typedef TArray<USpatialPose *> SPosePool;
+typedef TArray<UHierarchicalPose *> HPosePool;
+
+/**
+ * A neat wrapper for a collection of poses
+ * Decoupled context for a Hierarchy
+ * Represents teh spatial description of a hierarchy at some point in time
+ */
+UCLASS()
+class ULAB_API UHierarchicalPose : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	TArray<FSpatialPose> Pool;
+	TArray<USpatialPose *> Poses;
 
 public:
-	FORCEINLINE TArray<FSpatialPose> GetPosePool() { return Pool; }
+	UHierarchicalPose();
+	~UHierarchicalPose();
+
 public:
-	FHierarchyPose();
-	FHierarchyPose(TArray<FSpatialPose> NewPool);
-	~FHierarchyPose();
+	FORCEINLINE SPosePool GetPoses() { return Poses; }
+	FORCEINLINE USpatialPose * GetPose(int Index) { return Poses[Index]; }
+
+public:
+	// Init given a number of poses
+	void Init(int NumPoses);
+	// Init given an array of poses
+	void Init(TArray<USpatialPose *> InitPoses);
+	// Update the pose at the passed index
+	void SetPose(USpatialPose * Pose, int Index);
+	// Add a new pose to the end of the pool
+	void AddPose(USpatialPose * Pose);
+	// Reset all poses in the pool
+	void ResetPoses();
+	void ConvertPoses(int NodeCount, PoseChannel Channel, PoseOrder Order);
 };
 
-USTRUCT(BlueprintType)
-struct ULAB_API FHierarchyPoseGroup
+/**
+ * A pool or group of hierarchical poses & their individual node poses
+ */
+UCLASS()
+class ULAB_API UHierarchyPosePool : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	// The hierarchy associated with this spatial data (organization of poses)
-	// The pool itself describes the spatial properties of this hierarchy
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pose Group Components")
-		FHierarchy Hierarchy;
+	// The hierarchy associated with this spatial data. 
+	// The whole pool describes the spatial properties of the hierarchy.
+	// Thie hierarchy describes the organization of poses.
+	UHierarchy * Hierarchy;
 
-	// Actual array of individual node poses
-	// Similar to a keyframe pol for all poses for this hierarhy & nodes
-	// TLDR: Set of all poses for all nodes
-	TArray<FSpatialPose> SpatialPosePool;
+	// The actual array of individual node poses.
+	// The set of all poses for all nodes.
+	TArray<USpatialPose *> SpatialPoses;
 
-	// An array of hierarchical poses (referencing ^ spatial poses)
-	// Similar to a keyframe pool for the whole hierarchy. 
-	// Organizes individual node poses.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pose Group Components")
-		TArray<FHierarchyPose> HierarchicalPoses;
+	// An array of hierarchical poses. References SpatialPoses.
+	// This organizes the individual node poses.
+	TArray<UHierarchicalPose *> HierarchicalPoses;
 
-	// Array of transforamtion channels for each node in the hierarchy
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pose Group Components")
-		TArray<SpatialPoseChannel> Channels;
+	// An array of transformation channels for each node in the Hierarchy
+	// Describes individual pose transformation components
+	// Ex: Rotation X, Translation XYZ, etc.)
+	TArray<PoseChannel> Channels;
 
-	// Global flag for the pool that describes the concatenation order
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pose Group Components")
-		SpatialPoseEulerOrder EulerOrder;
-
-	// # of Hierarchical Poses
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pose Group Components")
-		int HPoseCount;
-
-	// Total # of Spatial Poses
-	// HPoseCount * HNumNodes
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pose Group Components")
-		int SPoseCount;
+	// Some global flag for the pool
+	// Describes the concatenation order of orientation channel
+	PoseOrder EulerOrder;
 
 public:
-	FORCEINLINE int GetHPoseCount() const { return HPoseCount; }
-	FORCEINLINE int GetSPoseCount() const { return SPoseCount; }
+	UHierarchyPosePool();
+	~UHierarchyPosePool();
 
 public:
-	FHierarchyPoseGroup();
-	FHierarchyPoseGroup(FHierarchy NewHier, int NumPoses);
-	~FHierarchyPoseGroup();
+	FORCEINLINE UHierarchy * GetHierarchy() { return Hierarchy; }
+	FORCEINLINE SPosePool GetSpatial() { return SpatialPoses; }
+	FORCEINLINE USpatialPose * GetSPose(int Index) { return SpatialPoses[Index]; }
+	FORCEINLINE HPosePool GetHierarchical() { return HierarchicalPoses; }
+	FORCEINLINE UHierarchicalPose * GetHPose(int Index) { return HierarchicalPoses[Index]; }
+	FORCEINLINE TArray<PoseChannel> GetChannels() { return Channels; }
+	FORCEINLINE PoseChannel GetChannel(int Index) { return Channels[Index]; }
+	FORCEINLINE PoseOrder GetOrder() { return EulerOrder; }
 };
 
-USTRUCT(BlueprintType)
-struct ULAB_API FHierarchyState
+/**
+ * A
+ */
+UCLASS()
+class ULAB_API UHierarchyState : public UObject
 {
 	GENERATED_BODY()
 
 protected:
-	FHierarchy Hierarchy;
-	FHierarchyPose SamplePose;
-	FHierarchyPose LocalSpacePose;
-	FHierarchyPose ObjectSpacePose;
+	UHierarchy * Hierarchy;
+
+	UHierarchicalPose * SamplePose;
+	UHierarchicalPose * LocalSpacePose;
+	UHierarchicalPose * ObjectSpacePose;
 
 public:
-	FORCEINLINE FHierarchy GetHierarchy() { return Hierarchy; }
-	FORCEINLINE FHierarchyPose GetSample() { return SamplePose; }
-	FORCEINLINE FHierarchyPose GetLocal() { return LocalSpacePose; }
-	FORCEINLINE FHierarchyPose GetObject() { return ObjectSpacePose; }
+	UHierarchyState();
+	~UHierarchyState();
 
 public:
-	FHierarchyState();
-	FHierarchyState(FHierarchy NewHier, TArray<FHierarchyPose> Poses);
-	~FHierarchyState();
+	FORCEINLINE UHierarchy * GetHierarchy() { return Hierarchy; }
+	FORCEINLINE UHierarchicalPose * GetSample() { return SamplePose; }
+	FORCEINLINE UHierarchicalPose * GetLocal() { return LocalSpacePose; }
+	FORCEINLINE UHierarchicalPose * GetObject() { return ObjectSpacePose; }
+	FORCEINLINE void SetHierarchy(UHierarchy * NewHier) { Hierarchy = NewHier; }
+	FORCEINLINE void SetSample(UHierarchicalPose * NewPose) { SamplePose = NewPose; }
+	FORCEINLINE void SetLocal(UHierarchicalPose * NewPose) { LocalSpacePose = NewPose; }
+	FORCEINLINE void SetObject(UHierarchicalPose * NewPose) { ObjectSpacePose = NewPose; }
+
+public:
+	// Iniitalize the state given the passed hierarchy
+	void Init(UHierarchy * NewHier);
+	// Update inverse object-space matrices
+	void UpdateObjectInverse();
 };

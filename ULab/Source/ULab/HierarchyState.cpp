@@ -1,99 +1,120 @@
 // Copyright 2020 Connor Ramsden
 
+
 #include "HierarchyState.h"
 
-typedef SpatialPoseEulerOrder PoseOrder;
-
-FHierarchyPose::FHierarchyPose()
+UHierarchicalPose::UHierarchicalPose()
 {
-	Pool = TArray<FSpatialPose>();
+	// Init a blank array of Poses
+	Poses = TArray<USpatialPose *>();
+	return;
+}
+
+UHierarchicalPose::~UHierarchicalPose()
+{
+	if (Poses.Num() > 0)
+		Poses.Empty();
 
 	return;
 }
 
-FHierarchyPose::FHierarchyPose(TArray<FSpatialPose> NewPool)
+void UHierarchicalPose::Init(int NumPoses)
 {
-	Pool = NewPool;
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		USpatialPose * TempPose = NewObject<USpatialPose>();
+
+		Poses.Add(TempPose);
+
+		TempPose->ConditionalBeginDestroy();
+	}
 
 	return;
 }
 
-FHierarchyPose::~FHierarchyPose()
+void UHierarchicalPose::Init(TArray<USpatialPose *> InitPoses)
 {
-	Pool.Empty();
+	Poses = InitPoses;
 
 	return;
 }
 
-FHierarchyPoseGroup::FHierarchyPoseGroup()
+void UHierarchicalPose::SetPose(USpatialPose * Pose, int Index)
 {
-	Hierarchy = FHierarchy();
+	Poses[Index] = Pose;
 
-	SpatialPosePool = TArray<FSpatialPose>();
+	return;
+}
 
-	HierarchicalPoses = TArray<FHierarchyPose>();
+void UHierarchicalPose::AddPose(USpatialPose * Pose)
+{
+	Poses.Add(Pose);
 
-	Channels = TArray<SpatialPoseChannel>();
+	return;
+}
+
+void UHierarchicalPose::ResetPoses()
+{
+	// For each Pose in pool, call Reset()
+	for (int i = 0; i < Poses.Num(); ++i)
+	{
+		Poses[i]->ResetPose();
+	}
+
+	return;
+}
+
+void UHierarchicalPose::ConvertPoses(int NodeCount, PoseChannel Channel, PoseOrder Order)
+{}
+
+UHierarchyPosePool::UHierarchyPosePool()
+{
+	Hierarchy = NewObject<UHierarchy>();
+
+	SpatialPoses = TArray<USpatialPose *>();
+
+	HierarchicalPoses = TArray<UHierarchicalPose *>();
+
+	Channels = TArray<PoseChannel>();
 
 	EulerOrder = PoseOrder::PoseEulerOrder_xyz;
 
-	HPoseCount = 0;
+	return;
+}
 
-	SPoseCount = HPoseCount * Hierarchy.GetNumNodes();
+UHierarchyPosePool::~UHierarchyPosePool()
+{
+	if (Hierarchy)
+		Hierarchy->ConditionalBeginDestroy();
+
+	if (SpatialPoses.Num() > 0)
+		SpatialPoses.Empty();
+
+	if (HierarchicalPoses.Num() > 0)
+		HierarchicalPoses.Empty();
+
+	if (HierarchicalPoses.Num() > 0)
+		Channels.Empty();
 
 	return;
 }
 
-FHierarchyPoseGroup::FHierarchyPoseGroup(FHierarchy NewHier, int NumPoses)
+UHierarchyState::UHierarchyState()
 {
-	Hierarchy = NewHier;
-
-	HPoseCount = NumPoses;
-	SPoseCount = NumPoses * Hierarchy.GetNumNodes();
-
-	HierarchicalPoses = TArray<FHierarchyPose>();
-	HierarchicalPoses.Init(FHierarchyPose(), HPoseCount);
-
-	SpatialPosePool = TArray<FSpatialPose>();
-	SpatialPosePool.Init(FSpatialPose(), SPoseCount);
-
-	Channels = TArray<SpatialPoseChannel>();
-	EulerOrder = PoseOrder::PoseEulerOrder_xyz;
-
-	return;
+	Hierarchy = NewObject<UHierarchy>();
+	SamplePose = NewObject<UHierarchicalPose>();
+	LocalSpacePose = NewObject<UHierarchicalPose>();
+	ObjectSpacePose = NewObject<UHierarchicalPose>();
 }
 
-FHierarchyPoseGroup::~FHierarchyPoseGroup()
+UHierarchyState::~UHierarchyState()
 {
-	HierarchicalPoses.Empty();
-	SpatialPosePool.Empty();
-
-	return;
-}
-
-FHierarchyState::FHierarchyState()
-{
-	Hierarchy = FHierarchy();
-
-	SamplePose = FHierarchyPose();
-	LocalSpacePose = FHierarchyPose();
-	ObjectSpacePose = FHierarchyPose();
-
-	return;
-}
-
-FHierarchyState::FHierarchyState(FHierarchy NewHier, TArray<FHierarchyPose> Poses)
-{
-	Hierarchy = NewHier;
-
-	SamplePose = Poses[0];
-	LocalSpacePose = Poses[1];
-	ObjectSpacePose = Poses[2];
-
-	return;
-}
-
-FHierarchyState::~FHierarchyState()
-{
-	return;
+	if (Hierarchy)
+		Hierarchy->ConditionalBeginDestroy();
+	if (SamplePose)
+		SamplePose->ConditionalBeginDestroy();
+	if (LocalSpacePose)
+		LocalSpacePose->ConditionalBeginDestroy();
+	if (ObjectSpacePose)
+		ObjectSpacePose->ConditionalBeginDestroy();
 }

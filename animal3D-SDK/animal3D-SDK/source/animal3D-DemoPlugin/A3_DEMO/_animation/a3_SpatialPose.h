@@ -69,6 +69,7 @@ enum a3_SpatialPoseChannel
 	a3poseChannel_orient_x = 0x0001,
 	a3poseChannel_orient_y = 0x0002,
 	a3poseChannel_orient_z = 0x0004,
+	a3poseChannel_orient_w = 0x0008,
 	a3poseChannel_orient_xy = a3poseChannel_orient_x | a3poseChannel_orient_y,
 	a3poseChannel_orient_yz = a3poseChannel_orient_y | a3poseChannel_orient_z,
 	a3poseChannel_orient_zx = a3poseChannel_orient_z | a3poseChannel_orient_x,
@@ -78,6 +79,7 @@ enum a3_SpatialPoseChannel
 	a3poseChannel_scale_x = 0x0010,
 	a3poseChannel_scale_y = 0x0020,
 	a3poseChannel_scale_z = 0x0040,
+	a3poseChannel_scale_w = 0x0080,
 	a3poseChannel_scale_xy = a3poseChannel_scale_x | a3poseChannel_scale_y,
 	a3poseChannel_scale_yz = a3poseChannel_scale_y | a3poseChannel_scale_z,
 	a3poseChannel_scale_zx = a3poseChannel_scale_z | a3poseChannel_scale_x,
@@ -87,6 +89,7 @@ enum a3_SpatialPoseChannel
 	a3poseChannel_translate_x = 0x0100,
 	a3poseChannel_translate_y = 0x0200,
 	a3poseChannel_translate_z = 0x0400,
+	a3poseChannel_translate_w = 0x0800,
 	a3poseChannel_translate_xy = a3poseChannel_translate_x | a3poseChannel_translate_y,
 	a3poseChannel_translate_yz = a3poseChannel_translate_y | a3poseChannel_translate_z,
 	a3poseChannel_translate_zx = a3poseChannel_translate_z | a3poseChannel_translate_x,
@@ -99,7 +102,22 @@ enum a3_SpatialPoseChannel
 // single pose for a single node
 struct a3_SpatialPose
 {
+	// final matrix - derived from TRS - matrices don't blend well :(
 	a3mat4 transform;
+
+	// Final DQ - can be derived from all below or TR - they do animate
+	// dq = dual number, with real and dual part, each a quaternion
+	// default dq = "1": real = (0, 0, 0, 1), dual = (0, 0, 0, 0)
+	a3dualquat dq; // encodes: angle/axis rotation, translation
+
+	// quaternion - derived from Euler angles or angle/axis
+	// default quat = "1": (0, 0, 0, 1)
+	a3quat orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
+
+	// raw description;
+	a3vec4 angles; // aka rotation
+	a3vec4 scale;
+	a3vec4 translation;
 };
 
 
@@ -125,6 +143,12 @@ a3i32 a3spatialPoseConvert(a3mat4* mat_out, const a3_SpatialPose* spatialPose_in
 
 // copy operation for single node pose
 a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_SpatialPose* spatialPose_in);
+
+// concat
+a3i32 a3spatialPoseConcat(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_lhs, const a3_SpatialPose * spatialPose_rhs, const a3boolean usingQuaternions);
+
+// lerp
+a3i32 a3spatialPoseLerp(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_0, const a3_SpatialPose * spatialPose_1, const a3real u);
 
 
 //-----------------------------------------------------------------------------
