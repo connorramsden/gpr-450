@@ -112,7 +112,7 @@ struct a3_SpatialPose
 
 	// quaternion - derived from Euler angles or angle/axis
 	// default quat = "1": (0, 0, 0, 1)
-	a3quat orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
+	a3vec4 orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
 
 	// raw description;
 	a3vec4 angles; // aka rotation
@@ -120,6 +120,17 @@ struct a3_SpatialPose
 	a3vec4 translation;
 };
 
+// fyunction pointer with form of lerp
+typedef a3real4r(* a3real4BlendOpLerp) (a3real4 const p0, a3real4 const p1, a3real const u);
+
+// blend operations collection for a whole pose
+struct a3_SpatialPoseBlend
+{
+	a3real4BlendOpLerp blendOpLerp_rotation;
+	a3real4BlendOpLerp blendOpLerp_scale;
+	a3real4BlendOpLerp blendOpLerp_translation;
+	a3real4BlendOpLerp blendOpLerp_orientation;
+};
 
 //-----------------------------------------------------------------------------
 
