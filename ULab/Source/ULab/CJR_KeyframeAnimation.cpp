@@ -1,123 +1,123 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KeyframeAnimation.h"
-#include <Math/UnrealMath.h>
-
-KeyframeAnimation::KeyframeAnimation()
-{}
-
-KeyframeAnimation::~KeyframeAnimation()
-{}
+#include "CJR_KeyframeAnimation.h"
 
 ///////////// KEYFRAME START /////////////
 
 // Default Constructor
-FKeyframe::FKeyframe()
+UFKeyframe::UFKeyframe()
 {
 	// index initialized in the Keyframe Pool
-
+	Index = -1;
 	// Arbitrary duration between 1 and 10 ticks
-	duration = FMath::RandRange(1.0f, 10.0f);
+	Duration = FMath::RandRange(1.0f, 10.0f);
 	// Calculate duration inverse
-	durationInv = 1.0f / duration;
+	DurationInv = 1.0f / Duration;
 	// Randomly select 'Data' (Will be more concrete in future update)
-	data = FMath::Rand();
-}
-
-// Initialize a keyframe
-FKeyframe::FKeyframe(const float newDuration, const int value_x)
-{
-	// Set duration
-	duration = newDuration;
-	// Calculate duration inverse
-	durationInv = 1.0f / duration;
-	// Set Data value (Will not be integer in future update)
-	data = value_x;
-
-	return;
+	Data = FMath::Rand();
 }
 
 // Default Deconstructor
-FKeyframe::~FKeyframe()
-{}
+UFKeyframe::~UFKeyframe()
+{
+}
+
+void UFKeyframe::Init(const float NewDuration, const int Value_X)
+{
+	// index initialized in Keyframe Pool
+	Index = -1;
+	// Set duration
+	Duration = NewDuration;
+	// Calculate duration inverse
+	DurationInv = 1.0f / Duration;
+	// Set Data value (Will not be integer in future update)
+	Data = Value_X;
+
+	return;
+}
 
 ///////////// KEYFRAME END /////////////
 
 ///////////// KEYFRAME POOL  START /////////////
 
 // Default KPool Constructor
-FKeyframePool::FKeyframePool()
+UFKeyframePool::UFKeyframePool()
 {
 	// Default initialization to 20 Keyframes
 	for (int i = 0; i < 20; ++i)
 	{
 		// Increment keyframe pool count
-		poolCount++;
+		PoolCount++;
 
 		// Assign a temporary keyframe a duration between 1 and 10, and a random piece of 'data'
-		FKeyframe tempFrame = FKeyframe(FMath::RandRange(1.0f, 10.0f), FMath::Rand());
+		UFKeyframe* TempFrame = NewObject<UFKeyframe>();
+
+		TempFrame->Init(
+			FMath::RandRange(1.0f, 10.0f), FMath::Rand());
+
 		// Set the temporary keyframe's index to the current keyframe count
-		tempFrame.index = poolCount;
+		TempFrame->Index = PoolCount;
 
 		// Add the temporary keyframe to the pool
-		pool.Add(tempFrame);
-	}
-
-	return;
-}
-
-// Allocate Keyframe Pool
-FKeyframePool::FKeyframePool(const int count)
-{
-	// Allocate array of keyframes (not sure if this function works. Might have to initialize manually)
-	for (int i = 0; i < count; ++i)
-	{
-		// Increment keyframe pool count
-		poolCount++;
-
-		// Assign a temporary keyframe a duration between 1 and 10, and a random piece of 'data'
-		FKeyframe tempFrame = FKeyframe(FMath::RandRange(1.0f, 10.0f), FMath::Rand());
-		// Set the temporary keyframe's index to the current keyframe count
-		tempFrame.index = poolCount;
-
-		// Add the temporary keyframe to the pool
-		pool.Add(tempFrame);
+		Pool.Add(TempFrame);
 	}
 
 	return;
 }
 
 // Release keyframe pool
-FKeyframePool::~FKeyframePool()
+UFKeyframePool::~UFKeyframePool()
 {
 	// Need to de-allocate array
 }
+
+void UFKeyframePool::Init(const int Count)
+{
+	// Allocate array of keyframes (not sure if this function works. Might have to initialize manually)
+	for (int i = 0; i < Count; ++i)
+	{
+		// Increment keyframe pool count
+		PoolCount++;
+
+		// Assign a temporary keyframe a duration between 1 and 10, and a random piece of 'data'
+		UFKeyframe* TempFrame = NewObject<UFKeyframe>();
+		TempFrame->Init(
+			FMath::RandRange(1.0f, 10.0f), FMath::Rand());
+
+		// Set the temporary keyframe's index to the current keyframe count
+		TempFrame->Index = PoolCount;
+
+		// Add the temporary keyframe to the pool
+		Pool.Add(TempFrame);
+	}
+}
+
 
 ///////////// KEYFRAME POOL END /////////////
 
 ///////////// CLIP START /////////////
 
 // Default Clip Constructor
-FClip::FClip()
+UFClip::UFClip()
 {
 	// Set default clip name
-	name = "New Clip";
+	Name = "New Clip";
 
 	// Initialize default keyframe pool (NOTE: Might not work the way I want it to!)
-	keyframePool = FKeyframePool();
+	KeyframePool = NewObject<UFKeyframePool>();
 
 	// Set count
-	count = keyframePool.poolCount;
+	Count = KeyframePool->PoolCount;
 
 	// NOTE: Might need to fix these default values, we'll see
 	// Set first keyframe index to 0
-	firstKeyframe = 0;
+	FirstKeyframe = 0;
 	// Last index should be 19 (since we have 20 keyframes in a default init)
-	lastKeyframe = 19;
+	LastKeyframe = 19;
 
 	// Init duration to 0
-	duration = 0;
+	Duration = 0;
 
 	// Calculate Duration based on keyframePool
 	CalculateDuration();
@@ -125,22 +125,26 @@ FClip::FClip()
 	return;
 }
 
-// Specialized Clip Constructor
-FClip::FClip(FString newClipName, const FKeyframePool newPool, const int firstKeyframeIndex, const int finalKeyframeIndex)
+UFClip::~UFClip()
+{
+}
+
+void UFClip::Init(const FString NewClipName, UFKeyframePool* NewPool, const int FirstKeyframeIndex,
+                  const int FinalKeyframeIndex)
 {
 	// Set name
-	name = newClipName;
+	Name = NewClipName;
 	// Set referenced keyframe pool
-	keyframePool = newPool;
+	KeyframePool = NewPool;
 	// Set count
-	count = keyframePool.poolCount;
+	Count = KeyframePool->PoolCount;
 	// Set first KF index
-	firstKeyframe = firstKeyframeIndex;
+	FirstKeyframe = FirstKeyframeIndex;
 	// Set last KF index
-	lastKeyframe = finalKeyframeIndex;
+	LastKeyframe = FinalKeyframeIndex;
 
 	// Init duration to 0
-	duration = 0;
+	Duration = 0;
 
 	// Calculate Duration based on keyframePool
 	CalculateDuration();
@@ -148,37 +152,34 @@ FClip::FClip(FString newClipName, const FKeyframePool newPool, const int firstKe
 	return;
 }
 
-FClip::~FClip()
-{}
-
 // Calculate clip duration as sum of keyframes' durations
-void FClip::CalculateDuration()
+void UFClip::CalculateDuration()
 {
 	// Sum the duration of all keyframes to calculate clip duration
-	for (int i = 0; i < keyframePool.poolCount; ++i)
+	for (int i = 0; i < KeyframePool->PoolCount; ++i)
 	{
-		duration += keyframePool.pool[i].duration;
+		Duration += KeyframePool->Pool[i]->Duration;
 	}
 
 	// Calculate clip duration inverse
-	durationInv = 1.0f / duration;
+	DurationInv = 1.0f / Duration;
 
 	return;
 }
 
 // Uniformly set duration and inverse across entire pool
-void FClip::DistributeDuration(const float newClipDuration)
+void UFClip::DistributeDuration(const float NewClipDuration)
 {
 	// Set duration directly
-	duration = newClipDuration;
+	Duration = NewClipDuration;
 	// Set inverse directly
-	durationInv = 1.0f / newClipDuration;
+	DurationInv = 1.0f / NewClipDuration;
 
 	// Distribute uniform duration across all keyframes
-	for (int i = 0; i < keyframePool.poolCount; ++i)
+	for (int i = 0; i < KeyframePool->PoolCount; ++i)
 	{
-		keyframePool.pool[i].duration = duration;
-		keyframePool.pool[i].durationInv = durationInv;
+		KeyframePool->Pool[i]->Duration = Duration;
+		KeyframePool->Pool[i]->DurationInv = DurationInv;
 	}
 
 	return;
@@ -190,66 +191,65 @@ void FClip::DistributeDuration(const float newClipDuration)
 ///////////// CLIP POOL START /////////////
 
 // Default Clip Pool Constructor
-FClipPool::FClipPool()
+UFClipPool::UFClipPool()
 {
 	// Assumes default initialization size is 5 clips
 	for (int i = 0; i < 5; ++i)
 	{
-		count++;
-	
-		FClip tempClip = FClip();
-		tempClip.index = count;
-		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
-	
-		pool.Add(tempClip);
-	}
+		Count++;
 
-	return;
-}
+		UFClip* TempClip = NewObject<UFClip>();
+		TempClip->Index = Count;
+		TempClip->Name = TempClip->Name + FString(" ") + FString::FromInt(TempClip->Index);
 
-// Specialized Clip Pool Constructor
-FClipPool::FClipPool(const int newCount)
-{
-	for (int i = 0; i < newCount; ++i)
-	{
-		// Increment clip count
-		count++;
-
-		// Create a default / blank Clip
-		FClip tempClip = FClip();
-		// Set the clip index to the current count
-		tempClip.index = count;
-		// Adjust clip name based on index
-		tempClip.name = tempClip.name + FString(" ") + FString::FromInt(tempClip.index);
-
-		// Add the temp clip to the pool
-		pool.Add(tempClip);
+		Pool.Add(TempClip);
 	}
 
 	return;
 }
 
 // Clip Pool Deconstructor
-FClipPool::~FClipPool()
+UFClipPool::~UFClipPool()
 {
 	// Do I need to deallocate anything from the pool?
 }
 
-int FClipPool::GetClipIndexInPool(FString clipName)
+void UFClipPool::Init(const int NewCount)
 {
-	int tempIndex = -1;
+	for (int i = 0; i < NewCount; ++i)
+	{
+		// Increment clip count
+		Count++;
 
-	for (int i = 0; i < count; ++i)
+		// Create a default / blank Clip
+		UFClip* TempClip = NewObject<UFClip>();
+		// Set the clip index to the current count
+		TempClip->Index = Count;
+		// Adjust clip name based on index
+		TempClip->Name = TempClip->Name + FString(" ") + FString::FromInt(TempClip->Index);
+
+		// Add the temp clip to the pool
+		Pool.Add(TempClip);
+	}
+
+	return;
+}
+
+int UFClipPool::GetClipIndexInPool(const FString ClipName)
+{
+	int TempIndex = -1;
+
+	for (int i = 0; i < Count; ++i)
 	{
 		// If the names match, set temp index
-		if (pool[i].name.Compare(clipName))
+		if (Pool[i]->Name.Compare(ClipName))
 		{
-			tempIndex = pool[i].index;
+			TempIndex = Pool[i]->Index;
 			break;
 		}
 	}
 
-	return tempIndex;
+	return TempIndex;
 }
 
 ///////////// CLIP POOL END /////////////

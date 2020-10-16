@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Hierarchy.generated.h"
+#include "CJR_Hierarchy.generated.h"
 
 /**
  * Core of all hierarchical data
@@ -28,12 +28,12 @@ public:
 	UHNode();
 
 public:
-	FORCEINLINE FString GetName() { return Name; }
-	FORCEINLINE int GetIndex() { return Index; }
-	FORCEINLINE int GetPIndex() { return ParentIndex; }
-	FORCEINLINE void SetName(FString NewName) { Name = NewName; }
-	FORCEINLINE void SetIndex(int NewIndex) { Index = NewIndex; }
-	FORCEINLINE void SetPIndex(int NewPIndex) { ParentIndex = NewPIndex; }
+	FORCEINLINE FString GetName() const { return Name; }
+	FORCEINLINE int GetIndex() const { return Index; }
+	FORCEINLINE int GetPIndex() const { return ParentIndex; }
+	FORCEINLINE void SetName(const FString NewName) { Name = NewName; }
+	FORCEINLINE void SetIndex(const int NewIndex) { Index = NewIndex; }
+	FORCEINLINE void SetPIndex(const int NewPIndex) { ParentIndex = NewPIndex; }
 };
 
 /**
@@ -47,6 +47,7 @@ class ULAB_API UHierarchy : public UObject
 	GENERATED_BODY()
 
 protected:
+	UPROPERTY()
 	TArray<UHNode *> Nodes;
 	int NumNodes;
 public:
@@ -54,9 +55,9 @@ public:
 	~UHierarchy();
 
 public:
-	FORCEINLINE TArray<UHNode *> GetNodes() { return Nodes; }			// get the entire array of nodes
-	FORCEINLINE UHNode * GetNode(int Index) { return Nodes[Index]; }	// get a specific node by index
-	FORCEINLINE int GetNumNodes() { return NumNodes; }					// return the number of nodes in the pool
+	FORCEINLINE TArray<UHNode *> GetNodes() const { return Nodes; }			// get the entire array of nodes
+	FORCEINLINE UHNode * GetNode(const int Index) { return Nodes[Index]; }	// get a specific node by index
+	FORCEINLINE int GetNumNodes() const { return NumNodes; }					// return the number of nodes in the pool
 
 public:
 	// Initialize Nodes with a number of nodes

@@ -1,7 +1,7 @@
 // Copyright 2020 Connor Ramsden
 
 
-#include "SpatialPose.h"
+#include "CJR_SpatialPose.h"
 
 USpatialPose::USpatialPose()
 {
@@ -26,8 +26,12 @@ void USpatialPose::ResetPose()
 	// Set Transform to Identity matrix
 	Transform = FTransform::Identity;
 
-	// Set Orientation to (0, 0, 0)
-	Orientation = FVector::ZeroVector;
+	Orientation = FVector4(0.f, 0.f, 0.f, 1.f);
+	
+	// Dq = FDualQuat(FQuat(0.f, 0.f, 0.f, 1.f), FQuat(0.f, 0.f, 0.f, 0.f));
+
+	// Set Rotation to (0, 0, 0)
+	Rotation = FVector::ZeroVector;
 	// Set Scale to (1, 1, 1)
 	Scale = FVector::OneVector;
 	// Set Translation to (0, 0, 0)
@@ -51,37 +55,56 @@ USpatialPose * PoseCopy(USpatialPose & OtherPose)
 	return OutPose;
 }
 
-FMatrix PoseConvert(USpatialPose & PoseIn, PoseChannel Channel, PoseOrder Order)
+void PoseConvert(USpatialPose & PoseIn, EPoseChannel Channel, EPoseOrder Order)
 {
-	return FMatrix();
+	// Check fucking slides lol
+	FMatrix rx, ry, rz, r;
+
+	switch(Order)
+	{
+		case ESpatialPoseEulerOrder::PoseEulerOrder_xyz:
+			break;
+		case ESpatialPoseEulerOrder::PoseEulerOrder_yzx:
+			break;
+		case ESpatialPoseEulerOrder::PoseEulerOrder_zxy:
+			break;
+		case ESpatialPoseEulerOrder::PoseEulerOrder_yxz:
+			break;
+		case ESpatialPoseEulerOrder::PoseEulerOrder_xzy:
+			break;
+		case ESpatialPoseEulerOrder::PoseEulerOrder_zyx:
+			break;
+	}
+
+	
 }
 
-USpatialPose * PoseConcat(USpatialPose & lhs, USpatialPose & rhs)
+USpatialPose * PoseConcat(USpatialPose & Lhs, USpatialPose & RHS)
 {
 	// Create the Pose to be returned
 	USpatialPose * OutPose = NewObject<USpatialPose>();
 
 	// Calculate & Set Concat'd values for O, S, & T
-	OutPose->SetOrientation(lhs.GetOrientation() + rhs.GetOrientation());
-	OutPose->SetScale(lhs.GetScale() * rhs.GetScale());
-	OutPose->SetTranslation(lhs.GetTranslation() + rhs.GetTranslation());
+	OutPose->SetRotation(Lhs.GetRotation() + RHS.GetRotation());
+	OutPose->SetScale(Lhs.GetScale() * RHS.GetScale());
+	OutPose->SetTranslation(Lhs.GetTranslation() + RHS.GetTranslation());
 
 	// Done, return the Pose
 	return OutPose;
 }
 
-USpatialPose * PoseLerp(USpatialPose & Pose0, USpatialPose & Pose1, float u)
+USpatialPose * PoseLerp(USpatialPose & Pose0, USpatialPose & Pose1, float U)
 {
 	// Create the Pose to be returned
 	USpatialPose * OutPose = NewObject<USpatialPose>();
 
 	// Calculate LERP'd values for O, S, & T
-	FVector OutOrientation = FMath::Lerp(Pose0.GetOrientation(), Pose1.GetOrientation(), u);
-	FVector OutScale = FMath::Lerp(Pose0.GetScale(), Pose1.GetScale(), u);
-	FVector OutTrans = FMath::Lerp(Pose0.GetTranslation(), Pose1.GetTranslation(), u);
+	const FVector OutRotation = FMath::Lerp(Pose0.GetRotation(), Pose1.GetRotation(), U);
+	const FVector OutScale = FMath::Lerp(Pose0.GetScale(), Pose1.GetScale(), U);
+	const FVector OutTrans = FMath::Lerp(Pose0.GetTranslation(), Pose1.GetTranslation(), U);
 
 	// Set calculated values for return'd pose
-	OutPose->SetOrientation(OutOrientation);
+	OutPose->SetRotation(OutRotation);
 	OutPose->SetScale(OutScale);
 	OutPose->SetTranslation(OutTrans);
 
