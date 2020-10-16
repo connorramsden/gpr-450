@@ -163,7 +163,7 @@ inline a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_Spatial
 }
 
 // concat
-inline a3i32 a3spatialPoseConcat(a3_SpatialPose* spatialPose_out, const a3_SpatialPose* spatialPose_lhs, const a3_SpatialPose* spatialPose_rhs)
+inline a3i32 a3spatialPoseConcat(a3_SpatialPose* spatialPose_out, const a3_SpatialPose* spatialPose_lhs, const a3_SpatialPose* spatialPose_rhs, const a3boolean usingQuaternions)
 {
 	if (spatialPose_out && spatialPose_lhs && spatialPose_rhs)
 	{
@@ -199,53 +199,6 @@ inline a3i32 a3spatialPoseLerp(a3_SpatialPose* spatialPose_out, const a3_Spatial
 	}
 	return -1;
 }
-
-
-inline a3i32 a3spatialPoseConcat(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_lhs, const a3_SpatialPose * spatialPose_rhs, const a3boolean usingQuaternions)
-{
-	if (spatialPose_out && spatialPose_lhs && spatialPose_rhs)
-	{
-		// how do they concat?
-		// angles:
-		// orientation ->	o_lhs + o_rhs
-		// scale ->			s_lhs * s_rhs (component-wise)
-		// translation ->	t_slhs + t_rhs
-
-		// quaternions:
-		// orientation -> o_lhs * oh_rhs
-		
-		// done
-		return 1;
-	}
-
-	return -1;
-}
-
-inline a3i32 a3spatialPoseLerp(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_0, const a3_SpatialPose * spatialPose_1, const a3real u)
-{
-	if (spatialPose_out && spatialPose_0 && spatialPose_1)
-	{
-		// how do they lerp?
-		// transform	->	can't / don't / won't 
-		// orientation	->	lerp(o0, o1, u)
-		// scale		->	lerp(s0, s1, u)
-		// translation	->	lerp(t0, t1, u)
-
-		// quaternions :
-		// orientation -> lerp(o0, 01, u) -> just another 4D vector :)
-		//					|q| < 1			-> s = |q|
-		//				-> nlerp(...)
-		//					|q| = 1
-		//				-> slerp(...)
-		//					|q| = 1
-
-		// done
-		return 1;
-	}
-
-	return -1;
-}
-
 
 //-----------------------------------------------------------------------------
 
