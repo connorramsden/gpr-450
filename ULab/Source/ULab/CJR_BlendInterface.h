@@ -13,9 +13,7 @@ typedef USpatialPose USPose;
 /**
  * 
  */
-UCLASS
-
-()
+UCLASS()
 class ULAB_API UCJR_BlendInterface final : public UObject
 {
 	GENERATED_BODY()

@@ -1,8 +1,6 @@
 // Copyright 2020 Connor Ramsden
 
-
 #include "CJR_BlendInterface.h"
-
 #include "CJR_HelperFunctions.h"
 
 USPose* UCJR_BlendInterface::SPoseOpIdentity()
@@ -66,9 +64,31 @@ USpatialPose& UCJR_BlendInterface::SPoseOpLerp(USPose& Pose0, USPose& Pose1, con
 USpatialPose& UCJR_BlendInterface::SPoseOpCubic(USPose& Pose0, USPose& Pose1, USPose& Pose2, USPose& Pose3,
                                                 const float U)
 {
-	FCJR_HelperFunctions::NotImplemented();
+	float Mat[16] = {
+		0.0f, 2.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 1.0f, 0.0f,
+		2.0f, -5.0f, 4.0f, -1.0f,
+		-1.0f, 3.0f, -3.0f, 1.0f
+	};
 
-	return;
+	FMatrix RotationMatrix(Pose0.GetRotation(), Pose1.GetRotation(), Pose2.GetRotation(), Pose3.GetRotation());
+	FMatrix ScaleMatrix(Pose0.GetScale(), Pose1.GetScale(), Pose2.GetScale(), Pose3.GetScale());
+	FMatrix TransMatrix(Pose0.GetTranslation(), Pose1.GetTranslation(), Pose2.GetTranslation(), Pose3.GetTranslation());
+
+	const float T0 = 0.5f;
+	const float T1 = T0 * U;
+	const float T2 = T1 * U;
+	const float T3 = T2 * U;
+
+	float T[4] = {T0, T1, T2, T3};
+
+	USpatialPose OutPose;
+
+	OutPose.SetRotation(RotationMatrix * (Mat * T));
+	OutPose.SetScale(ScaleMatrix * (Mat * T));
+	OutPose.SetTranslation(TransMatrix * (Mat * T));
+
+	return OutPose;
 }
 
 USpatialPose& UCJR_BlendInterface::SPoseOpDeconcat(USPose& Lhs, USPose& Rhs)
