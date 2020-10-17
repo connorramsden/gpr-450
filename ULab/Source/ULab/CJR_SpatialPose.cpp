@@ -107,12 +107,6 @@ void USpatialPose::PoseLerp(USpatialPose* Other, const float U, EInterpMode Mode
 		break;
 	case EInterpMode::Mode_Step:
 		{
-			// Lerp Rotation
-			SetRotation(FMath::Lerp(GetRotation(), Other->GetRotation(), U));
-			// Lerp Scale
-			SetScale(FMath::Lerp(GetScale(), Other->GetScale(), U));
-			// Lerp Translation
-			SetTranslation(FMath::Lerp(GetTranslation(), Other->GetTranslation(), U));
 			break;
 		}
 	case EInterpMode::Mode_Nearest:
@@ -121,6 +115,12 @@ void USpatialPose::PoseLerp(USpatialPose* Other, const float U, EInterpMode Mode
 		}
 	case EInterpMode::Mode_Linear:
 		{
+			// Lerp Rotation
+			SetRotation(FMath::Lerp(GetRotation(), Other->GetRotation(), U));
+			// Lerp Scale
+			SetScale(FMath::Lerp(GetScale(), Other->GetScale(), U));
+			// Lerp Translation
+			SetTranslation(FMath::Lerp(GetTranslation(), Other->GetTranslation(), U));
 			break;
 		}
 	case EInterpMode::Mode_Smooth:
