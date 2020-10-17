@@ -20,24 +20,25 @@ class ULAB_API UHierarchyPose final : public UObject
 
 protected:
 	UPROPERTY()
-	USpatialPose* Pose;
+	TArray<USpatialPose*> Pose;
 
 public:
 	UHierarchyPose();
 	~UHierarchyPose();
 
-	void Init();
+	void Init(const int NumPoses);
 
 	void PoseReset(const int NodeCount);
-	void PoseConvert();
-	void PoseRestore();
-	void PoseCopy();
-	void PoseConcat();
-	void PoseLerp();
+	void PoseConvert(const int NodeCount, ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order);
+	void PoseRestore(const int NodeCount, ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order);
+	void PoseCopy(UHierarchyPose* PoseIn, const int NodeCount);
+	void PoseConcat(UHierarchyPose* Other, const int NodeCount);
+	void PoseLerp(UHierarchyPose* Other, const int NodeCount, const float U);
 
 public: // Getters & Setters
-	FORCEINLINE USpatialPose* GetPose() const { return Pose; }
-	FORCEINLINE void SetPose(USpatialPose* NewP) { Pose = NewP; }
+	FORCEINLINE TArray<USpatialPose*> GetPose() const { return Pose; }
+	FORCEINLINE void UpdatePose(USpatialPose* NewP, const int Index) { Pose[Index] = NewP; }
+	FORCEINLINE void SetPose(const TArray<USpatialPose*> NewP) { Pose = NewP; }
 };
 
 typedef TArray<USpatialPose*> FSPosePool;
@@ -59,11 +60,11 @@ protected:
 
 	// Hierarchical Spatial Poses
 	UPROPERTY()
-	FHPosePool HPose;
+	TArray<UHierarchyPose*> HPose;
 
 	// Spatial Poses
 	UPROPERTY()
-	FSPosePool Pose;
+	TArray<USpatialPose*> Pose;
 
 	// Channels
 	UPROPERTY()
@@ -85,12 +86,13 @@ public:
 	UHierarchyPoseGroup();
 	~UHierarchyPoseGroup();
 
-	void Init(UHierarchy* NewHier, const int PoseCount, const ESpatialPoseEulerOrder NewOrder);
+	void Init(UHierarchy* NewHier, const int NewCount, const ESpatialPoseEulerOrder NewOrder);
 };
 
 UCLASS()
 class ULAB_API UHierarchyState final : public UObject
 {
+	GENERATED_BODY()
 protected:
 	UPROPERTY()
 	UHierarchy* Hierarchy;
@@ -111,8 +113,15 @@ public:
 	UHierarchyState();
 	~UHierarchyState();
 
-	void Init();
+	void Init(UHierarchy* Hier);
 
 	void UpdateObjectInverse();
 	void UpdateObjectBindToCurrent();
+
+public:
+	FORCEINLINE UHierarchy* GetHierarchy() const { return Hierarchy; }
+	FORCEINLINE UHierarchyPose* GetLocal() const { return LocalSpace; }
+	FORCEINLINE UHierarchyPose* GetObject() const { return ObjectSpace; }
+	FORCEINLINE UHierarchyPose* GetObjectInv() const { return ObjectSpaceInverse; }
+	FORCEINLINE UHierarchyPose* GetObjectBind() const { return ObjectSpaceBindToCurrent; }
 };

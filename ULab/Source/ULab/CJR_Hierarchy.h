@@ -11,13 +11,17 @@
  * Contains no spatial or temporal information
  */
 UCLASS()
-class ULAB_API UHNode : public UObject
+class ULAB_API UHNode final : public UObject
 {
 	GENERATED_BODY()
 
 protected:
 	// The node's Name
 	FString Name;
+
+	// The Mesh that a Node is visualized by
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent * Mesh;
 
 	// Index within the Tree
 	int Index;
@@ -42,7 +46,7 @@ public:
  */
 
 UCLASS()
-class ULAB_API UHierarchy : public UObject
+class ULAB_API UHierarchy final : public UObject
 {
 	GENERATED_BODY()
 

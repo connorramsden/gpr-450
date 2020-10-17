@@ -60,6 +60,19 @@ enum class ESpatialPoseChannel
 	PoseChannel_Translate_XYZ = PoseChannel_Translate_XY | PoseChannel_Translate_Z,
 };
 
+UENUM()
+enum class EInterpMode
+{
+	Mode_Err = -1,
+	Mode_Step,
+	Mode_Nearest,
+	Mode_Linear,
+	Mode_Smooth
+};
+
+typedef ESpatialPoseChannel EPoseChannel;
+typedef ESpatialPoseEulerOrder EPoseOrder;
+
 /**
  * A description of a transformation (pose) in space
  * Provides spatial / temporal context for a UHNode
@@ -84,7 +97,7 @@ protected: // Member Variables
 	// quaternion - derived from Euler angles or angle/axis
 	// default quat = "1": (0, 0, 0, 1)
 	FVector4 Orientation;
-	
+
 	// 3 Element Vectors
 	// R -> Elements describing Euler angle orientation, relative to parent space
 	// S -> Elements describing scale, relative to parent space
@@ -109,12 +122,9 @@ public: // Getters & Setters
 public:
 	void Init(FTransform TMat, FVector O, FVector S, FVector TVec);
 	void ResetPose();
+	void PoseConvert(EPoseChannel Channel, EPoseOrder Order);
+	void PoseRestore(ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order);
+	void PoseCopy(USpatialPose& Other);
+	void PoseConcat(USpatialPose* Other);
+	void PoseLerp(USpatialPose* Other, const float U, EInterpMode Mode = EInterpMode::Mode_Step);
 };
-
-typedef ESpatialPoseChannel EPoseChannel;
-typedef ESpatialPoseEulerOrder EPoseOrder;
-
-USpatialPose * PoseCopy(USpatialPose & OtherPose);
-void PoseConvert(USpatialPose & PoseIn, EPoseChannel Channel, EPoseOrder Order);
-USpatialPose * PoseConcat(USpatialPose & Lhs, USpatialPose & RHS);
-USpatialPose * PoseLerp(USpatialPose & Pose0, USpatialPose & Pose1, float U);

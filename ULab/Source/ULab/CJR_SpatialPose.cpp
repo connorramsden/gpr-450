@@ -2,6 +2,8 @@
 
 
 #include "CJR_SpatialPose.h"
+#include "CJR_HelperFunctions.h"
+typedef FCJR_HelperFunctions FHF;
 
 USpatialPose::USpatialPose()
 {
@@ -27,7 +29,7 @@ void USpatialPose::ResetPose()
 	Transform = FTransform::Identity;
 
 	Orientation = FVector4(0.f, 0.f, 0.f, 1.f);
-	
+
 	// Dq = FDualQuat(FQuat(0.f, 0.f, 0.f, 1.f), FQuat(0.f, 0.f, 0.f, 0.f));
 
 	// Set Rotation to (0, 0, 0)
@@ -40,74 +42,95 @@ void USpatialPose::ResetPose()
 	return;
 }
 
-USpatialPose * PoseCopy(USpatialPose & OtherPose)
-{
-	// Create the Pose to be returned
-	USpatialPose * OutPose = NewObject<USpatialPose>();
-
-	// Copy OtherPose's values to the OutPose
-	OutPose->SetTransform(OtherPose.GetTransform());
-	OutPose->SetOrientation(OtherPose.GetOrientation());
-	OutPose->SetScale(OtherPose.GetScale());
-	OutPose->SetTranslation(OtherPose.GetTranslation());
-
-	// Done, return the Pose
-	return OutPose;
-}
-
-void PoseConvert(USpatialPose & PoseIn, EPoseChannel Channel, EPoseOrder Order)
+void USpatialPose::PoseConvert(EPoseChannel Channel, EPoseOrder Order)
 {
 	// Check fucking slides lol
 	FMatrix rx, ry, rz, r;
 
-	switch(Order)
+	switch (Order)
 	{
-		case ESpatialPoseEulerOrder::PoseEulerOrder_xyz:
-			break;
-		case ESpatialPoseEulerOrder::PoseEulerOrder_yzx:
-			break;
-		case ESpatialPoseEulerOrder::PoseEulerOrder_zxy:
-			break;
-		case ESpatialPoseEulerOrder::PoseEulerOrder_yxz:
-			break;
-		case ESpatialPoseEulerOrder::PoseEulerOrder_xzy:
-			break;
-		case ESpatialPoseEulerOrder::PoseEulerOrder_zyx:
-			break;
+	case ESpatialPoseEulerOrder::PoseEulerOrder_xyz:
+		break;
+	case ESpatialPoseEulerOrder::PoseEulerOrder_yzx:
+		break;
+	case ESpatialPoseEulerOrder::PoseEulerOrder_zxy:
+		break;
+	case ESpatialPoseEulerOrder::PoseEulerOrder_yxz:
+		break;
+	case ESpatialPoseEulerOrder::PoseEulerOrder_xzy:
+		break;
+	case ESpatialPoseEulerOrder::PoseEulerOrder_zyx:
+		break;
 	}
 
+	FHF::NotImplemented();
 	
+	return;
 }
 
-USpatialPose * PoseConcat(USpatialPose & Lhs, USpatialPose & RHS)
+void USpatialPose::PoseRestore(ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order)
 {
-	// Create the Pose to be returned
-	USpatialPose * OutPose = NewObject<USpatialPose>();
+	FHF::NotImplemented();
 
-	// Calculate & Set Concat'd values for O, S, & T
-	OutPose->SetRotation(Lhs.GetRotation() + RHS.GetRotation());
-	OutPose->SetScale(Lhs.GetScale() * RHS.GetScale());
-	OutPose->SetTranslation(Lhs.GetTranslation() + RHS.GetTranslation());
-
-	// Done, return the Pose
-	return OutPose;
+	return;
 }
 
-USpatialPose * PoseLerp(USpatialPose & Pose0, USpatialPose & Pose1, float U)
+void USpatialPose::PoseCopy(USpatialPose& Other)
 {
-	// Create the Pose to be returned
-	USpatialPose * OutPose = NewObject<USpatialPose>();
+	SetTransform(Other.GetTransform());
+	SetOrientation(Other.GetOrientation());
+	SetRotation(Other.GetRotation());
+	SetScale(Other.GetScale());
+	SetTranslation(Other.GetTranslation());
 
-	// Calculate LERP'd values for O, S, & T
-	const FVector OutRotation = FMath::Lerp(Pose0.GetRotation(), Pose1.GetRotation(), U);
-	const FVector OutScale = FMath::Lerp(Pose0.GetScale(), Pose1.GetScale(), U);
-	const FVector OutTrans = FMath::Lerp(Pose0.GetTranslation(), Pose1.GetTranslation(), U);
+	return;
+}
 
-	// Set calculated values for return'd pose
-	OutPose->SetRotation(OutRotation);
-	OutPose->SetScale(OutScale);
-	OutPose->SetTranslation(OutTrans);
+void USpatialPose::PoseConcat(USpatialPose* Other)
+{
+	// Concat Rotation
+	SetRotation(GetRotation() + Other->GetRotation());
+	// Concat Scale
+	SetScale(GetScale() * Other->GetScale());
+	// Concat Translation
+	SetTranslation(GetTranslation() + Other->GetTranslation());
 
-	// Done, return the Pose
-	return OutPose;
+	return;
+}
+
+void USpatialPose::PoseLerp(USpatialPose* Other, const float U, EInterpMode Mode)
+{
+	switch (Mode)
+	{
+	case EInterpMode::Mode_Err:
+		FHF::LogStringErr("Error: Mode Passed Incorrectly.");
+		break;
+	case EInterpMode::Mode_Step:
+		{
+			// Lerp Rotation
+			SetRotation(FMath::Lerp(GetRotation(), Other->GetRotation(), U));
+			// Lerp Scale
+			SetScale(FMath::Lerp(GetScale(), Other->GetScale(), U));
+			// Lerp Translation
+			SetTranslation(FMath::Lerp(GetTranslation(), Other->GetTranslation(), U));
+			break;
+		}
+	case EInterpMode::Mode_Nearest:
+		{
+			break;
+		}
+	case EInterpMode::Mode_Linear:
+		{
+			break;
+		}
+	case EInterpMode::Mode_Smooth:
+		{
+			break;
+		}
+	default:
+		FHF::LogStringErr("Error: Mode Passed Incorrectly.");
+		break;
+	}
+
+	return;
 }
