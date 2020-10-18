@@ -3,12 +3,14 @@
 #include "CJR_BlendInterface.h"
 #include "CJR_HelperFunctions.h"
 
+// Return an Identity / Fully Reset SpatialPose
 USPose* UCJR_BlendInterface::SPoseOpIdentity()
 {
 	USpatialPose* OutPose = NewObject<USpatialPose>();
 	return OutPose;
 }
 
+// Return a Spatial Pose comprised of passed TRS
 USpatialPose& UCJR_BlendInterface::SPoseOpConstruct(USpatialPose& Pose, const FVector Rotation, const FVector Scale,
                                                     const FVector Translation)
 {
@@ -19,6 +21,7 @@ USpatialPose& UCJR_BlendInterface::SPoseOpConstruct(USpatialPose& Pose, const FV
 	return Pose;
 }
 
+// Return a SpatialPose the same as the passed posed
 USpatialPose& UCJR_BlendInterface::SPoseOpCopy(USPose& PoseOut, USPose* PoseIn)
 {
 	PoseOut.SetRotation(PoseIn->GetRotation());
@@ -28,6 +31,7 @@ USpatialPose& UCJR_BlendInterface::SPoseOpCopy(USPose& PoseOut, USPose* PoseIn)
 	return PoseOut;
 }
 
+// Invert the passed pose
 USpatialPose& UCJR_BlendInterface::SPoseOpInvert(USPose& Pose)
 {
 	Pose.GetRotation() *= -1.0f;
@@ -37,6 +41,7 @@ USpatialPose& UCJR_BlendInterface::SPoseOpInvert(USPose& Pose)
 	return Pose;
 }
 
+// Concatenate the passed poses
 USpatialPose& UCJR_BlendInterface::SPoseOpConcat(USPose& Lhs, USPose& Rhs)
 {
 	Lhs.SetRotation(Lhs.GetRotation() + Rhs.GetRotation());
@@ -46,6 +51,7 @@ USpatialPose& UCJR_BlendInterface::SPoseOpConcat(USPose& Lhs, USPose& Rhs)
 	return Lhs;
 }
 
+// Blend using Nearest Neighbor
 USpatialPose& UCJR_BlendInterface::SPoseOpNearest(USPose& Pose0, USPose& Pose1, const float U)
 {
 	if (U < 0.5f)
@@ -64,31 +70,6 @@ USpatialPose& UCJR_BlendInterface::SPoseOpLerp(USPose& Pose0, USPose& Pose1, con
 USpatialPose& UCJR_BlendInterface::SPoseOpCubic(USPose& Pose0, USPose& Pose1, USPose& Pose2, USPose& Pose3,
                                                 const float U)
 {
-	float Mat[16] = {
-		0.0f, 2.0f, 0.0f, 0.0f,
-		1.0f, 0.0f, 1.0f, 0.0f,
-		2.0f, -5.0f, 4.0f, -1.0f,
-		-1.0f, 3.0f, -3.0f, 1.0f
-	};
-
-	FMatrix RotationMatrix(Pose0.GetRotation(), Pose1.GetRotation(), Pose2.GetRotation(), Pose3.GetRotation());
-	FMatrix ScaleMatrix(Pose0.GetScale(), Pose1.GetScale(), Pose2.GetScale(), Pose3.GetScale());
-	FMatrix TransMatrix(Pose0.GetTranslation(), Pose1.GetTranslation(), Pose2.GetTranslation(), Pose3.GetTranslation());
-
-	const float T0 = 0.5f;
-	const float T1 = T0 * U;
-	const float T2 = T1 * U;
-	const float T3 = T2 * U;
-
-	float T[4] = {T0, T1, T2, T3};
-
-	USpatialPose OutPose;
-
-	OutPose.SetRotation(RotationMatrix * (Mat * T));
-	OutPose.SetScale(ScaleMatrix * (Mat * T));
-	OutPose.SetTranslation(TransMatrix * (Mat * T));
-
-	return OutPose;
 }
 
 USpatialPose& UCJR_BlendInterface::SPoseOpDeconcat(USPose& Lhs, USPose& Rhs)
