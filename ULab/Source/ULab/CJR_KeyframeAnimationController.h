@@ -3,34 +3,36 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KeyframeAnimation.h"
+#include "UObject/NoExportTypes.h"
+#include "CJR_KeyframeAnimation.h"
 
 // Must be last include
-#include "KeyframeAnimationController.generated.h"
+#include "CJR_KeyframeAnimationController.generated.h"
 
-USTRUCT(BlueprintType)
-struct ULAB_API FKeyframeAnimationController
+UCLASS(BlueprintType)
+class ULAB_API UFKeyframeAnimationController final : public UObject
 {
 	GENERATED_BODY()
 
 public:
 	// Identifies controller by name. NOT the name of the clip
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components", meta = (AllowPrivateAccess = "true"))
-		FString name;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components", meta = (AllowPrivateAccess =
+		"true"))
+	FString Name;
 
 	// CLIP DATA BEGIN//
 
 	// Index of clip to control in referenced pool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		int clipIndex;
+	int ClipIndex;
 
 	// Current time relative to start of clip. Between [0, current clip's duration)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		float clipTime;
+	float ClipTime;
 
 	// Normalized keyframe time. Should always be between [0, 1)
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-		float clipParameter;
+	float ClipParameter;
 
 	// CLIP DATA END //
 
@@ -38,47 +40,45 @@ public:
 
 	// Index of current keyframe in referenced keyframe pool (clip references pool)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		int keyframeIndex;
+	int KeyframeIndex;
 
 	// Current time relative to current keyframe; always between [0, current keyframe duration)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		float keyframeTime;
+	float KeyframeTime;
 
 	// Normalized keyframe time. Always between [0, 1)
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-		float keyframeParameter;
+	float KeyframeParameter;
 
 	// KEYFRAME DATA END //
 
 	// Active behavior of playback (-1 reverse, 0 pause, +1 forward)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		int currPlaybackDir;
+	int CurrPlaybackDir;
 
 	// Previous behavior of playback. Defaults to 1 (Forward Play)
 	UPROPERTY(VisibleAnywhere, Category = "Clip Controller Components")
-	int prevPlaybackDir;
+	int PrevPlaybackDir;
 
 	// The pool of clips that this Controller controls
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Clip Controller Components")
-		FClipPool clipPool;
+	UFClipPool* ClipPool;
 protected:
 	bool bIsResolved = false;
 
 private:
 	// Return the current clip from the clip pool
-	FORCEINLINE FClip & GetCurrentClip() { return clipPool.pool[clipIndex]; }
+	FORCEINLINE UFClip* GetCurrentClip() const { return ClipPool->Pool[ClipIndex]; }
 	// Return the current Keyframe referenced by the current Clip
-	FORCEINLINE FKeyframe & GetCurrentKeyframe() { return GetCurrentClip().keyframePool.pool[keyframeIndex]; }
-	// FORCEINLINE FKeyframe SetCurrentKeyframe(FKeyframe & newFrame) {GetCurrentClip().keyra }
+	FORCEINLINE UFKeyframe* GetCurrentKeyframe() const { return GetCurrentClip()->KeyframePool->Pool[KeyframeIndex]; }
 	// Return the current keyframe's duration
-	FORCEINLINE float GetKeyframeDuration() { return GetCurrentKeyframe().duration; }
+	FORCEINLINE float GetKeyframeDuration() const { return GetCurrentKeyframe()->Duration; }
 
 public:
 	// Sets default values for this actor's properties
-	FKeyframeAnimationController();
+	UFKeyframeAnimationController();
 
-	// set starting clip, keyframe and state
-	FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex);
+	void Init(FString CtrlName, UFClipPool* NewPool, int ClipPoolIndex);
 
 	void ClipControllerUpdate(float DeltaTime);
 };

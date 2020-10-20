@@ -1,66 +1,65 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KeyframeAnimationController.h"
+#include "CJR_KeyframeAnimationController.h"
 
 // Sets default values
-FKeyframeAnimationController::FKeyframeAnimationController()
+UFKeyframeAnimationController::UFKeyframeAnimationController()
 {
 	// UE_LOG(LogTemp, Warning, TEXT("Clip Controller Constructor"));
 
 	// Set default controller name
-	name = "Clip Controller";
+	Name = "Clip Controller";
 
 	// INIT CLIP DATA BEGIN //
 
 	// Initialize default Clip Pool
-	clipPool = FClipPool();
+	ClipPool = NewObject<UFClipPool>();
 	// Set default index to 0
-	clipIndex = 0;
+	ClipIndex = 0;
 	// Initialize clip time to 0
-	clipTime = 0;
+	ClipTime = 0;
 
-	if (clipPool.pool.Num() > 0)
+	if (ClipPool->Pool.Num() > 0)
 	{
 		// Initialize clip parameter (normalized keyframe time)
-		clipParameter = clipTime / clipPool.pool[clipIndex].duration;
+		ClipParameter = ClipTime / ClipPool->Pool[ClipIndex]->Duration;
 
 		// INIT CLIP DATA END //
 
 		// INIT KEYFRAME DATA BEGIN //
 
 		// Initialize to first keyframe of current clip pool
-		keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
-		keyframeTime = 0;
-		keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+		KeyframeIndex = ClipPool->Pool[ClipIndex]->FirstKeyframe;
+		KeyframeTime = 0;
+		KeyframeParameter = KeyframeTime / ClipPool->Pool[ClipIndex]->KeyframePool->Pool[KeyframeIndex]->Duration;
 
 		// INIT KEYFRAME DATA END //
 	}
 	// Init Current Playback Direction to Paused
-	currPlaybackDir = 0;
+	CurrPlaybackDir = 0;
 	// Init Previous Playback Direction to Forward
-	prevPlaybackDir = 1;
+	PrevPlaybackDir = 1;
 }
 
-// Set starting clip, keyframe and state
-FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FClipPool newPool, int clipPoolIndex)
+void UFKeyframeAnimationController::Init(FString CtrlName, UFClipPool* NewPool, int ClipPoolIndex)
 {
 	// Set controller name
-	name = ctrlName;
+	Name = CtrlName;
 
 	// INIT CLIP DATA BEGIN //
 
 	// Set clip pool
-	clipPool = newPool;
+	ClipPool = NewPool;
 	// Set default clip index
-	clipIndex = clipPoolIndex;
+	ClipIndex = ClipPoolIndex;
 	// Initialize clip time to 0
-	clipTime = 0;
+	ClipTime = 0;
 
-	if (clipPool.pool.Num() >= 0)
+	if (ClipPool->Pool.Num() >= 0)
 	{
 		// Initialize clip parameter (normalized keyframe time)
-		clipParameter = clipTime / clipPool.pool[clipIndex].duration;
+		ClipParameter = ClipTime / ClipPool->Pool[ClipIndex]->Duration;
 
 
 		// INIT CLIP DATA END //
@@ -68,27 +67,27 @@ FKeyframeAnimationController::FKeyframeAnimationController(FString ctrlName, FCl
 		// INIT KEYFRAME DATA BEGIN //
 
 		// Initialize to first keyframe of current clip pool
-		keyframeIndex = clipPool.pool[clipIndex].firstKeyframe;
-		keyframeTime = 0;
-		keyframeParameter = keyframeTime / clipPool.pool[clipIndex].keyframePool.pool[keyframeIndex].duration;
+		KeyframeIndex = ClipPool->Pool[ClipIndex]->FirstKeyframe;
+		KeyframeTime = 0;
+		KeyframeParameter = KeyframeTime / ClipPool->Pool[ClipIndex]->KeyframePool->Pool[KeyframeIndex]->Duration;
 	}
 	// INIT KEYFRAME DATA END //
 
 	// Init Current Playback Direction to Paused
-	currPlaybackDir = 0;
+	CurrPlaybackDir = 0;
 	// Init Previous Playback Direction to Forward
-	prevPlaybackDir = 1;
+	PrevPlaybackDir = 1;
 }
 
 // Called every frame (Basically Unity Update)
-void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
+void UFKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 {
 	// Check our pause case first. Exit if paused.
-	if (currPlaybackDir == 0)
+	if (CurrPlaybackDir == 0)
 		return;
 
 	// Adjust time step by playback direction
-	DeltaTime *= currPlaybackDir;
+	DeltaTime *= CurrPlaybackDir;
 
 	/* Step 01: Pre-resolution
 	* Apply time step
@@ -97,12 +96,12 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	* Utilizes numerical integration for time itself
 	*/
 
-	keyframeTime += DeltaTime;
-	clipTime += DeltaTime;
+	KeyframeTime += DeltaTime;
+	ClipTime += DeltaTime;
 
 	// Acquire current clip for case evaluations
-	FClip currClip = GetCurrentClip();
-	FKeyframe currKeyframe = GetCurrentKeyframe();
+	UFClip* CurrClip = GetCurrentClip();
+	UFKeyframe* CurrKeyframe = GetCurrentKeyframe();
 
 	/* Step 02: Resolve time
 	* While unresolved, continue to use playback behaviour to determine the NEW keyframe time & clip time
@@ -119,51 +118,51 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	*/
 
 	// Check play direction
-	switch (currPlaybackDir)
+	switch (CurrPlaybackDir)
 	{
 		// Evaluate Reverse (Three Cases)
-		case(-1):
+	case(-1):
 		{
 			// Reverse Skip
-			if (keyframeTime < 0)
+			if (KeyframeTime < 0)
 			{
 				// Decrement the keyframe index (return to previous keyframe)
-				keyframeIndex--;
+				KeyframeIndex--;
 
 				// Check if KFIndex has gone below current clip's set of keyframes
-				if (keyframeIndex < currClip.firstKeyframe)
+				if (KeyframeIndex < CurrClip->FirstKeyframe)
 				{
 					// Set current keyframe to last keyframe
-					keyframeIndex = currClip.lastKeyframe;
+					KeyframeIndex = CurrClip->LastKeyframe;
 					// Set clip time to duration + parameter
-					clipTime = currClip.duration + keyframeParameter;
+					ClipTime = CurrClip->Duration + KeyframeParameter;
 				}
 
 				// Set keyframe time to the top of the pool
-				keyframeTime = currKeyframe.duration + keyframeParameter;
+				KeyframeTime = CurrKeyframe->Duration + KeyframeParameter;
 			}
 
 			break;
 		}
 		// Evaluate Forward (Three Cases)
-		case(1):
+	case(1):
 		{
 			// Check if keyframe time exceeds keyframe duration
-			if (keyframeTime > currClip.duration)
+			if (KeyframeTime > CurrClip->Duration)
 			{
 				// Increment the keyframe index (move to next keyframe)
-				keyframeIndex++;
+				KeyframeIndex++;
 
 				// Flip keyframe time over to the next keyframe
-				keyframeTime -= currClip.duration;
+				KeyframeTime -= CurrClip->Duration;
 
 				// Forward Terminus (keyframe index exceeds last clip
-				if (keyframeIndex > currClip.lastKeyframe)
+				if (KeyframeIndex > CurrClip->LastKeyframe)
 				{
 					// Move back to the first clip
-					keyframeIndex = currClip.firstKeyframe;
+					KeyframeIndex = CurrClip->FirstKeyframe;
 					// reset clip time to start of keyframe time
-					clipTime = keyframeTime;
+					ClipTime = KeyframeTime;
 				}
 			}
 
@@ -172,7 +171,6 @@ void FKeyframeAnimationController::ClipControllerUpdate(float DeltaTime)
 	}
 
 	// Establish parameters without clamping. Similar to calculating inverse / normals
-	clipParameter = clipTime / currClip.duration;
-	keyframeParameter = keyframeTime / currKeyframe.duration;
+	ClipParameter = ClipTime / CurrClip->Duration;
+	KeyframeParameter = KeyframeTime / CurrKeyframe->Duration;
 }
-

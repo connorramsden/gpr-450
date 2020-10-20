@@ -11,15 +11,15 @@
 	distributed under the License is distributed on an "AS IS" BASIS,
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
-limitations under the License.
+	limitations under the License.
 */
 
 /*
-animal3D SDK: Minimal 3D Animation Framework
-By Daniel S. Buckstein
+	animal3D SDK: Minimal 3D Animation Framework
+	By Daniel S. Buckstein
 	
-a3_SpatialPose.h
-Description of a spatial pose with rotation, translation and scale.
+	a3_SpatialPose.h
+	Description of a spatial pose with rotation, translation and scale.
 */
 
 #ifndef __ANIMAL3D_SPATIALPOSE_H
@@ -112,7 +112,7 @@ struct a3_SpatialPose
 
 	// quaternion - derived from Euler angles or angle/axis
 	// default quat = "1": (0, 0, 0, 1)
-	a3quat orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
+	a3vec4 orientation; // enncodes: angle/axis rotation, uniform scale (squared magnitude)
 
 	// raw description;
 	a3vec4 angles; // aka rotation
@@ -120,6 +120,17 @@ struct a3_SpatialPose
 	a3vec4 translation;
 };
 
+// fyunction pointer with form of lerp
+typedef a3real4r(* a3real4BlendOpLerp) (a3real4 const p0, a3real4 const p1, a3real const u);
+
+// blend operations collection for a whole pose
+struct a3_SpatialPoseBlend
+{
+	a3real4BlendOpLerp blendOpLerp_rotation;
+	a3real4BlendOpLerp blendOpLerp_scale;
+	a3real4BlendOpLerp blendOpLerp_translation;
+	a3real4BlendOpLerp blendOpLerp_orientation;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -136,13 +147,16 @@ a3i32 a3spatialPoseSetTranslation(a3_SpatialPose* spatialPose, const a3f32 tx, c
 //-----------------------------------------------------------------------------
 
 // reset single node pose
-//a3i32 a3spatialPoseReset(a3_SpatialPose* spatialPose);
+a3i32 a3spatialPoseReset(a3_SpatialPose* spatialPose);
 
 // convert single node pose to matrix
-a3i32 a3spatialPoseConvert(a3mat4* mat_out, const a3_SpatialPose* spatialPose_in, const a3_SpatialPoseChannel channel, const a3_SpatialPoseEulerOrder order);
+a3i32 a3spatialPoseConvert(a3_SpatialPose* spatialPose, const a3_SpatialPoseChannel channel, const a3_SpatialPoseEulerOrder order);
+
+// restore single node pose from matrix
+a3i32 a3spatialPoseRestore(a3_SpatialPose* spatialPose, const a3_SpatialPoseChannel channel, const a3_SpatialPoseEulerOrder order);
 
 // copy operation for single node pose
-//a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_SpatialPose* spatialPose_in);
+a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_SpatialPose* spatialPose_in);
 
 // concat
 a3i32 a3spatialPoseConcat(a3_SpatialPose * spatialPose_out, const a3_SpatialPose * spatialPose_lhs, const a3_SpatialPose * spatialPose_rhs, const a3boolean usingQuaternions);

@@ -1,6 +1,6 @@
 // Copyright 2020 Connor Ramsden
 
-#include "Hierarchy.h"
+#include "CJR_Hierarchy.h"
 
 UHNode::UHNode()
 {

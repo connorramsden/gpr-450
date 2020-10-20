@@ -1,3 +1,4 @@
+#include "..\a3_HierarchyStateBlend.h"
 /*
 	Copyright 2011-2020 Daniel S. Buckstein
 
@@ -36,6 +37,11 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 	pose_out->transform = a3mat4_identity;
 	// ...
 
+	pose_out->orientation = a3vec4_w;
+	pose_out->angles = a3vec4_w;
+	pose_out->scale = a3vec4_one;
+	pose_out->translation = a3vec4_w;
+
 	// done
 	return pose_out;
 }
@@ -43,11 +49,31 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 // pointer-based LERP operation for single spatial pose
 inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
 {
+	a3real4Lerp(pose_out->angles.v, pose0->angles.v, pose1->angles.v, u);
+	a3real4Lerp(pose_out->scale.v, pose0->scale.v, pose1->scale.v, u);
+	a3real4Lerp(pose_out->translation.v, pose0->translation.v, pose1->translation.v, u);
+
+	// quat
+	// a3...lerp(pose_out->orientation.v, ...);
+	// slerp
+	// nlerp
 
 	// done
 	return pose_out;
 }
 
+// concat ...
+
+
+inline a3_SpatialPose * a3SpatialPoseOpConst(a3_SpatialPose * pose_in)
+{
+	return pose_in;
+}
+
+inline a3_SpatialPose * a3SpatialPoseOpCopy(a3_SpatialPose * pose_out, a3_SpatialPose const * pose_in)
+{
+	return pose_out;
+}
 
 //-----------------------------------------------------------------------------
 

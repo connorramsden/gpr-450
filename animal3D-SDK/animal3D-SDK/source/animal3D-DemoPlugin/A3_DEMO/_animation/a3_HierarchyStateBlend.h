@@ -17,7 +17,7 @@
 /*
 	animal3D SDK: Minimal 3D Animation Framework
 	By Daniel S. Buckstein
-	
+
 	a3_HierarchyStateBlend.h
 	Hierarchy blend operations.
 */
@@ -37,15 +37,21 @@ extern "C"
 #else	// !__cplusplus
 
 #endif	// __cplusplus
-	
+
 
 //-----------------------------------------------------------------------------
 
 // pointer-based reset/identity operation for single spatial pose
-a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);
+a3_SpatialPose * a3spatialPoseOpIdentity(a3_SpatialPose * pose_out);
 
 // pointer-based LERP operation for single spatial pose
-a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u);
+a3_SpatialPose * a3spatialPoseOpLERP(a3_SpatialPose * pose_out, a3_SpatialPose const * pose0, a3_SpatialPose const * pose1, a3real const u);
+
+// const
+a3_SpatialPose * a3SpatialPoseOpConst(a3_SpatialPose * pose_in);
+
+// copy
+a3_SpatialPose * a3SpatialPoseOpCopy(a3_SpatialPose * pose_out, a3_SpatialPose const * pose_in);
 
 
 //-----------------------------------------------------------------------------
@@ -56,14 +62,20 @@ a3_SpatialPose a3spatialPoseDOpIdentity();
 // data-based LERP
 a3_SpatialPose a3spatialPoseDOpLERP(a3_SpatialPose const pose0, a3_SpatialPose const pose1, a3real const u);
 
+// const
+// a3_SpatialPose & a3SpatialPoseOpConst(a3_SpatialPose & pose_inout);
+
+// a3_SpatialPose & a3SpatialPoseOpCopy(a3_SpatialPose const & pose_in);
+
+
 
 //-----------------------------------------------------------------------------
 
 // pointer-based reset/identity operation for hierarchical pose
-a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out);
+a3_HierarchyPose * a3hierarchyPoseOpIdentity(a3_HierarchyPose * pose_out);
 
 // pointer-based LERP operation for hierarchical pose
-a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u);
+a3_HierarchyPose * a3hierarchyPoseOpLERP(a3_HierarchyPose * pose_out, a3_HierarchyPose const * pose0, a3_HierarchyPose const * pose1, a3real const u);
 
 
 //-----------------------------------------------------------------------------

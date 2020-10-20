@@ -3,38 +3,39 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
 #include "Components/ActorComponent.h"
 
-#include "DataHandler.generated.h"
+#include "CJR_DataHandler.generated.h"
 
 // Data structure to hold incoming file data / instructions
 
-USTRUCT()
-struct ULAB_API FClipInstruction
+UCLASS()
+class ULAB_API UFClipInstruction final : public UObject
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
 
 public:
 	// Name of clip from file
 	UPROPERTY(VisibleAnywhere, Category = "Instructions", meta = (AllowPrivateAccess = "true"))
-	FString clipName;
+	FString ClipName;
 
 	// Duration of clip from file
-	float clipDuration;
+	float ClipDuration;
 	// Frame lengths from file
-	int firstFrame;
-	int lastFrame;
+	int FirstFrame;
+	int LastFrame;
 
 	// Transition instructions
-	FString revTransition;
-	FString fwdTransition;
+	FString RevTransition;
+	FString FwdTransition;
 
 	// Comments (reading them so nothing messes up, will be ignored)
-	FString comments;
+	FString Comments;
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class ULAB_API UDataHandler : public UActorComponent
+class ULAB_API UDataHandler final : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -45,18 +46,15 @@ public:
 
 	// An array of Clip Instructions read from file
 	UPROPERTY(VisibleAnywhere, Category = "Data Components", meta = (AllowPrivateAccess = "true"))
-	TArray<FClipInstruction> instructions;
+	TArray<UFClipInstruction*> Instructions;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	FString clipPoolFile;
+	FString ClipPoolFile;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction) override;
-
 	// Reads data from fileName
 	UFUNCTION(BlueprintCallable)
-		FString ReadFile(FString fileName);
+	FString ReadFile(FString FileName) const;
 };

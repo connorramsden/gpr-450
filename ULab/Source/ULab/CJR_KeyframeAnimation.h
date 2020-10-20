@@ -3,130 +3,123 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KeyframeAnimation.generated.h"
+#include "UObject/NoExportTypes.h"
+#include "CJR_KeyframeAnimation.generated.h"
 
-/**
- *
- */
-
-class ULAB_API KeyframeAnimation
-{
-	public:
-	KeyframeAnimation();
-	~KeyframeAnimation();
-};
-
-USTRUCT(BlueprintType)
-struct ULAB_API FKeyframe
+UCLASS(BlueprintType)
+class ULAB_API UFKeyframe final : public UObject
 {
 	GENERATED_BODY()
-	public:
+public:
 	// Index in pool of keyframes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		int index;
+	int Index;
 	// Interval of time for which this keyframe is active. Cannot be zero
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Components")
-		float duration;
+	float Duration;
 	// Reciprocal of kDuration
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		float durationInv;
+	float DurationInv;
 	// Value of the sample described by a keyframe. Just an integer for example purposes
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Components")
-		int data;
-
-	// Default Contructor
-	FKeyframe();
-	// Initialize a keyframe
-	FKeyframe(const float newDuration, const int value_x);
+	int Data;
+	
+	// Default Constructor
+	UFKeyframe();
 	// Release a keyframe
-	~FKeyframe();
+	~UFKeyframe();
+
+	// Init a Keyframe
+	void Init(const float NewDuration, const int Value_X);
 };
 
-USTRUCT(BlueprintType)
-struct ULAB_API FKeyframePool
+UCLASS(BlueprintType)
+class ULAB_API UFKeyframePool final : public UObject
 {
 	GENERATED_BODY()
-	public:
+public:
 	// Array of all keyframes in the pool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Keyframe Pool Components")
-		TArray<FKeyframe> pool;
+	TArray<UFKeyframe*> Pool;
 
 	// Number of keyframes in the pool
 	UPROPERTY(VisibleAnywhere, Category = "Keyframe Pool Components")
-		int poolCount = -1;
-
+	int PoolCount = -1;
+	
 	// Default KPool Constructor
-	FKeyframePool();
-	// Allocate Keyframe Pool
-	FKeyframePool(const int count);
+	UFKeyframePool();
 	// Release keyframe pool
-	~FKeyframePool();
+	~UFKeyframePool();
+	
+	void Init(const int Count);
 };
 
-USTRUCT(BlueprintType)
-struct ULAB_API FClip
+UCLASS(BlueprintType)
+class ULAB_API UFClip final : public UObject
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	// Identifies the clip
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Components", meta = (AllowPrivateAccess = "true"))
-		FString name;
+	FString Name;
 	// Index in clip pool
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		int index;
+	int Index;
 	// Duration of the clip; can be calculated as sum of all referenced keyframes or set first & distribute. Cannot be 0
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		float duration;
+	float Duration;
 	// Inverse of clipDuration
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		float durationInv;
+	float DurationInv;
 	// Number of keyframes referenced by clip
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		int count;
+	int Count;
 	// index of first keyframe in pool ref'd by clip
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		int firstKeyframe;
+	int FirstKeyframe;
 	// index of final keyframe in pool ref'd by clip
 	UPROPERTY(VisibleAnywhere, Category = "Clip Components")
-		int lastKeyframe;
+	int LastKeyframe;
 	// The pool of keyframes containing those included in this set.
-	FKeyframePool keyframePool;
+	UPROPERTY()
+	UFKeyframePool* KeyframePool;
 
 	// Default Clip Constructor
-	FClip();
-	// Initialize Clip with First and Last indices
-	FClip(FString newClipName, const FKeyframePool keyframePool, const int firstKeyframeIndex, const int finalKeyframeIndex);
+	UFClip();
 	// Release Clip
-	~FClip();
+	~UFClip();
+
+	void Init(FString NewClipName, UFKeyframePool* NewPool, const int FirstKeyframeIndex,
+           const int FinalKeyframeIndex);
 
 	// Calculate clip duration as sum of keyframes' durations
 	void CalculateDuration();
 	// Uniformly set duration and inverse across entire pool
-	void DistributeDuration(const float newClipDuration);
+	void DistributeDuration(const float NewClipDuration);
 };
 
-USTRUCT(BlueprintType)
-struct ULAB_API FClipPool
+UCLASS(BlueprintType)
+class ULAB_API UFClipPool final : public UObject
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	// Array of Clips
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Clip Pool Components")
-		TArray<FClip> pool;
+	TArray<UFClip*> Pool;
 
 	// Number of Clips in the Pool
 	UPROPERTY(EditAnywhere, Category = "Clip Pool Components")
-		int count = -1;
+	int Count = -1;
 
 	// Default ClipPool Constructor
-	FClipPool();
-	// Allocate Clip Pool
-	FClipPool(const int newCount);
+	UFClipPool();
 	// Release Clip Pool
-	~FClipPool();
+	~UFClipPool();
+
+	void Init(const int NewCount);
 
 	// Get Clip Index from Pool
-	int GetClipIndexInPool(FString clipName);
+	int GetClipIndexInPool(FString ClipName);
 };
