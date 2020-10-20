@@ -24,6 +24,8 @@ USpatialPose& UCJR_BlendInterface::SPoseOpConstruct(USpatialPose& Pose, const FV
 // Return a SpatialPose the same as the passed posed
 USpatialPose& UCJR_BlendInterface::SPoseOpCopy(USPose& PoseOut, USPose* PoseIn)
 {
+	PoseOut.SetTransform(PoseIn->GetTransform());
+	PoseOut.SetOrientation(PoseIn->GetOrientation());
 	PoseOut.SetRotation(PoseIn->GetRotation());
 	PoseOut.SetScale(PoseIn->GetScale());
 	PoseOut.SetTranslation(PoseOut.GetTranslation());
@@ -72,6 +74,96 @@ USpatialPose& UCJR_BlendInterface::SPoseOpCubic(USPose& Pose0, USPose& Pose1, US
 {
 }
 
+UHierarchyPose* UCJR_BlendInterface::HPoseOpIdentity(const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		OutPose->AddPose(SPoseOpIdentity());
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose& UCJR_BlendInterface::HPoseOpConstruct(UHPose& Pose, const FVector Rotation, const FVector Scale,
+                                                      const FVector Translation, const int NumPoses)
+{
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		Pose.AddPose(&SPoseOpConstruct(Pose.GetPose(i), Rotation, Scale, Translation));
+	}
+
+	return Pose;
+}
+
+UHierarchyPose& UCJR_BlendInterface::HPoseOpCopy(UHPose& PoseOut, UHPose* PoseIn, const int NumPoses)
+{
+	if (PoseOut.GetPoses().Num() <= PoseIn->GetPoses().Num())
+	{
+		for (int i = 0; i < NumPoses; ++i)
+		{
+			SPoseOpCopy(PoseOut.GetPose(i), &PoseIn->GetPose(i));
+		}
+	}
+
+	return PoseOut;
+}
+
+UHierarchyPose& UCJR_BlendInterface::HPoseOpInvert(UHPose& Pose, const int NumPoses)
+{
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		SPoseOpInvert(Pose.GetPose(i));
+	}
+
+	return Pose;
+}
+
+UHierarchyPose& UCJR_BlendInterface::HPoseOpConcat(UHPose& Lhs, UHPose& Rhs, const int NumPoses)
+{
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		SPoseOpConcat(Lhs.GetPose(i), Rhs.GetPose(i));
+	}
+
+	return Lhs;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpNearest(UHPose& Pose0, UHPose& Pose1, const float U, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		OutPose->AddPose(&SPoseOpNearest(Pose0.GetPose(i), Pose1.GetPose(i), U));
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose& UCJR_BlendInterface::HPoseOpLerp(UHPose& Pose0, UHPose& Pose1, const float U, const int NumPoses)
+{
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		SPoseOpLerp(Pose0.GetPose(i), Pose1.GetPose(i), U);
+	}
+
+	return Pose0;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpCubic(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, UHPose& Pose3,
+                                                  const float U, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		OutPose->AddPose(&SPoseOpCubic(Pose0.GetPose(i), Pose1.GetPose(i), Pose2.GetPose(i), Pose3.GetPose(i), U));
+	}
+
+	return OutPose;
+}
+
 USpatialPose& UCJR_BlendInterface::SPoseOpDeconcat(USPose& Lhs, USPose& Rhs)
 {
 	return SPoseOpConcat(Lhs, SPoseOpInvert(Rhs));
@@ -114,4 +206,87 @@ USpatialPose& UCJR_BlendInterface::SPoseOpBicubic(USPose& PoseP0, USPose& PoseP1
 	                    SPoseOpCubic(PoseP2, PoseN2, Pose02, Pose12, U2),
 	                    SPoseOpCubic(PoseP3, PoseN3, Pose03, Pose13, U3),
 	                    U);
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpDeconcat(UHPose& Lhs, UHPose& Rhs, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		SPoseOpDeconcat(Lhs.GetPose(i), Rhs.GetPose(i));
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpScale(UHPose& Pose, const float U, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		SPoseOpScale(Pose.GetPose(i), U);
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpTri(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, const float U1,
+                                                const float U2, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		SPoseOpTri(Pose0.GetPose(i), Pose1.GetPose(i), Pose2.GetPose(i), U1, U2);
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpBinearest(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, UHPose& Pose3,
+                                                      const float U0, const float U1, const float U, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		OutPose->AddPose(&SPoseOpBinearest(Pose0.GetPose(i), Pose1.GetPose(i), Pose2.GetPose(i), Pose3.GetPose(i), U0,
+		                                   U1, U));
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpBilerp(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, UHPose& Pose3,
+                                                   const float U0, const float U1, const float U, const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		OutPose->AddPose(&SPoseOpBilerp(Pose0.GetPose(i), Pose1.GetPose(i), Pose2.GetPose(i), Pose3.GetPose(i), U0, U1,
+		                                U));
+	}
+
+	return OutPose;
+}
+
+UHierarchyPose* UCJR_BlendInterface::HPoseOpBicubic(UHPose& PoseP0, UHPose& PoseP1, UHPose& PoseP2, UHPose& PoseP3,
+                                                    UHPose& PoseN0, UHPose& PoseN1, UHPose& PoseN2, UHPose& PoseN3,
+                                                    UHPose& Pose00, UHPose& Pose01, UHPose& Pose02,
+                                                    UHPose& Pose03, UHPose& Pose10, UHPose& Pose11, UHPose& Pose12,
+                                                    UHPose& Pose13, const float U0, const float U1,
+                                                    const float U2, const float U3, const float U,
+                                                    const int NumPoses)
+{
+	UHierarchyPose* OutPose = NewObject<UHierarchyPose>();
+
+	for (int i = 0; i < NumPoses; ++i)
+	{
+		OutPose->AddPose(&SPoseOpBicubic(PoseP0.GetPose(i), PoseP1.GetPose(i), PoseP2.GetPose(i), PoseP3.GetPose(i),
+		                                 PoseN0.GetPose(i), PoseN1.GetPose(i), PoseN2.GetPose(i),
+		                                 PoseN3.GetPose(i), Pose00.GetPose(i), Pose01.GetPose(i), Pose02.GetPose(i),
+		                                 Pose03.GetPose(i), Pose10.GetPose(i), Pose11.GetPose(i),
+		                                 Pose12.GetPose(i), Pose13.GetPose(i), U0, U1, U2, U3, U));
+	}
+
+	return OutPose;
 }

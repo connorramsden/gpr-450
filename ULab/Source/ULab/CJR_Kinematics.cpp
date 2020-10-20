@@ -36,19 +36,19 @@ void KinematicsSolveForwardPartial(const UHierarchyState& HierarchyState, const 
 			if (Node->GetPIndex() >= 0)
 			{
 				// Get Parent Object Matrix
-				FTransform ParentObjectMatrix = HierarchyState.GetObject()->GetPose()[Node->GetPIndex()]->
+				FTransform ParentObjectMatrix = HierarchyState.GetObject()->GetPoses()[Node->GetPIndex()]->
 					GetTransform();
 
 				// Get Local Matrix
-				FTransform LocalMatrix = HierarchyState.GetLocal()->GetPose()[Node->GetIndex()]->GetTransform();
+				FTransform LocalMatrix = HierarchyState.GetLocal()->GetPoses()[Node->GetIndex()]->GetTransform();
 
 				// Set the new Object Matrix (POM * LM)
-				HierarchyState.GetObject()->GetPose()[Node->GetIndex()]->SetTransform(ParentObjectMatrix * LocalMatrix);
+				HierarchyState.GetObject()->GetPoses()[Node->GetIndex()]->SetTransform(ParentObjectMatrix * LocalMatrix);
 			}
 			else
 			{
 				// Copy Local Matrix to Object Matrix
-				HierarchyState.GetObject()->GetPose()[Node->GetIndex()] = HierarchyState.GetLocal()->GetPose()[Node->
+				HierarchyState.GetObject()->GetPoses()[Node->GetIndex()] = HierarchyState.GetLocal()->GetPoses()[Node->
 					GetIndex()];
 			}
 		}

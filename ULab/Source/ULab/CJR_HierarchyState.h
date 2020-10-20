@@ -36,9 +36,12 @@ public:
 	void PoseLerp(UHierarchyPose* Other, const int NodeCount, const float U);
 
 public: // Getters & Setters
-	FORCEINLINE TArray<USpatialPose*> GetPose() const { return Pose; }
+	FORCEINLINE TArray<USpatialPose*> GetPoses() const { return Pose; }
+	FORCEINLINE USpatialPose* GetPose(const int Index) const {return Pose[Index];}
+	FORCEINLINE USpatialPose& GetPose(const int Index) {return *Pose[Index];}
 	FORCEINLINE void UpdatePose(USpatialPose* NewP, const int Index) { Pose[Index] = NewP; }
 	FORCEINLINE void SetPose(const TArray<USpatialPose*> NewP) { Pose = NewP; }
+	FORCEINLINE void AddPose(USpatialPose* NewP) { Pose.Add(NewP); }
 };
 
 typedef TArray<USpatialPose*> FSPosePool;

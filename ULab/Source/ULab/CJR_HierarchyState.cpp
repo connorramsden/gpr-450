@@ -75,7 +75,7 @@ void UHierarchyPose::PoseCopy(UHierarchyPose* PoseIn, const int NodeCount)
 {
 	for (int i = 0; i < NodeCount; ++i)
 	{
-		Pose[i] = PoseIn->GetPose()[i];
+		Pose[i] = PoseIn->GetPoses()[i];
 	}
 
 	return;
@@ -85,7 +85,7 @@ void UHierarchyPose::PoseConcat(UHierarchyPose* Other, const int NodeCount)
 {
 	for (int i = 0; i < NodeCount; ++i)
 	{
-		Pose[i]->PoseConcat(Other->GetPose()[i]);
+		Pose[i]->PoseConcat(Other->GetPoses()[i]);
 	}
 }
 
@@ -93,7 +93,7 @@ void UHierarchyPose::PoseLerp(UHierarchyPose* Other, const int NodeCount, const 
 {
 	for (int i = 0; i < NodeCount; ++i)
 	{
-		Pose[i]->PoseLerp(Other->GetPose()[i], U);
+		Pose[i]->PoseLerp(Other->GetPoses()[i], U);
 	}
 }
 
@@ -180,15 +180,15 @@ void UHierarchyState::Init(UHierarchy* Hier)
 		Hierarchy = Hier;
 
 		// Init other poses from this hierarchy
-		ObjectSpace->SetPose(LocalSpace->GetPose());
-		ObjectSpaceInverse->SetPose(ObjectSpace->GetPose());
-		ObjectSpaceBindToCurrent->SetPose(ObjectSpaceInverse->GetPose());
+		ObjectSpace->SetPose(LocalSpace->GetPoses());
+		ObjectSpaceInverse->SetPose(ObjectSpace->GetPoses());
+		ObjectSpaceBindToCurrent->SetPose(ObjectSpaceInverse->GetPoses());
 
 		for (int i = 0; i < HPoseCount; ++i)
 		{
 			for (int j = 0; ; j += NodeCount)
 			{
-				LocalSpace->GetPose()[i] = LocalSpace->GetPose()[j];
+				LocalSpace->GetPoses()[i] = LocalSpace->GetPoses()[j];
 			}
 		}
 
@@ -202,8 +202,8 @@ void UHierarchyState::UpdateObjectInverse()
 	{
 		for (int i = 0; i < Hierarchy->GetNumNodes(); ++i)
 		{
-			ObjectSpaceInverse->GetPose()[i]->SetTransform(
-				ObjectSpace->GetPose()[i]->GetTransform().Inverse());
+			ObjectSpaceInverse->GetPoses()[i]->SetTransform(
+				ObjectSpace->GetPoses()[i]->GetTransform().Inverse());
 		}
 	}
 
