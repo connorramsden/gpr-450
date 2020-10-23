@@ -35,9 +35,61 @@
 extern "C"
 {
 #else	// !__cplusplus
+typedef struct a3_SpatialPoseBlendNode a3_SpatialPoseBlendNode; // application of each operation
+typedef struct a3_SpatialPoseBlendTree a3_SpatialPoseBlendTree; // application of hierarchy
 
 #endif	// __cplusplus
 
+//-----------------------------------------------------------------------------
+
+// execution template
+typedef void (*a3_SpatialPoseOpExec)(a3_SpatialPoseBlendNode const* blendNode); // Take one blend node and execute it
+void a3SpatialPoseOpExec0C0I(a3_SpatialPoseBlendNode const* blendNode);
+void a3SpatialPoseOpExec2C1I(a3_SpatialPoseBlendNode const* blendNode);
+void a3SpatialPoseTreeExec(a3_SpatialPoseBlendTree const * blendTree);
+
+// operation template for any spatial pose operation
+//typedef a3_SpatialPose* (*a3_spatialPoseOp)(a3_SpatialPose* pose_out); // identity
+//typedef a3_SpatialPose* (*a3_spatialPoseOp)(a3_SpatialPose* pose_out, a3_SpatialPose const* pose_in); // copy
+//typedef a3_SpatialPose* (*a3_spatialPoseOp)(a3_SpatialPose* pose_out, a3_SpatialPose const* pose_lhs, a3_SpatialPose const* pose_rhs); // concat
+//typedef a3_SpatialPose* (*a3_spatialPoseOp)(a3_SpatialPose* pose_out, a3_SpatialPose* pose_0, a3_SpatialPose* pose_1, const float u); // lerp
+typedef a3_SpatialPose * (*a3_spatialPoseOp)(a3_SpatialPose * pose_out, ...); // ALL OF THEM
+
+
+//-----------------------------------------------------------------------------
+
+// complete representation of a blend operation
+// POINTER IMPLIES THING COMES FROM SOMETHING ELSE
+// The sum of other blend nodes (conceptually speaking)
+struct a3_SpatialPoseBlendNode
+{
+	// execution invokation
+	a3_SpatialPoseOpExec exec;
+
+	// the op itself
+	a3_spatialPoseOp op;
+
+	// output pose
+	a3_SpatialPose * pose_out; // exactly 1 ptr/ref to externally-sourced pose (target)
+
+	// control poses
+	a3_SpatialPose const * pose_ctrl[16]; // up to 16 ptrs/refs to externally-sourced pose data
+
+	// parameters - updated by who manages them
+	a3real const* u[8]; // up to 8 ptrs/refs to externally-sourced params
+
+	// how many ofthe above (optional)
+	a3ui16 ctrlCount, paramCount;
+};
+
+struct a3_SpatialPoseBlendTree
+{
+	a3_Hierarchy const * blendTreeDescriptor; // tells us num nodes and parent of each node
+
+	a3_SpatialPoseBlendNode * nodes;
+
+	// optional: child indices
+};
 
 //-----------------------------------------------------------------------------
 
