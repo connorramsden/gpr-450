@@ -72,6 +72,9 @@ USpatialPose& UCJR_BlendInterface::SPoseOpLerp(USPose& Pose0, USPose& Pose1, con
 USpatialPose& UCJR_BlendInterface::SPoseOpCubic(USPose& Pose0, USPose& Pose1, USPose& Pose2, USPose& Pose3,
                                                 const float U)
 {
+	// This needs actual work on it.
+	
+	return Pose0;
 }
 
 UHierarchyPose* UCJR_BlendInterface::HPoseOpIdentity(const int NumPoses)

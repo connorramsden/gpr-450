@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Components/ActorComponent.h"
 #include "CJR_Hierarchy.h"
 #include "CJR_SpatialPose.h"
 
@@ -14,7 +14,7 @@
  * Makes algorithms easier to keep this as a sep. data type.
  */
 UCLASS()
-class ULAB_API UHierarchyPose final : public UObject
+class ULAB_API UHierarchyPose final : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -23,6 +23,8 @@ protected:
 	TArray<USpatialPose*> Pose;
 
 public:
+	bool bIsInitialized;
+	
 	UHierarchyPose();
 	~UHierarchyPose();
 
@@ -52,7 +54,7 @@ typedef TArray<UHierarchyPose*> FHPosePool;
  */
 
 UCLASS()
-class ULAB_API UHierarchyPoseGroup final : public UObject
+class ULAB_API UHierarchyPoseGroup final : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -85,6 +87,9 @@ protected:
 	UPROPERTY()
 	int PoseCount;
 
+	public:
+	bool bIsInitialized;
+
 public:
 	UHierarchyPoseGroup();
 	~UHierarchyPoseGroup();
@@ -93,7 +98,7 @@ public:
 };
 
 UCLASS()
-class ULAB_API UHierarchyState final : public UObject
+class ULAB_API UHierarchyState final : public UActorComponent
 {
 	GENERATED_BODY()
 protected:

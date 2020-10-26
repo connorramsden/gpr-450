@@ -1,70 +1,87 @@
 // Copyright 2020 Connor Ramsden
 
 #include "CJR_Hierarchy.h"
+#include "CJR_HelperFunctions.h"
 
-UHNode::UHNode()
+typedef FCJR_HelperFunctions FHF;
+
+AHNode::AHNode()
 {
-	Name = "Node";
-	Index = 0;
-	ParentIndex = Index - 1;
+    Name = "Node";
+    Index = 0;
+    ParentIndex = Index - 1;
 
-	return;
+    return;
 }
 
 UHierarchy::UHierarchy()
 {
-	Nodes = TArray<UHNode *>();
-	NumNodes = 0;
+    Nodes = TArray<AHNode*>();
+    NumNodes = 0;
+    bIsInitialized = false;
 
-	return;
+    return;
 }
 
 UHierarchy::~UHierarchy()
 {
-	Nodes.Empty();
-
-	return;
+    if (Nodes.Num() > 0)
+        Nodes.Empty();
 }
 
 void UHierarchy::Init(int NumNodesToCreate)
 {
-	TArray<FString> Names;
+    FHF::LogString("Entering Hierarchy.Init()");
 
-	for (int i = 0; i < NumNodesToCreate; ++i)
-	{
-		Names.Add("Node " + FString::FromInt(i));
-	}
+    TArray<FString> Names = TArray<FString>();
 
-	Init(NumNodesToCreate, Names);
+    for (int i = 0; i < NumNodesToCreate; ++i)
+    {
+        Names.Add("Node " + FString::FromInt(i));
+    }
 
-	return;
+    if (NumNodes <= 0)
+        NumNodes = NumNodesToCreate;
+
+    if (Names.Num() > 0)
+        Init(NumNodesToCreate, Names);
+    else
+        FHF::LogStringErr("Names Array is causing an error.");
+
+    if (Nodes.Num() > 0 && bIsInitialized == false)
+        bIsInitialized = true;
 }
 
 void UHierarchy::Init(int NumNodesToCreate, TArray<FString> Names)
 {
-	// Create NumNodes nodes & append them to Nodes pool
-	for (int i = 0; i < NumNodesToCreate; ++i)
-	{
-		// Create a temporary node
-		UHNode * TempNode = NewObject<UHNode>();
-		// Assign its name, index, and parent index
-		TempNode->SetName(Names[i]);
-		TempNode->SetIndex(i);
-		TempNode->SetPIndex(i - 1);
+    FHF::LogString("Entering Hierarchy.Init() with Names");
 
-		// Add the node to the pool
-		Nodes.Add(TempNode);
-		// Free memory
-		TempNode->ConditionalBeginDestroy();
-	}
+    // Create NumNodes nodes & append them to Nodes pool
+    for (int i = 0; i < NumNodesToCreate; ++i)
+    {
+        // Create a temporary node
+        AHNode* TempNode = NewObject<AHNode>();
 
-	return;
+        // Assign its name, index, and parent index
+        TempNode->SetName(Names[i]);
+        TempNode->SetIndex(i);
+        TempNode->SetPIndex(i - 1);
+
+        // Add the node to the pool
+        Nodes.Add(TempNode);
+        // Free memory
+        TempNode->ConditionalBeginDestroy();
+    }
+
+    if (NumNodes <= 0)
+        NumNodes = NumNodesToCreate;
+
+    if (Nodes.Num() > 0 && bIsInitialized == false)
+        bIsInitialized = true;
 }
 
 void UHierarchy::SetNode(int Index, int NewPIndex, FString NewName)
 {
-	Nodes[Index]->SetPIndex(NewPIndex);
-	Nodes[Index]->SetName(NewName);
-
-	return;
+    Nodes[Index]->SetPIndex(NewPIndex);
+    Nodes[Index]->SetName(NewName);
 }

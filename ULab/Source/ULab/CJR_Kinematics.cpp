@@ -30,7 +30,7 @@ void KinematicsSolveForwardPartial(const UHierarchyState& HierarchyState, const 
 		for (int i = FirstIndex; i < NumNodes; ++i)
 		{
 			// Get the node at current index
-			const UHNode* Node = HierarchyState.GetHierarchy()->GetNodes()[i];
+			const AHNode* Node = HierarchyState.GetHierarchy()->GetNodes()[i];
 
 			// Ensure we have a non-root node
 			if (Node->GetPIndex() >= 0)

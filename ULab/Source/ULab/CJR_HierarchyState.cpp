@@ -8,19 +8,19 @@ typedef FCJR_HelperFunctions FHF;
 UHierarchyPose::UHierarchyPose()
 {
 	Pose = TArray<USpatialPose*>();
+	bIsInitialized = false;
 
 	return;
 }
 
 UHierarchyPose::~UHierarchyPose()
 {
+	/*
 	for (int i = 0; i < Pose.Num(); ++i)
 	{
 		if (Pose[i])
 			Pose[i]->ConditionalBeginDestroy();
-	}
-
-	return;
+	}*/
 }
 
 void UHierarchyPose::Init(const int NumPoses)
@@ -36,19 +36,23 @@ void UHierarchyPose::Init(const int NumPoses)
 		// Do I need to clean up TempPose here?
 	}
 
-	return;
+	bIsInitialized = true;
 }
 
 void UHierarchyPose::PoseReset(const int NodeCount)
-{
+{	
+	if(Pose.Num() <= 0 || NodeCount <= 0)
+	{
+		FHF::LogStringErr("Hierarchy Pose Count is 0 or Less.");
+		return;
+	}
+	
 	// Iterate through Pose[0] --> Pose[NodeCount]
 	for (int i = 0; i < NodeCount; ++i)
 	{
 		// Reset Pose[i]
 		Pose[i]->ResetPose();
 	}
-
-	return;
 }
 
 void UHierarchyPose::PoseConvert(const int NodeCount, ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order)
@@ -59,8 +63,6 @@ void UHierarchyPose::PoseConvert(const int NodeCount, ESpatialPoseChannel Channe
 		// Convert Pose[i]
 		Pose[i]->PoseConvert(Channel, Order);
 	}
-
-	return;
 }
 
 void UHierarchyPose::PoseRestore(const int NodeCount, ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order)
@@ -77,8 +79,6 @@ void UHierarchyPose::PoseCopy(UHierarchyPose* PoseIn, const int NodeCount)
 	{
 		Pose[i] = PoseIn->GetPoses()[i];
 	}
-
-	return;
 }
 
 void UHierarchyPose::PoseConcat(UHierarchyPose* Other, const int NodeCount)
@@ -111,12 +111,14 @@ UHierarchyPoseGroup::UHierarchyPoseGroup()
 
 	PoseCount = -1;
 
+	bIsInitialized = false;
+
 	return;
 }
 
 UHierarchyPoseGroup::~UHierarchyPoseGroup()
 {
-	if (Hierarchy)
+	/*if (Hierarchy)
 		Hierarchy->ConditionalBeginDestroy();
 	for (int i = 0; i < HPose.Num(); ++i)
 	{
@@ -128,23 +130,46 @@ UHierarchyPoseGroup::~UHierarchyPoseGroup()
 	{
 		if (Pose[i])
 			Pose[i]->ConditionalBeginDestroy();
-	}
-
-	return;
+	}*/
 }
 
 void UHierarchyPoseGroup::Init(UHierarchy* NewHier, const int NewCount, const ESpatialPoseEulerOrder NewOrder)
 {
-	if (NewHier != nullptr)
+	// Redundant error handling for passed Hierarchy.
+	if (NewHier == nullptr || NewHier->bIsInitialized == false)
 	{
-		Hierarchy = NewHier;
+		FHF::LogStringErr("PoseGroup->Init() received a nullptr or uninitialized Hierarchy.");
+		return;
 	}
+
+	// Error handling for passed pose count
+	if(NewCount <= 0)
+	{
+		FHF::LogStringErr("Cannot Init() a PoseGroup with 0 or Negative PoseCount.");
+		return;
+	}
+
+	// Init Hierarchy
+	Hierarchy = NewHier;
+
+	// Init pose counts
+	HPoseCount = NewCount;
+	PoseCount = HPoseCount * Hierarchy->GetNumNodes();
+
+	// Init Spatial Pose Order
+	Order = NewOrder;
+
+	// Should also initialize Channel here.
+
+	bIsInitialized = true;
 }
 
 UHierarchyState::UHierarchyState()
 {
+	// Instantiate Hierarchy
 	Hierarchy = NewObject<UHierarchy>();
 
+	// Instantiate all Poses
 	LocalSpace = NewObject<UHierarchyPose>();
 	ObjectSpace = NewObject<UHierarchyPose>();
 	ObjectSpaceInverse = NewObject<UHierarchyPose>();
@@ -155,59 +180,55 @@ UHierarchyState::UHierarchyState()
 
 UHierarchyState::~UHierarchyState()
 {
-	if (Hierarchy)
-		Hierarchy->ConditionalBeginDestroy();
-	if (LocalSpace)
-		LocalSpace->ConditionalBeginDestroy();
-	if (ObjectSpace)
-		ObjectSpace->ConditionalBeginDestroy();
-	if (ObjectSpaceInverse)
-		ObjectSpaceInverse->ConditionalBeginDestroy();
-	if (ObjectSpaceBindToCurrent)
-		ObjectSpaceBindToCurrent->ConditionalBeginDestroy();
-
-	return;
 }
 
 void UHierarchyState::Init(UHierarchy* Hier)
 {
-	if (Hier)
+	// Hierarchy error handling
+	if (Hier == nullptr || Hier->bIsInitialized == false)
 	{
-		const int NodeCount = Hier->GetNumNodes();
-		const int HPoseCount = 4;
-		const int SPoseCount = HPoseCount * NodeCount;
-
-		Hierarchy = Hier;
-
-		// Init other poses from this hierarchy
-		ObjectSpace->SetPose(LocalSpace->GetPoses());
-		ObjectSpaceInverse->SetPose(ObjectSpace->GetPoses());
-		ObjectSpaceBindToCurrent->SetPose(ObjectSpaceInverse->GetPoses());
-
-		for (int i = 0; i < HPoseCount; ++i)
-		{
-			for (int j = 0; ; j += NodeCount)
-			{
-				LocalSpace->GetPoses()[i] = LocalSpace->GetPoses()[j];
-			}
-		}
-
-		LocalSpace->PoseReset(SPoseCount);
+		FHF::LogStringErr("HierarchyState->Init() received a nullptr or uninitialized Hierarchy.");
+		return;
 	}
+
+	const int NodeCount = Hier->GetNumNodes();
+	const int HPoseCount = 4;
+	const int SPoseCount = HPoseCount * NodeCount;
+
+	Hierarchy = Hier;
+
+	// Init other poses from this hierarchy
+	ObjectSpace->SetPose(LocalSpace->GetPoses());
+	ObjectSpaceInverse->SetPose(ObjectSpace->GetPoses());
+	ObjectSpaceBindToCurrent->SetPose(ObjectSpaceInverse->GetPoses());
+
+
+	FHF::LogStringErr("Reached previous error point from HierarchyState->Init()");
+
+	/*for (int i = 0; i < HPoseCount; ++i)
+	{
+		for (int j = 0; ; j += NodeCount)
+		{
+			LocalSpace->GetPoses()[i] = LocalSpace->GetPoses()[j];
+		}
+	}*/
+
+	LocalSpace->PoseReset(SPoseCount);
 }
 
 void UHierarchyState::UpdateObjectInverse()
 {
-	if (Hierarchy)
+	if (Hierarchy == nullptr || Hierarchy->bIsInitialized == false)
 	{
-		for (int i = 0; i < Hierarchy->GetNumNodes(); ++i)
-		{
-			ObjectSpaceInverse->GetPoses()[i]->SetTransform(
-				ObjectSpace->GetPoses()[i]->GetTransform().Inverse());
-		}
+		FHF::LogStringErr("Hierarchy is null or uninitialized in HierarchyState->UpdateObjectInverse()");
+		return;
 	}
 
-	return;
+	for (int i = 0; i < Hierarchy->GetNumNodes(); ++i)
+	{
+		ObjectSpaceInverse->GetPoses()[i]->SetTransform(
+			ObjectSpace->GetPoses()[i]->GetTransform().Inverse());
+	}
 }
 
 void UHierarchyState::UpdateObjectBindToCurrent()

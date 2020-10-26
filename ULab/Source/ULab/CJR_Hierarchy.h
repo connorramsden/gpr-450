@@ -3,33 +3,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Components/ActorComponent.h"
+#include "GameFramework/Actor.h"
 #include "CJR_Hierarchy.generated.h"
 
 /**
  * Core of all hierarchical data
  * Contains no spatial or temporal information
  */
-UCLASS()
-class ULAB_API UHNode final : public UObject
+UCLASS(BlueprintType)
+class ULAB_API AHNode final : public AActor
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	// The node's Name
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FString Name;
 
 	// The Mesh that a Node is visualized by
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent * Mesh;
 
 	// Index within the Tree
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	int Index;
 	// Parent's index within the tree
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	int ParentIndex;
 
 public:
-	UHNode();
+	AHNode();
 
 public:
 	FORCEINLINE FString GetName() const { return Name; }
@@ -45,22 +49,25 @@ public:
  * Nodes are sorted Tree-style, via depth
  */
 
-UCLASS()
-class ULAB_API UHierarchy final : public UObject
+UCLASS(BlueprintType)
+class ULAB_API UHierarchy : public UActorComponent
 {
 	GENERATED_BODY()
 
-protected:
-	UPROPERTY()
-	TArray<UHNode *> Nodes;
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	TArray<AHNode *> Nodes;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int NumNodes;
+
+    bool bIsInitialized;
 public:
 	UHierarchy();
 	~UHierarchy();
 
 public:
-	FORCEINLINE TArray<UHNode *> GetNodes() const { return Nodes; }			// get the entire array of nodes
-	FORCEINLINE UHNode * GetNode(const int Index) { return Nodes[Index]; }	// get a specific node by index
+	FORCEINLINE TArray<AHNode *> GetNodes() const { return Nodes; }			// get the entire array of nodes
+	FORCEINLINE AHNode * GetNode(const int Index) { return Nodes[Index]; }	// get a specific node by index
 	FORCEINLINE int GetNumNodes() const { return NumNodes; }					// return the number of nodes in the pool
 
 public:
