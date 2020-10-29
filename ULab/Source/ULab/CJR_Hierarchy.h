@@ -57,10 +57,14 @@ public:
 	UPROPERTY()
 	bool bIsInitialized;
 
-	/// METHODS ///
+	/// Ctor & Dtor ///
 	FHierarchy();
 	~FHierarchy();
 
+	/// ACCESSORS ///
+	FORCEINLINE AHNode * GetNode(const int Index) {return Nodes[Index];}
+	
+	/// METHODS ///
 	void Init(int NodesToCreate);
 	void Init(int NodesToCreate, TArray<FString> Names);
 	void SetNode(int Index, int NewPIndex, FString NewName);

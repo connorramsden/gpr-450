@@ -73,7 +73,8 @@ typedef ESpatialPoseChannel EPoseChannel;
 typedef ESpatialPoseEulerOrder EPoseOrder;
 
 USTRUCT()
-struct ULAB_API FSpatialPose {
+struct ULAB_API FSpatialPose
+{
 	GENERATED_BODY()
 
 protected:
@@ -92,10 +93,27 @@ protected:
 public:
 	/// CONSTRUCTOR ///
 	FSpatialPose();
-	
+
+	/// ACCESSORS ///
+	// Get & Set Transform
+	FORCEINLINE FTransform GetTransform() { return Transform; }
+	FORCEINLINE void SetTransform(FTransform NewT) { Transform = NewT; }
+	// Get & Set Orientation
+	FORCEINLINE FVector4 GetOrientation() { return Orientation; }
+	FORCEINLINE void SetOrientation(FVector4 NewO) { Orientation = NewO; }
+	// Get & Set Translation
+	FORCEINLINE FVector GetTranslation() { return Translation; }
+	FORCEINLINE void SetTranslation(FVector NewT) { Translation = NewT; }
+	// Get & Set Rotation
+	FORCEINLINE FVector GetRotation() { return Rotation; }
+	FORCEINLINE void SetRotation(FVector NewR) { Rotation = NewR; }
+	// Get & Set Scale
+	FORCEINLINE FVector GetScale() { return Scale; }
+	FORCEINLINE void SetScale(FVector NewS) { Scale = NewS; }
+
 	/// METHODS ///
 	// Init a new Spatial Pose
-	void Init(FTransform TMat,FVector TVec, FVector R, FVector S);
+	void Init(FTransform TMat, FVector TVec, FVector R, FVector S);
 	// Reset a given Spatial Pose
 	void ResetPose();
 	// Convert a Spatial Pose

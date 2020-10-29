@@ -30,12 +30,13 @@ public:
 	~FHierarchyPose();
 
 	/// GETTERS & SETTERS ///
-	FORCEINLINE FSpatialPose GetPose(const int Index) {return Pose[Index];}
-	FORCEINLINE TArray<FSpatialPose> GetPoses() {return Pose;}
-	FORCEINLINE int GetNumPoses() {return Pose.Num();}
-	
+	FORCEINLINE FSpatialPose GetPose(const int Index) { return Pose[Index]; }
+	FORCEINLINE void SetPose(const int Index, FSpatialPose NewP) {Pose[Index].PoseCopy(NewP);}
+	FORCEINLINE TArray<FSpatialPose> GetPoses() { return Pose; }
+	FORCEINLINE int GetNumPoses() { return Pose.Num(); }
+
 	/// METHODS ///
-	
+
 	void Init(const int NumPoses);
 
 	void PoseReset(const int NodeCount, const int FirstIndex = 0);
@@ -104,9 +105,19 @@ protected:
 	FHierarchyPose ObjectSpaceBindToCurrent;
 
 public:
+	/// Ctor & Dtor ///
 	FHierarchyState();
 	~FHierarchyState();
 
+	/// ACCESSORS ///
+	FORCEINLINE FHierarchy GetHierarchy() { return Hierarchy; }
+	FORCEINLINE void SetHierarchy(FHierarchy NewH) { Hierarchy = NewH; }
+	FORCEINLINE FHierarchyPose GetLocal() {return LocalSpace;}
+	FORCEINLINE FHierarchyPose GetObject() {return ObjectSpace;}
+	FORCEINLINE FHierarchyPose GetObjectInv() {return ObjectSpaceInv;}
+	FORCEINLINE FHierarchyPose GetObjectBind() {return ObjectSpaceBindToCurrent;}
+
+	/// METHODS /// 
 	void Init(FHierarchy NewH);
 	void UpdateObjectInverse();
 	void UpdateObjectBindToCurrent();
