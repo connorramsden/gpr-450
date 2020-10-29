@@ -5,13 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CJR_Hierarchy.generated.h"
-
 /**
  * Core of all Hierarchical data
  * Contains no spatial or temporal information
  */
 UCLASS(BlueprintType)
-class ULAB_API AHNode final : public AActor
+class ULAB_API AHNode : public AActor
 {
 	GENERATED_BODY()
 
