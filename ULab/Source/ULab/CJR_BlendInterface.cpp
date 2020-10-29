@@ -267,3 +267,54 @@ FHierarchyPose FBlendInterface::HPoseOpBicubic(FHPose  OutPose, FHPose PoseP0, F
 
 	return OutPose;
 }
+
+FSpatialPose FBlendInterface::SPoseOpSmoothstep(FSPose Pose0, FSPose Pose1, const float U)
+{
+}
+
+FSpatialPose FBlendInterface::SPoseOpDescale(FSPose Pose, const float U)
+{
+}
+
+FSpatialPose FBlendInterface::SPoseOpConvert(FSPose Pose)
+{
+}
+
+FSpatialPose FBlendInterface::SPoseOpRestore(FSPose Pose)
+{
+}
+
+FSpatialPose FBlendInterface::SPoseOpFK(FHierarchy H, FSPose Local, FSPose Object)
+{
+}
+
+FSpatialPose FBlendInterface::SPoseOpIK(FHierarchy H, FSPose Object, FSPose Local)
+{
+}
+
+FHierarchyPose FBlendInterface::HPoseOpSmoothstep(FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
+	const int FirstIndex)
+{
+}
+
+FHierarchyPose FBlendInterface::HPoseOpDescale(FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
+{
+}
+
+FHierarchyPose FBlendInterface::HPoseOpConvert(FHPose Pose, const int NumPoses, const int FirstIndex)
+{
+}
+
+FHierarchyPose FBlendInterface::HPoseOpRestore(FHPose Pose, const int NumPoses, const int FirstIndex)
+{
+}
+
+FHierarchyPose FBlendInterface::HPoseOpFK(FHierarchy H, FHPose Local, FHPose Object, const int NumPoses,
+	const int FirstIndex)
+{
+}
+
+FHierarchyPose FBlendInterface::HPoseOpIK(FHierarchy H, FHPose Object, FHPose Local, const int NumPoses,
+	const int FirstIndex)
+{
+}
