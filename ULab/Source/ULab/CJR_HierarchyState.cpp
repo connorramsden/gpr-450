@@ -26,6 +26,17 @@ void FHierarchyPose::Init(const int NumPoses)
 		// Add temp pose to pose array
 		Pose.Add(TempPose);
 	}
+
+	bIsInitialized = true;
+}
+
+void FHierarchyPose::Init(const int NumPoses, FSpatialPose PoseTemplate)
+{
+	for(int i = 0; i < NumPoses; ++i)
+	{
+		Pose.Add(PoseTemplate);
+	}
+	bIsInitialized = true;
 }
 
 

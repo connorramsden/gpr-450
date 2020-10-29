@@ -31,14 +31,16 @@ public:
 
 	/// GETTERS & SETTERS ///
 	FORCEINLINE FSpatialPose GetPose(const int Index) { return Pose[Index]; }
-	FORCEINLINE void SetPose(const int Index, FSpatialPose NewP) {Pose[Index].PoseCopy(NewP);}
+	FORCEINLINE void SetPose(const int Index, FSpatialPose NewP) { Pose[Index].PoseCopy(NewP); }
 	FORCEINLINE TArray<FSpatialPose> GetPoses() { return Pose; }
 	FORCEINLINE int GetNumPoses() { return Pose.Num(); }
 
 	/// METHODS ///
 
 	void Init(const int NumPoses);
+	void Init(const int NumPoses, FSpatialPose PoseTemplate);
 
+	FORCEINLINE void AddPose(const FSpatialPose NewP) { Pose.Add(NewP); };
 	void PoseReset(const int NodeCount, const int FirstIndex = 0);
 	void PoseConvert(EPoseChannel Channel, EPoseOrder Order, const int NodeCount, const int FirstIndex = 0);
 	void PoseRestore(EPoseChannel Channel, EPoseOrder Order, const int NodeCount, const int FirstIndex = 0);
@@ -112,10 +114,10 @@ public:
 	/// ACCESSORS ///
 	FORCEINLINE FHierarchy GetHierarchy() { return Hierarchy; }
 	FORCEINLINE void SetHierarchy(FHierarchy NewH) { Hierarchy = NewH; }
-	FORCEINLINE FHierarchyPose GetLocal() {return LocalSpace;}
-	FORCEINLINE FHierarchyPose GetObject() {return ObjectSpace;}
-	FORCEINLINE FHierarchyPose GetObjectInv() {return ObjectSpaceInv;}
-	FORCEINLINE FHierarchyPose GetObjectBind() {return ObjectSpaceBindToCurrent;}
+	FORCEINLINE FHierarchyPose GetLocal() { return LocalSpace; }
+	FORCEINLINE FHierarchyPose GetObject() { return ObjectSpace; }
+	FORCEINLINE FHierarchyPose GetObjectInv() { return ObjectSpaceInv; }
+	FORCEINLINE FHierarchyPose GetObjectBind() { return ObjectSpaceBindToCurrent; }
 
 	/// METHODS /// 
 	void Init(FHierarchy NewH);
