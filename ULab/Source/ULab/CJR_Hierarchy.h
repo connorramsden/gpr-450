@@ -51,7 +51,7 @@ struct ULAB_API FHierarchy
 public:
 	/// PROPERTIES ///
 	UPROPERTY()
-	TArray<AHNode> Nodes;
+	TArray<AHNode *> Nodes;
 	UPROPERTY()
 	int NumNodes;
 	UPROPERTY()
