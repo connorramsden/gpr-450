@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "Math/DualQuat.h"
+#include "UObject/NoExportTypes.h"
 #include "CJR_SpatialPose.generated.h"
 
 /**
@@ -72,7 +74,7 @@ enum class EInterpMode
 typedef ESpatialPoseChannel EPoseChannel;
 typedef ESpatialPoseEulerOrder EPoseOrder;
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FSpatialPose
 {
 	GENERATED_BODY()

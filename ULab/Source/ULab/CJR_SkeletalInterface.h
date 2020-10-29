@@ -12,16 +12,15 @@
 
 #include "CJR_SkeletalInterface.generated.h"
 
-UCLASS()
+UCLASS(BlueprintType)
 class ULAB_API ASkeletalInterface : public AActor {
 	GENERATED_BODY()
 
 	protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	struct FHierarchy Hierarchy;
 
-	UPROPERTY()
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	struct FHierarchyState BasePose;
 
 	virtual void BeginPlay() override;

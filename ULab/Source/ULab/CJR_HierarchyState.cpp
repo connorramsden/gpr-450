@@ -1,4 +1,5 @@
 #include "CJR_HierarchyState.h"
+
 #include "CJR_HelperFunctions.h"
 typedef FCJR_HelperFunctions FHF;
 

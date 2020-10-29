@@ -3,23 +3,24 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
 #include "CJR_Hierarchy.h"
 #include "CJR_SpatialPose.h"
 
-#include "CJR_Hierarchy.generated.h"
+#include "CJR_HierarchyState.generated.h"
 
 /**
  * A set of poses for a collection of nodes.
  * Makes algorithms easier to keep this separate.
  */
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FHierarchyPose
 {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TArray<FSpatialPose> Pose;
 
 public:
@@ -30,7 +31,7 @@ public:
 	~FHierarchyPose();
 
 	/// GETTERS & SETTERS ///
-	FORCEINLINE FSpatialPose GetPose(const int Index) { return Pose[Index]; }
+	FORCEINLINE FSpatialPose & GetPose(const int Index) { return Pose[Index]; }
 	FORCEINLINE void SetPose(const int Index, FSpatialPose NewP) { Pose[Index].PoseCopy(NewP); }
 	FORCEINLINE TArray<FSpatialPose> GetPoses() { return Pose; }
 	FORCEINLINE int GetNumPoses() { return Pose.Num(); }
@@ -56,29 +57,29 @@ typedef TArray<FHierarchyPose> FHPosePool;
  * Pose Group
  */
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FHierarchyPoseGroup
 {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FHierarchy Hierarchy;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TArray<FHierarchyPose> HPose;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TArray<FSpatialPose> Pose;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TArray<ESpatialPoseChannel> Channel;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	ESpatialPoseEulerOrder Order;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int HPoseCount;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int PoseCount;
 public:
 	bool bIsInitialized;
@@ -89,21 +90,21 @@ public:
 	void Init(FHierarchy NewH, const int NewC, const EPoseOrder NewO);
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ULAB_API FHierarchyState
 {
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FHierarchy Hierarchy;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FHierarchyPose LocalSpace;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FHierarchyPose ObjectSpace;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FHierarchyPose ObjectSpaceInv;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FHierarchyPose ObjectSpaceBindToCurrent;
 
 public:
