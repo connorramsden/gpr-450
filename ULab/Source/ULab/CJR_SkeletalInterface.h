@@ -23,11 +23,13 @@ class ULAB_API ASkeletalInterface : public AActor {
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	struct FHierarchyState BasePose;
 
+	// Acting as an initializer
 	virtual void BeginPlay() override;
 
 	public:
 	ASkeletalInterface();
 	~ASkeletalInterface();
 
+	// Called every single frame during Play
 	virtual void Tick(float DeltaSeconds) override;
 };

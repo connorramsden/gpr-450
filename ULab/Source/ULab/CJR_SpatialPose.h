@@ -81,15 +81,15 @@ struct ULAB_API FSpatialPose
 
 protected:
 	/// PROPERTIES ///
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FTransform Transform;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FVector4 Orientation;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FVector Translation;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FVector Rotation;
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FVector Scale;
 
 public:
