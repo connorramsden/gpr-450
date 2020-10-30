@@ -9,8 +9,8 @@
 #include "CJR_SpatialPose.generated.h"
 
 /**
- * List of Euler angle product orders
- */
+* List of Euler angle product orders
+*/
 UENUM()
 enum class ESpatialPoseEulerOrder
 {
@@ -23,9 +23,9 @@ enum class ESpatialPoseEulerOrder
 };
 
 /**
- * Flags to describe transformation components in use
- * Useful for constraining motion and kinematics
- */
+* Flags to describe transformation components in use
+* Useful for constraining motion and kinematics
+*/
 UENUM()
 enum class ESpatialPoseChannel
 {
@@ -60,6 +60,7 @@ enum class ESpatialPoseChannel
 	PoseChannel_Translate_XYZ = PoseChannel_Translate_XY | PoseChannel_Translate_Z,
 };
 
+// Determines which interpolation mode a Pose will utilize
 UENUM()
 enum class EInterpMode
 {
@@ -73,58 +74,58 @@ enum class EInterpMode
 typedef ESpatialPoseChannel EPoseChannel;
 typedef ESpatialPoseEulerOrder EPoseOrder;
 
-/**
- * A description of a transformation (pose) in space
- * Provides spatial / temporal context for a UHNode
- * Spatial description of a UHNode at a given time
- */
-UCLASS()
-class ULAB_API USpatialPose final : public UObject
+USTRUCT(BlueprintType)
+struct ULAB_API FSpatialPose
 {
 	GENERATED_BODY()
 
-protected: // Member Variables
-	// 4x4 matrix described by a pose, relative to parent space
-	// Derived from TRS, and matrices don't blend well
+protected:
+	/// PROPERTIES ///
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FTransform Transform;
-
-	// Final DQ - can be derived from all below or TR - they do animate
-	// dq = dual number, with real and dual part, each a quaternion
-	// default dq = "1": real = (0, 0, 0, 1), dual = (0, 0, 0, 0)
-	// encodes angle/axis rotation, uniform scale (squared magnitude))
-	// FDualQuat Dq; 
-
-	// quaternion - derived from Euler angles or angle/axis
-	// default quat = "1": (0, 0, 0, 1)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	FVector4 Orientation;
-
-	// 3 Element Vectors
-	// R -> Elements describing Euler angle orientation, relative to parent space
-	// S -> Elements describing scale, relative to parent space
-	// T -> Elements describing the translation, relative to parent space
-	FVector Rotation, Scale, Translation;
-
-public: // CTor
-	USpatialPose();
-
-public: // Getters & Setters
-	FORCEINLINE FTransform GetTransform() const { return Transform; }
-	FORCEINLINE FVector4 GetOrientation() const { return Orientation; }
-	FORCEINLINE FVector GetRotation() const { return Rotation; }
-	FORCEINLINE FVector GetScale() const { return Scale; }
-	FORCEINLINE FVector GetTranslation() const { return Translation; }
-	FORCEINLINE void SetTransform(const FTransform NewT) { Transform = NewT; }
-	FORCEINLINE void SetOrientation(const FVector4 NewO) { Orientation = NewO; }
-	FORCEINLINE void SetRotation(const FVector NewR) { Rotation = NewR; }
-	FORCEINLINE void SetScale(const FVector NewS) { Scale = NewS; }
-	FORCEINLINE void SetTranslation(const FVector NewT) { Translation = NewT; }
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	FVector Translation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	FVector Rotation;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
+	FVector Scale;
 
 public:
-	void Init(FTransform TMat, FVector O, FVector S, FVector TVec);
+	/// CONSTRUCTOR ///
+	FSpatialPose();
+
+	/// ACCESSORS ///
+	// Get & Set Transform
+	FORCEINLINE FTransform GetTransform() { return Transform; }
+	FORCEINLINE void SetTransform(FTransform NewT) { Transform = NewT; }
+	// Get & Set Orientation
+	FORCEINLINE FVector4 GetOrientation() { return Orientation; }
+	FORCEINLINE void SetOrientation(FVector4 NewO) { Orientation = NewO; }
+	// Get & Set Translation
+	FORCEINLINE FVector GetTranslation() { return Translation; }
+	FORCEINLINE void SetTranslation(FVector NewT) { Translation = NewT; }
+	// Get & Set Rotation
+	FORCEINLINE FVector GetRotation() { return Rotation; }
+	FORCEINLINE void SetRotation(FVector NewR) { Rotation = NewR; }
+	// Get & Set Scale
+	FORCEINLINE FVector GetScale() { return Scale; }
+	FORCEINLINE void SetScale(FVector NewS) { Scale = NewS; }
+
+	/// METHODS ///
+	// Init a new Spatial Pose
+	void Init(FTransform TMat, FVector TVec, FVector R, FVector S);
+	// Reset a given Spatial Pose
 	void ResetPose();
-	void PoseConvert(EPoseChannel Channel, EPoseOrder Order);
-	void PoseRestore(ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order);
-	void PoseCopy(USpatialPose& Other);
-	void PoseConcat(USpatialPose* Other);
-	void PoseLerp(USpatialPose* Other, const float U, EInterpMode Mode = EInterpMode::Mode_Step);
+	// Convert a Spatial Pose
+	void PoseConvert(EPoseChannel Channel = ESpatialPoseChannel::PoseChannel_None, EPoseOrder Order = ESpatialPoseEulerOrder::PoseEulerOrder_xyz);
+	// Restore a Spatial Pose
+	void PoseRestore(EPoseChannel Channe = ESpatialPoseChannel::PoseChannel_None, EPoseOrder Order = ESpatialPoseEulerOrder::PoseEulerOrder_xyz);
+	// Copy the passed Pose to this Pose
+	void PoseCopy(const FSpatialPose Other);
+	// Concat the passed Pose with this Pose
+	void PoseConcat(const FSpatialPose Other);
+	// Lerp the passed Pose with this Pose via U (defaults to LERP)
+	void PoseLerp(const FSpatialPose Other, const float U, const EInterpMode Mode = EInterpMode::Mode_Linear);
 };

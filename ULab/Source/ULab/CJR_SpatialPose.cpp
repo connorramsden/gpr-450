@@ -1,136 +1,84 @@
 // Copyright 2020 Connor Ramsden
 
-
 #include "CJR_SpatialPose.h"
 #include "CJR_HelperFunctions.h"
 typedef FCJR_HelperFunctions FHF;
 
-USpatialPose::USpatialPose()
+FSpatialPose::FSpatialPose()
 {
-	// Reset does the same thing the Constructor should do
+	// Performs the same ops we'd want in a default pose anyways.
 	ResetPose();
-
-	return;
 }
 
-void USpatialPose::Init(FTransform TMat, FVector O, FVector S, FVector TVec)
+void FSpatialPose::Init(FTransform TMat, FVector TVec, FVector R, FVector S)
 {
-	SetTransform(TMat);
-	SetOrientation(O);
-	SetScale(S);
-	SetTranslation(TVec);
+	Transform = TMat;
 
-	return;
+	Translation = TVec;
+	Rotation = R;
+	Scale = S;
 }
 
-void USpatialPose::ResetPose()
+void FSpatialPose::ResetPose()
 {
-	// Set Transform to Identity matrix
+	// Transform is Identity
 	Transform = FTransform::Identity;
 
-	Orientation = FVector4(0.f, 0.f, 0.f, 1.f);
+	// Orientation is V4 Identity
+	Orientation = FVector4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Dq = FDualQuat(FQuat(0.f, 0.f, 0.f, 1.f), FQuat(0.f, 0.f, 0.f, 0.f));
-
-	// Set Rotation to (0, 0, 0)
-	Rotation = FVector::ZeroVector;
-	// Set Scale to (1, 1, 1)
-	Scale = FVector::OneVector;
-	// Set Translation to (0, 0, 0)
+	// (0, 0, 0)
 	Translation = FVector::ZeroVector;
-
-	return;
+	// (0, 0, 0)
+	Rotation = FVector::ZeroVector;
+	// (1, 1, 1)
+	Scale = FVector::OneVector;
 }
 
-void USpatialPose::PoseConvert(EPoseChannel Channel, EPoseOrder Order)
-{
-	// Check fucking slides lol
-	FMatrix rx, ry, rz, r;
-
-	switch (Order)
-	{
-	case ESpatialPoseEulerOrder::PoseEulerOrder_xyz:
-		break;
-	case ESpatialPoseEulerOrder::PoseEulerOrder_yzx:
-		break;
-	case ESpatialPoseEulerOrder::PoseEulerOrder_zxy:
-		break;
-	case ESpatialPoseEulerOrder::PoseEulerOrder_yxz:
-		break;
-	case ESpatialPoseEulerOrder::PoseEulerOrder_xzy:
-		break;
-	case ESpatialPoseEulerOrder::PoseEulerOrder_zyx:
-		break;
-	}
-
-	FHF::NotImplemented();
-	
-	return;
-}
-
-void USpatialPose::PoseRestore(ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order)
+void FSpatialPose::PoseConvert(EPoseChannel Channel, EPoseOrder Order)
 {
 	FHF::NotImplemented();
-
-	return;
 }
 
-void USpatialPose::PoseCopy(USpatialPose& Other)
+void FSpatialPose::PoseRestore(EPoseChannel Channel, EPoseOrder Order)
 {
-	SetTransform(Other.GetTransform());
-	SetOrientation(Other.GetOrientation());
-	SetRotation(Other.GetRotation());
-	SetScale(Other.GetScale());
-	SetTranslation(Other.GetTranslation());
-
-	return;
+	FHF::NotImplemented();
 }
 
-void USpatialPose::PoseConcat(USpatialPose* Other)
+void FSpatialPose::PoseCopy(const FSpatialPose Other)
 {
-	// Concat Rotation
-	SetRotation(GetRotation() + Other->GetRotation());
-	// Concat Scale
-	SetScale(GetScale() * Other->GetScale());
-	// Concat Translation
-	SetTranslation(GetTranslation() + Other->GetTranslation());
+	Transform = Other.Transform;
+	Orientation = Other.Orientation;
 
-	return;
+	Translation = Other.Translation;
+	Rotation = Other.Rotation;
+	Scale = Other.Scale;
 }
 
-void USpatialPose::PoseLerp(USpatialPose* Other, const float U, EInterpMode Mode)
+void FSpatialPose::PoseConcat(const FSpatialPose Other)
+{
+	Translation += Other.Translation;
+	Rotation += Other.Rotation;
+	Scale *= Other.Scale;
+}
+
+void FSpatialPose::PoseLerp(const FSpatialPose Other, const float U, const EInterpMode Mode)
 {
 	switch (Mode)
 	{
 	case EInterpMode::Mode_Err:
-		FHF::LogStringErr("Error: Mode Passed Incorrectly.");
+		FHF::LogStringErr("PoseLerp() Mode passed incorrectly.");
 		break;
 	case EInterpMode::Mode_Step:
-		{
-			break;
-		}
+		break;
 	case EInterpMode::Mode_Nearest:
-		{
-			break;
-		}
+		break;
 	case EInterpMode::Mode_Linear:
-		{
-			// Lerp Rotation
-			SetRotation(FMath::Lerp(GetRotation(), Other->GetRotation(), U));
-			// Lerp Scale
-			SetScale(FMath::Lerp(GetScale(), Other->GetScale(), U));
-			// Lerp Translation
-			SetTranslation(FMath::Lerp(GetTranslation(), Other->GetTranslation(), U));
-			break;
-		}
+		Translation = FMath::Lerp(Translation, Other.Translation, U);
+		Rotation = FMath::Lerp(Rotation, Other.Rotation, U);
+		Scale = FMath::Lerp(Scale, Other.Scale, U);
+		break;
 	case EInterpMode::Mode_Smooth:
-		{
-			break;
-		}
-	default:
-		FHF::LogStringErr("Error: Mode Passed Incorrectly.");
 		break;
 	}
-
-	return;
 }

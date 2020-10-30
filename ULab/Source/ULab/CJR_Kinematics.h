@@ -6,13 +6,13 @@
 #include "CJR_HierarchyState.h"
 
 // Solve forward for entire tree
-void KinematicsSolveForward(const UHierarchyState& HierarchyState);
+void KinematicsSolveForward(FHierarchyState HierarchyState);
 
 // Solve forward for given indices
-void KinematicsSolveForwardPartial(const UHierarchyState& HierarchyState, const int FirstIndex, const int NodeCount);
+void KinematicsSolveForwardPartial(FHierarchyState HierarchyState, const int FirstIndex, const int NodeCount);
 
 // Solve inverse for entire tree
-void KinematicsSolveInverse(const UHierarchyState& HierarchyState);
+void KinematicsSolveInverse(FHierarchyState HierarchyState);
 
 // Solve inverse for given indices
-void KinematicsSolveInversePartial(const UHierarchyState& HierarchyState, const int FirstIndex, const int NodeCount);
+void KinematicsSolveInversePartial(FHierarchyState HierarchyState, const int FirstIndex, const int NodeCount);

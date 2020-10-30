@@ -6,73 +6,136 @@
 
 #include "CJR_SpatialPose.h"
 #include "CJR_HierarchyState.h"
-#include "UObject/NoExportTypes.h"
 #include "CJR_BlendInterface.generated.h"
 
-typedef USpatialPose USPose;
-typedef UHierarchyPose UHPose;
+typedef FSpatialPose FSPose;
+typedef FHierarchyPose FHPose;
 
-/**
- * 
- */
-UCLASS()
-class ULAB_API UCJR_BlendInterface final : public UObject
+// No idea if this works in UE4C++ LOL
+// Execution template
+typedef void (*FSpatialPoseOpExec)(struct FBlendNode const BlendNode);
+
+// Operation template for (almost) any Spatial Pose Operation
+typedef FSpatialPose (*FSpatialPoseOp)(FSpatialPose PoseOut, ...);
+
+USTRUCT()
+struct ULAB_API FBlendNode
 {
 	GENERATED_BODY()
+	// Execution Invocation
+	FSpatialPoseOpExec Execution;
 
-	// Fundamental Spatial Operations
-	static USPose* SPoseOpIdentity();
-	static USpatialPose& SPoseOpConstruct(USPose& Pose, FVector Rotation, FVector Scale, FVector Translation);
-	static USpatialPose& SPoseOpCopy(USPose& PoseOut, USPose* PoseIn);
-	static USpatialPose& SPoseOpInvert(USPose& Pose);
-	static USpatialPose& SPoseOpConcat(USPose& Lhs, USPose& Rhs);
-	static USpatialPose& SPoseOpNearest(USPose& Pose0, USPose& Pose1, const float U);
-	static USpatialPose& SPoseOpLerp(USPose& Pose0, USPose& Pose1, const float U);
-	static USpatialPose& SPoseOpCubic(USPose& Pose0, USPose& Pose1, USPose& Pose2,
-	                                  USPose& Pose3, const float U);
+	// The operation itself
+	FSpatialPoseOp Operation;
 
+	// Output pose
+	FSpatialPose PoseOut; // exactly one external pose referenced
 
-	// Fundamental Hierarchical Operations
-	static UHierarchyPose* HPoseOpIdentity(const int NumPoses);
-	static UHierarchyPose& HPoseOpConstruct(UHPose& Pose, FVector Rotation, FVector Scale, FVector Translation,
-	                                        const int NumPoses);
-	static UHierarchyPose& HPoseOpCopy(UHPose& PoseOut, UHPose* PoseIn, const int NumPoses);
-	static UHierarchyPose& HPoseOpInvert(UHPose& Pose, const int NumPoses);
-	static UHierarchyPose& HPoseOpConcat(UHPose& Lhs, UHPose& Rhs, const int NumPoses);
-	static UHierarchyPose* HPoseOpNearest(UHPose& Pose0, UHPose& Pose1, const float U, const int NumPoses);
-	static UHierarchyPose& HPoseOpLerp(UHPose& Pose0, UHPose& Pose1, const float U, const int NumPoses);
-	static UHierarchyPose* HPoseOpCubic(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2,
-	                                    UHPose& Pose3, const float U, const int NumPoses);
+	// Control poses
+	TArray<FSpatialPose> PoseControl;
 
-	// Derivative Spatial Operations
-	static USpatialPose& SPoseOpDeconcat(USPose& Lhs, USPose& Rhs);
-	static USpatialPose& SPoseOpScale(USPose& Pose, const float U);
-	static USpatialPose& SPoseOpTri(USPose& Pose0, USPose& Pose1, USPose& Pose2, const float U1,
-	                                const float U2);
-	static USpatialPose& SPoseOpBinearest(USPose& Pose0, USPose& Pose1, USPose& Pose2, USPose& Pose3,
-	                                      const float U0, const float U1, const float U);
-	static USpatialPose& SPoseOpBilerp(USPose& Pose0, USPose& Pose1, USPose& Pose2, USPose& Pose3, const float U0,
-	                                   const float U1, const float U);
-	static USpatialPose& SPoseOpBicubic(USPose& PoseP0, USPose& PoseP1, USPose& PoseP2, USPose& PoseP3,
-	                                    USPose& PoseN0, USPose& PoseN1, USPose& PoseN2, USPose& PoseN3,
-	                                    USPose& Pose00, USPose& Pose01, USPose& Pose02, USPose& Pose03,
-	                                    USPose& Pose10, USPose& Pose11, USPose& Pose12, USPose& Pose13,
-	                                    const float U0, const float U1, const float U2, const float U3, const float U);
+	// Parameters
+	float const* U[8]; // up to 8 pointers, externally sourced
 
-
-	// Derivative Hierarchical Poses
-	static UHierarchyPose* HPoseOpDeconcat(UHPose& Lhs, UHPose& Rhs, const int NumPoses);
-	static UHierarchyPose* HPoseOpScale(UHPose& Pose, const float U, const int NumPoses);
-	static UHierarchyPose* HPoseOpTri(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, const float U1,
-	                                  const float U2, const int NumPoses);
-	static UHierarchyPose* HPoseOpBinearest(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, UHPose& Pose3,
-	                                        const float U0, const float U1, const float U, const int NumPoses);
-	static UHierarchyPose* HPoseOpBilerp(UHPose& Pose0, UHPose& Pose1, UHPose& Pose2, UHPose& Pose3, const float U0,
-	                                     const float U1, const float U, const int NumPoses);
-	static UHierarchyPose* HPoseOpBicubic(UHPose& PoseP0, UHPose& PoseP1, UHPose& PoseP2, UHPose& PoseP3,
-	                                      UHPose& PoseN0, UHPose& PoseN1, UHPose& PoseN2, UHPose& PoseN3,
-	                                      UHPose& Pose00, UHPose& Pose01, UHPose& Pose02, UHPose& Pose03,
-	                                      UHPose& Pose10, UHPose& Pose11, UHPose& Pose12, UHPose& Pose13,
-	                                      const float U0, const float U1, const float U2, const float U3,
-	                                      const float U, const int NumPoses);
+	// How many of the above do we have? (optional)
+	int ControlCount, ParamCount;
 };
+
+USTRUCT()
+struct ULAB_API FBlendTree
+{
+	GENERATED_BODY()
+	// Tells us NumNodes and the Parent of each node
+	FHierarchy BlendTreeDescriptor;
+
+	// All blend nodes that are in this tree
+	TArray<FBlendNode> Nodes;
+
+	// We could also keep track of child indices if we wanted to
+};
+
+/// Execution Operations (Project 03) ///
+// 0 Control Params, 0 Inputs
+void SpatialPoseOpExec0C0I(FBlendNode BlendNode);
+// 1 Control, 1 Input (ex: Scale)
+void SpatialPoseOpExec1C1I(FBlendNode BlendNode);
+// 2 Control, 0 Input (ex: ADD)
+void SpatialPoseOpExec2C0I(FBlendNode BlendNode);
+// 2 Control Params, 1 Input (ex: LERP)
+void SpatialPoseOpExec2C1I(FBlendNode BlendNode);
+
+/// FUNDAMENTAL SPATIAL OPERATIONS (Lab 03) ///
+static FSpatialPose SPoseOpIdentity();
+static FSpatialPose SPoseOpConstruct(FSPose Pose, FVector T, FVector R, FVector S);
+static FSpatialPose SPoseOpCopy(FSPose PoseOut, FSPose PoseIn);
+static FSpatialPose SPoseOpInvert(FSPose Pose);
+static FSpatialPose SPoseOpConcat(FSPose Lhs, FSPose Rhs);
+static FSpatialPose SPoseOpNearest(FSPose Pose0, FSPose Pose1, const float U);
+static FSpatialPose SPoseOpLerp(FSPose Pose0, FSPose Pose1, const float U);
+static FSpatialPose SPoseOpCubic(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3, const float U);
+
+/// FUNDAMENTAL HIERARCHICAL OPERATIONS (Lab 03)  ///
+static FHierarchyPose HPoseOpIdentity(FHPose OutPose, const int NumPoses);
+static FHierarchyPose HPoseOpConstruct(FHPose Pose, FVector T, FVector R, FVector S, const int NumPoses,
+                                       const int FirstIndex = 0);
+static FHierarchyPose HPoseOpCopy(FHPose PoseOut, FHPose PoseIn, const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpInvert(FHPose Pose, const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpConcat(FHPose Lhs, FHPose Rhs, const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpNearest(FHPose OutPose, FHPose Pose0, FHPose Pose1, const float U,
+                                     const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpLerp(FHPose OutPose, FHPose Pose0, FHPose Pose1, const float U,
+                                  const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpCubic(FHPose OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
+                                   const float U, const int NumPoses, const int FirstIndex = 0);
+
+/// DERIVATIVE SPATIAL OPERATIONS (Lab 03)  ///
+static FSpatialPose SPoseOpDeconcat(FSPose Lhs, FSPose Rhs);
+static FSpatialPose SPoseOpScale(FSPose Pose, const float U);
+static FSpatialPose SPoseOpTri(FSPose Pose0, FSPose Pose1, FSPose Pose2, const float U0, const float U1);
+static FSpatialPose SPoseOpBinearest(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3, const float U0,
+                                     const float U1, const float U);
+static FSpatialPose SPoseOpBilerp(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3, const float U0,
+                                  const float U1, const float U);
+static FSpatialPose SPoseOpBicubic(FSPose PoseP0, FSPose PoseP1, FSPose PoseP2, FSPose PoseP3,
+                                   FSPose PoseN0, FSPose PoseN1, FSPose PoseN2, FSPose PoseN3,
+                                   FSPose Pose00, FSPose Pose01, FSPose Pose02, FSPose Pose03,
+                                   FSPose Pose10, FSPose Pose11, FSPose Pose12, FSPose Pose13,
+                                   const float U0, const float U1, const float U2, const float U3, const float U);
+
+/// DERIVATIVE HIERARCHICAL OPERATIONS (Lab 03)  ///
+static FHierarchyPose HPoseOpDeconcat(FHPose OutPose, FHPose Lhs, FHPose Rhs, const int NumPoses,
+                                      const int FirstIndex = 0);
+static FHierarchyPose HPoseOpScale(FHPose OutPose, FHPose Pose, const float U, const int NumPoses,
+                                   const int FirstIndex = 0);
+static FHierarchyPose HPoseOpTri(FHPose OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, const float U0,
+                                 const float U1, const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpBinearest(FHPose OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
+                                       const float U0, const float U1, const float U, const int NumPoses,
+                                       const int FirstIndex = 0);
+static FHierarchyPose HPoseOpBilerp(FHPose OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
+                                    const float U0, const float U1, const float U, const int NumPoses,
+                                    const int FirstIndex = 0);
+static FHierarchyPose HPoseOpBicubic(FHPose OutPose, FHPose PoseP0, FHPose PoseP1, FHPose PoseP2,
+                                     FHPose PoseP3, FHPose PoseN0, FHPose PoseN1, FHPose PoseN2,
+                                     FHPose PoseN3, FHPose Pose00, FHPose Pose01, FHPose Pose02,
+                                     FHPose Pose03, FHPose Pose10, FHPose Pose11, FHPose Pose12,
+                                     FHPose Pose13, const float U0, const float U1, const float U2, const float U3,
+                                     const float U, const int NumPoses, const int FirstIndex = 0);
+
+/// ADDITIONAL SPATIAL BLEND OPERATIONS (Project 03) ///
+static FSpatialPose SPoseOpSmoothstep(FSPose Pose0, FSPose Pose1, const float U);
+static FSpatialPose SPoseOpDescale(FSPose Pose, const float U);
+static FSpatialPose SPoseOpConvert(FSPose Pose);
+static FSpatialPose SPoseOpRestore(FSPose Pose);
+static TArray<FTransform> SPoseOpFK(FHierarchyState State);
+static TArray<FTransform> SPoseOpIK(FHierarchyState State);
+
+/// ADDITIONAL HIERARCHICAL BLEND OPERATIONS (Project 03) ///
+static FHierarchyPose HPoseOpSmoothstep(FHPose PoseOut, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
+                                        const int FirstIndex = 0);
+static FHierarchyPose HPoseOpDescale(FHPose PoseOut, FHPose Pose, const float U, const int NumPoses,
+                                     const int FirstIndex = 0);
+static FHierarchyPose HPoseOpConvert(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex = 0);
+static FHierarchyPose HPoseOpRestore(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex = 0);
+// static TArray<FTransform> HPoseOpFK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses, const int FirstIndex = 0);
+// static TArray<FTransform> HPoseOpIK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses, const int FirstIndex = 0);

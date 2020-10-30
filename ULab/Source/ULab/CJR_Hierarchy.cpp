@@ -1,70 +1,74 @@
-// Copyright 2020 Connor Ramsden
-
 #include "CJR_Hierarchy.h"
+#include "CJR_HelperFunctions.h"
 
-UHNode::UHNode()
+typedef FCJR_HelperFunctions FHF;
+
+AHNode::AHNode()
 {
-	Name = "Node";
+	Name = "Node 0";
 	Index = 0;
 	ParentIndex = Index - 1;
-
-	return;
 }
 
-UHierarchy::UHierarchy()
+FHierarchy::FHierarchy()
 {
-	Nodes = TArray<UHNode *>();
+	Nodes = TArray<AHNode*>();
 	NumNodes = 0;
-
-	return;
+	bIsInitialized = false;
 }
 
-UHierarchy::~UHierarchy()
+FHierarchy::~FHierarchy()
 {
-	Nodes.Empty();
-
-	return;
+	if (Nodes.Num() > 0)
+	{
+		Nodes.Empty();
+	}
 }
 
-void UHierarchy::Init(int NumNodesToCreate)
+void FHierarchy::Init(int NodesToCreate)
 {
-	TArray<FString> Names;
+	TArray<FString> Names = TArray<FString>();
 
-	for (int i = 0; i < NumNodesToCreate; ++i)
+	for(int i = 0; i < NodesToCreate; ++i)
 	{
 		Names.Add("Node " + FString::FromInt(i));
 	}
 
-	Init(NumNodesToCreate, Names);
-
-	return;
-}
-
-void UHierarchy::Init(int NumNodesToCreate, TArray<FString> Names)
-{
-	// Create NumNodes nodes & append them to Nodes pool
-	for (int i = 0; i < NumNodesToCreate; ++i)
+	if(NumNodes <= 0)
 	{
-		// Create a temporary node
-		UHNode * TempNode = NewObject<UHNode>();
-		// Assign its name, index, and parent index
-		TempNode->SetName(Names[i]);
-		TempNode->SetIndex(i);
-		TempNode->SetPIndex(i - 1);
-
-		// Add the node to the pool
-		Nodes.Add(TempNode);
-		// Free memory
-		TempNode->ConditionalBeginDestroy();
+		NumNodes = NodesToCreate;
 	}
 
-	return;
+	if(Names.Num() > 0)
+		Init(NodesToCreate, Names);
+	else
+		FHF::LogStringErr("Names Array causing an error.");
+
+	if(Nodes.Num() > 0 && bIsInitialized == false)
+		bIsInitialized = true;
 }
 
-void UHierarchy::SetNode(int Index, int NewPIndex, FString NewName)
+void FHierarchy::Init(int NodesToCreate, TArray<FString> Names)
 {
-	Nodes[Index]->SetPIndex(NewPIndex);
-	Nodes[Index]->SetName(NewName);
+	for(int i = 0; i < NodesToCreate; ++i)
+	{
+		AHNode * TempNode = NewObject<AHNode>();
 
-	return;
+		TempNode->Name = Names[i];
+		TempNode->Index = i;
+		TempNode->ParentIndex = i - 1;
+
+		Nodes.Add(TempNode);
+	}
+
+	if(NumNodes <= 0)
+		NumNodes = NodesToCreate;
+	if(Nodes.Num() > 0 && bIsInitialized == false)
+		bIsInitialized = true;
+}
+
+void FHierarchy::SetNode(int Index, int NewPIndex, FString NewName)
+{
+	Nodes[Index]->ParentIndex = NewPIndex;
+	Nodes[Index]->Name = NewName;
 }

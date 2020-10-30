@@ -2,20 +2,18 @@
 
 #include "CJR_Kinematics.h"
 
-void KinematicsSolveForward(const UHierarchyState& HierarchyState)
+void KinematicsSolveForward(FHierarchyState HierarchyState)
 {
-	if (HierarchyState.GetHierarchy())
+	if (HierarchyState.GetHierarchy().bIsInitialized)
 	{
 		// Solve for entire tree
-		KinematicsSolveForwardPartial(HierarchyState, 0, HierarchyState.GetHierarchy()->GetNumNodes());
+		KinematicsSolveForwardPartial(HierarchyState, 0, HierarchyState.GetHierarchy().NumNodes);
 	}
-
-	return;
 }
  
-void KinematicsSolveForwardPartial(const UHierarchyState& HierarchyState, const int FirstIndex, const int NodeCount)
+void KinematicsSolveForwardPartial(FHierarchyState HierarchyState, const int FirstIndex, const int NodeCount)
 {
-	const int NumNodes = HierarchyState.GetHierarchy()->GetNumNodes();
+	const int NumNodes = HierarchyState.GetHierarchy().NumNodes;
 
 	if (FirstIndex < NumNodes && NodeCount > 0)
 	{
@@ -30,37 +28,33 @@ void KinematicsSolveForwardPartial(const UHierarchyState& HierarchyState, const 
 		for (int i = FirstIndex; i < NumNodes; ++i)
 		{
 			// Get the node at current index
-			const UHNode* Node = HierarchyState.GetHierarchy()->GetNodes()[i];
+			const AHNode* Node = HierarchyState.GetHierarchy().GetNode(i);
 
 			// Ensure we have a non-root node
-			if (Node->GetPIndex() >= 0)
+			if (Node->ParentIndex >= 0)
 			{
 				// Get Parent Object Matrix
-				FTransform ParentObjectMatrix = HierarchyState.GetObject()->GetPoses()[Node->GetPIndex()]->
-					GetTransform();
+				FTransform ParentObjectMatrix = HierarchyState.GetObject().GetPose(Node->ParentIndex).GetTransform();
 
 				// Get Local Matrix
-				FTransform LocalMatrix = HierarchyState.GetLocal()->GetPoses()[Node->GetIndex()]->GetTransform();
+				FTransform LocalMat = HierarchyState.GetLocal().GetPose(Node->Index).GetTransform();
 
 				// Set the new Object Matrix (POM * LM)
-				HierarchyState.GetObject()->GetPoses()[Node->GetIndex()]->SetTransform(ParentObjectMatrix * LocalMatrix);
+				HierarchyState.GetObject().GetPose(Node->Index).SetTransform(ParentObjectMatrix * LocalMat);
 			}
 			else
 			{
 				// Copy Local Matrix to Object Matrix
-				HierarchyState.GetObject()->GetPoses()[Node->GetIndex()] = HierarchyState.GetLocal()->GetPoses()[Node->
-					GetIndex()];
+				HierarchyState.GetObject().SetPose(Node->Index, HierarchyState.GetLocal().GetPose(Node->Index));
 			}
 		}
 	}
-
-	return;
 }
 
-void KinematicsSolveInverse(const UHierarchyState& HierarchyState)
+void KinematicsSolveInverse(const FHierarchyState HierarchyState)
 {
 }
 
-void KinematicsSolveInversePartial(const UHierarchyState& HierarchyState, const int FirstIndex, const int NodeCount)
+void KinematicsSolveInversePartial(const FHierarchyState HierarchyState, const int FirstIndex, const int NodeCount)
 {
 }

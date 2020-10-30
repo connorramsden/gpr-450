@@ -1,216 +1,240 @@
-// Copyright 2020 Connor Ramsden
-
-
 #include "CJR_HierarchyState.h"
+
 #include "CJR_HelperFunctions.h"
 typedef FCJR_HelperFunctions FHF;
 
-UHierarchyPose::UHierarchyPose()
+FHierarchyPose::FHierarchyPose()
 {
-	Pose = TArray<USpatialPose*>();
-
-	return;
+	Pose = TArray<FSpatialPose>();
+	bIsInitialized = false;
 }
 
-UHierarchyPose::~UHierarchyPose()
+FHierarchyPose::~FHierarchyPose()
 {
-	for (int i = 0; i < Pose.Num(); ++i)
+	if (Pose.Num() > 0)
 	{
-		if (Pose[i])
-			Pose[i]->ConditionalBeginDestroy();
+		Pose.Empty();
 	}
-
-	return;
 }
 
-void UHierarchyPose::Init(const int NumPoses)
+void FHierarchyPose::Init(const int NumPoses)
 {
 	for (int i = 0; i < NumPoses; ++i)
 	{
-		// Create temporary pose
-		USpatialPose* TempPose = NewObject<USpatialPose>();
-
-		// Add temporary pose to Pose array
+		// Create temp pose
+		FSpatialPose TempPose;
+		// Any additional init needed?
+		// Add temp pose to pose array
 		Pose.Add(TempPose);
-
-		// Do I need to clean up TempPose here?
 	}
 
-	return;
+	bIsInitialized = true;
 }
 
-void UHierarchyPose::PoseReset(const int NodeCount)
+void FHierarchyPose::Init(const int NumPoses, FSpatialPose PoseTemplate)
 {
-	// Iterate through Pose[0] --> Pose[NodeCount]
-	for (int i = 0; i < NodeCount; ++i)
+	for(int i = 0; i < NumPoses; ++i)
 	{
-		// Reset Pose[i]
-		Pose[i]->ResetPose();
+		Pose.Add(PoseTemplate);
 	}
-
-	return;
+	bIsInitialized = true;
 }
 
-void UHierarchyPose::PoseConvert(const int NodeCount, ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order)
+
+void FHierarchyPose::PoseReset(const int NodeCount, const int FirstIndex)
 {
-	// Iterate through Pose[0] --> Pose[NodeCount]
-	for (int i = 0; i < NodeCount; ++i)
+	// Error Handling
+	if (Pose.Num() <= 0 || NodeCount <= 0 || Pose.Num() < NodeCount)
 	{
-		// Convert Pose[i]
-		Pose[i]->PoseConvert(Channel, Order);
+		FHF::LogStringErr("FHP.PoseReset() passed invalid iterator count.");
+		return;
 	}
 
-	return;
-}
-
-void UHierarchyPose::PoseRestore(const int NodeCount, ESpatialPoseChannel Channel, ESpatialPoseEulerOrder Order)
-{
-	for (int i = 0; i < NodeCount; ++i)
+	// Loop through each pose from Pose[FirstIndex] to Pose[NodeCount]
+	for (int i = FirstIndex; i < NodeCount; ++i)
 	{
-		Pose[i]->PoseRestore(Channel, Order);
+		// Reset the pose at the given index
+		Pose[i].ResetPose();
 	}
 }
 
-void UHierarchyPose::PoseCopy(UHierarchyPose* PoseIn, const int NodeCount)
+void FHierarchyPose::PoseConvert(EPoseChannel Channel, EPoseOrder Order, const int NodeCount, const int FirstIndex)
 {
-	for (int i = 0; i < NodeCount; ++i)
+	// Error Handling
+	if (Pose.Num() <= 0 || NodeCount <= 0 || Pose.Num() < NodeCount)
 	{
-		Pose[i] = PoseIn->GetPoses()[i];
+		FHF::LogStringErr("FHP.PoseConvert() passed invalid iterator count.");
+		return;
 	}
 
-	return;
-}
-
-void UHierarchyPose::PoseConcat(UHierarchyPose* Other, const int NodeCount)
-{
-	for (int i = 0; i < NodeCount; ++i)
+	// Loop through each pose from Pose[FirstIndex] to Pose[NodeCount]
+	for (int i = FirstIndex; i < NodeCount; ++i)
 	{
-		Pose[i]->PoseConcat(Other->GetPoses()[i]);
+		// Convert the pose at the given index
+		Pose[i].PoseConvert(Channel, Order);
 	}
 }
 
-void UHierarchyPose::PoseLerp(UHierarchyPose* Other, const int NodeCount, const float U)
+void FHierarchyPose::PoseRestore(EPoseChannel Channel, EPoseOrder Order, const int NodeCount, const int FirstIndex)
 {
-	for (int i = 0; i < NodeCount; ++i)
+	// Error Handling
+	if (Pose.Num() <= 0 || NodeCount <= 0 || Pose.Num() < NodeCount)
 	{
-		Pose[i]->PoseLerp(Other->GetPoses()[i], U);
+		FHF::LogStringErr("FHP.PoseRestore() passed invalid iterator count.");
+		return;
+	}
+
+	// Loop through each pose from Pose[FirstIndex] to Pose[NodeCount]
+	for (int i = FirstIndex; i < NodeCount; ++i)
+	{
+		// Restore the pose at the given index
+		Pose[i].PoseRestore(Channel, Order);
 	}
 }
 
-UHierarchyPoseGroup::UHierarchyPoseGroup()
+void FHierarchyPose::PoseCopy(FHierarchyPose Other, const int NodeCount, const int FirstIndex)
 {
-	Hierarchy = NewObject<UHierarchy>();
+	// Error Handling for this Pose
+	if (Pose.Num() <= 0 || NodeCount <= 0 || Pose.Num() < NodeCount)
+	{
+		FHF::LogStringErr("FHP.PoseCopy() passed invalid iterator count.");
+		return;
+	}
 
-	HPose = TArray<UHierarchyPose*>();
+	// Error Handling for Other Pose
+	if (Other.GetNumPoses() <= 0 || Other.GetNumPoses() < Pose.Num() || Other.GetNumPoses() < NodeCount)
+	{
+		FHF::LogStringErr("FHF.PoseCopy() passed invalid Other");
+		return;
+	}
 
-	Pose = TArray<USpatialPose*>();
+	// Loop through each pose from Pose[FirstIndex] to Pose[NodeCount]
+	for (int i = FirstIndex; i < NodeCount; ++i)
+	{
+		// Copy Other[i] to Pose[i]
+		Pose[i].PoseCopy(Other.GetPose(i));
+	}
+}
 
+void FHierarchyPose::PoseConcat(FHierarchyPose Other, const int NodeCount, const int FirstIndex)
+{
+	// Error Handling for this Pose
+	if (Pose.Num() <= 0 || NodeCount <= 0 || Pose.Num() < NodeCount)
+	{
+		FHF::LogStringErr("FHP.PoseConcat() passed invalid iterator count.");
+		return;
+	}
+
+	// Error Handling for Other Pose
+	if (Other.GetNumPoses() <= 0 || Other.GetNumPoses() < Pose.Num() || Other.GetNumPoses() < NodeCount)
+	{
+		FHF::LogStringErr("FHF.PoseCopy() passed invalid Other");
+		return;
+	}
+
+	for (int i = FirstIndex; i < NodeCount; ++i)
+	{
+		Pose[i].PoseConcat(Other.GetPose(i));
+	}
+}
+
+void FHierarchyPose::PoseLerp(FHierarchyPose Other, const float U, const int NodeCount, const int FirstIndex)
+{
+	// Error Handling for this Pose
+	if (Pose.Num() <= 0 || NodeCount <= 0 || Pose.Num() < NodeCount)
+	{
+		FHF::LogStringErr("FHP.PoseConcat() passed invalid iterator count.");
+		return;
+	}
+
+	// Error Handling for Other Pose
+	if (Other.GetNumPoses() <= 0 || Other.GetNumPoses() < Pose.Num() || Other.GetNumPoses() < NodeCount)
+	{
+		FHF::LogStringErr("FHF.PoseCopy() passed invalid Other");
+		return;
+	}
+
+	for (int i = FirstIndex; i < NodeCount; ++i)
+	{
+		Pose[i].PoseLerp(Other.GetPose(i), U);
+	}
+}
+
+FHierarchyPoseGroup::FHierarchyPoseGroup()
+{
+	Hierarchy = FHierarchy();
+	HPose = TArray<FHierarchyPose>();
+	Pose = TArray<FSpatialPose>();
 	Channel = TArray<ESpatialPoseChannel>();
-
 	Order = ESpatialPoseEulerOrder::PoseEulerOrder_xyz;
-
+	HPoseCount = -1;
 	PoseCount = -1;
-
-	return;
+	bIsInitialized = false;
 }
 
-UHierarchyPoseGroup::~UHierarchyPoseGroup()
+FHierarchyPoseGroup::~FHierarchyPoseGroup()
 {
-	if (Hierarchy)
-		Hierarchy->ConditionalBeginDestroy();
-	for (int i = 0; i < HPose.Num(); ++i)
+	// Might need to clean up here, might not.
+}
+
+void FHierarchyPoseGroup::Init(FHierarchy NewH, const int NewC, const EPoseOrder NewO)
+{
+	if(NewH.bIsInitialized == false)
 	{
-		if (HPose[i])
-			HPose[i]->ConditionalBeginDestroy();
+		FHF::LogString("PoseGroup->Init() received an uninitialized Hierarchy");
+		return;
 	}
 
-	for (int i = 0; i < Pose.Num(); ++i)
+	if(NewC <= 0)
 	{
-		if (Pose[i])
-			Pose[i]->ConditionalBeginDestroy();
+		FHF::LogStringErr("PoseGroup->Init() received a PoseGroup with <= 0 PoseCount.");
+		return;
 	}
 
-	return;
+	// Assign members to passed variables
+	Hierarchy = NewH;
+	HPoseCount = NewC;
+	PoseCount = HPoseCount * Hierarchy.NumNodes;
+	Order = NewO;
+
+	// Initialization complete
+	bIsInitialized = true;
 }
 
-void UHierarchyPoseGroup::Init(UHierarchy* NewHier, const int NewCount, const ESpatialPoseEulerOrder NewOrder)
+FHierarchyState::FHierarchyState()
 {
-	if (NewHier != nullptr)
+	// Nothing to really Init here.
+}
+
+FHierarchyState::~FHierarchyState()
+{
+	// Nothing to explicitly clean up.
+}
+
+void FHierarchyState::Init(FHierarchy NewH)
+{
+	if(NewH.bIsInitialized == false)
 	{
-		Hierarchy = NewHier;
-	}
-}
-
-UHierarchyState::UHierarchyState()
-{
-	Hierarchy = NewObject<UHierarchy>();
-
-	LocalSpace = NewObject<UHierarchyPose>();
-	ObjectSpace = NewObject<UHierarchyPose>();
-	ObjectSpaceInverse = NewObject<UHierarchyPose>();
-	ObjectSpaceBindToCurrent = NewObject<UHierarchyPose>();
-
-	return;
-}
-
-UHierarchyState::~UHierarchyState()
-{
-	if (Hierarchy)
-		Hierarchy->ConditionalBeginDestroy();
-	if (LocalSpace)
-		LocalSpace->ConditionalBeginDestroy();
-	if (ObjectSpace)
-		ObjectSpace->ConditionalBeginDestroy();
-	if (ObjectSpaceInverse)
-		ObjectSpaceInverse->ConditionalBeginDestroy();
-	if (ObjectSpaceBindToCurrent)
-		ObjectSpaceBindToCurrent->ConditionalBeginDestroy();
-
-	return;
-}
-
-void UHierarchyState::Init(UHierarchy* Hier)
-{
-	if (Hier)
-	{
-		const int NodeCount = Hier->GetNumNodes();
-		const int HPoseCount = 4;
-		const int SPoseCount = HPoseCount * NodeCount;
-
-		Hierarchy = Hier;
-
-		// Init other poses from this hierarchy
-		ObjectSpace->SetPose(LocalSpace->GetPoses());
-		ObjectSpaceInverse->SetPose(ObjectSpace->GetPoses());
-		ObjectSpaceBindToCurrent->SetPose(ObjectSpaceInverse->GetPoses());
-
-		for (int i = 0; i < HPoseCount; ++i)
-		{
-			for (int j = 0; ; j += NodeCount)
-			{
-				LocalSpace->GetPoses()[i] = LocalSpace->GetPoses()[j];
-			}
-		}
-
-		LocalSpace->PoseReset(SPoseCount);
-	}
-}
-
-void UHierarchyState::UpdateObjectInverse()
-{
-	if (Hierarchy)
-	{
-		for (int i = 0; i < Hierarchy->GetNumNodes(); ++i)
-		{
-			ObjectSpaceInverse->GetPoses()[i]->SetTransform(
-				ObjectSpace->GetPoses()[i]->GetTransform().Inverse());
-		}
+		FHF::LogStringErr("HierarchyState->Init() received an uninitialized Hierarchy.");
+		return;
 	}
 
-	return;
+	const int NodeCount = NewH.NumNodes;
+	const int HPoseCount = 4;
+	const int SPoseCount = HPoseCount * NodeCount;
+
+	Hierarchy = NewH;
+
+	// Init other poses from this Hierarchy;
+	
 }
 
-void UHierarchyState::UpdateObjectBindToCurrent()
+void FHierarchyState::UpdateObjectInverse()
+{
+	FHF::NotImplemented();
+}
+
+void FHierarchyState::UpdateObjectBindToCurrent()
 {
 	FHF::NotImplemented();
 }
