@@ -119,9 +119,9 @@ public:
 	// Reset a given Spatial Pose
 	void ResetPose();
 	// Convert a Spatial Pose
-	void PoseConvert(EPoseChannel Channel, EPoseOrder Order);
+	void PoseConvert(EPoseChannel Channel = ESpatialPoseChannel::PoseChannel_None, EPoseOrder Order = ESpatialPoseEulerOrder::PoseEulerOrder_xyz);
 	// Restore a Spatial Pose
-	void PoseRestore(EPoseChannel Channel, EPoseOrder Order);
+	void PoseRestore(EPoseChannel Channe = ESpatialPoseChannel::PoseChannel_None, EPoseOrder Order = ESpatialPoseEulerOrder::PoseEulerOrder_xyz);
 	// Copy the passed Pose to this Pose
 	void PoseCopy(const FSpatialPose Other);
 	// Concat the passed Pose with this Pose

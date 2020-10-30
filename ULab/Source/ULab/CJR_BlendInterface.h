@@ -80,15 +80,15 @@ struct ULAB_API FBlendInterface
 	static FSpatialPose SPoseOpDescale(FSPose Pose, const float U);
 	static FSpatialPose SPoseOpConvert(FSPose Pose);
 	static FSpatialPose SPoseOpRestore(FSPose Pose);
-	static FSpatialPose SPoseOpFK(FHierarchy H, FSPose Local, FSPose Object);
-	static FSpatialPose SPoseOpIK(FHierarchy H, FSPose Object, FSPose Local);
+	static TArray<FTransform> SPoseOpFK(FHierarchyState State);
+	static TArray<FTransform> SPoseOpIK(FHierarchyState State);
 		
 	/// ADDITIONAL HIERARCHICAL BLEND OPERATIONS (Project 03) ///
-	static FHierarchyPose HPoseOpSmoothstep(FHPose Pose0, FHPose Pose1, const float U, const int NumPoses, const int FirstIndex = 0);
-	static FHierarchyPose HPoseOpDescale(FHPose Pose, const float U, const int NumPoses, const int FirstIndex = 0);
-	static FHierarchyPose HPoseOpConvert(FHPose Pose, const int NumPoses, const int FirstIndex = 0);
-	static FHierarchyPose HPoseOpRestore(FHPose Pose, const int NumPoses, const int FirstIndex = 0);
-	static FHierarchyPose HPoseOpFK(FHierarchy H, FHPose Local, FHPose Object, const int NumPoses, const int FirstIndex = 0);
-	static FHierarchyPose HPoseOpIK(FHierarchy H, FHPose Object, FHPose Local, const int NumPoses, const int FirstIndex = 0);
+	static FHierarchyPose HPoseOpSmoothstep(FHPose PoseOut, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses, const int FirstIndex = 0);
+	static FHierarchyPose HPoseOpDescale(FHPose PoseOut, FHPose Pose, const float U, const int NumPoses, const int FirstIndex = 0);
+	static FHierarchyPose HPoseOpConvert(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex = 0);
+	static FHierarchyPose HPoseOpRestore(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex = 0);
+	// static TArray<FTransform> HPoseOpFK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses, const int FirstIndex = 0);
+	// static TArray<FTransform> HPoseOpIK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses, const int FirstIndex = 0);
 	
 };

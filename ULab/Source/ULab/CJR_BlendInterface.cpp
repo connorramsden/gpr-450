@@ -1,5 +1,7 @@
 #include "CJR_BlendInterface.h"
 
+#include "CJR_Kinematics.h"
+
 FSpatialPose FBlendInterface::SPoseOpIdentity()
 {
 	FSpatialPose OutPose;
@@ -268,65 +270,128 @@ FHierarchyPose FBlendInterface::HPoseOpBicubic(FHPose  OutPose, FHPose PoseP0, F
 	return OutPose;
 }
 
+// an input of 0 results in P0; an input of 1 results in P1;
+// any other input between 0 and 1 results in an "easing" blend or mixture of the two control poses.
 FSpatialPose FBlendInterface::SPoseOpSmoothstep(FSPose Pose0, FSPose Pose1, const float U)
 {
-	return Pose0;
+	if(U <= 0.0f)
+		return Pose0;
+	if(U >= 1.0f)
+		return Pose1;
+
+	return SPoseOpLerp(Pose0, Pose1, U);
 }
 
+// an input of 0 results in the identity pose; an input of 1 results in the inverted control pose;
+// any other input between 0 and 1 results in some pose that is not identity but not quite the inverted control pose.
 FSpatialPose FBlendInterface::SPoseOpDescale(FSPose Pose, const float U)
 {
-	return Pose;
+	if(U <= 0.0f)
+		return SPoseOpIdentity();
+	if(U >= 1.0f)
+		return SPoseOpInvert(Pose);
+
+	return SPoseOpLerp(SPoseOpIdentity(), SPoseOpInvert(Pose), U);
 }
 
+// Utility operation that performs the "convert" step for a spatial/hierarchical pose
+// (convert raw components into transforms).
 FSpatialPose FBlendInterface::SPoseOpConvert(FSPose Pose)
 {
+	Pose.PoseConvert();
 	return Pose;
 }
 
+// Utility operation that performs the opposite of convert (restore raw components from transforms)
 FSpatialPose FBlendInterface::SPoseOpRestore(FSPose Pose)
 {
+	Pose.PoseRestore();
 	return Pose;
 }
 
-FSpatialPose FBlendInterface::SPoseOpFK(FHierarchy H, FSPose Local, FSPose Object)
+// Utility operation that performs the fundamental forward kinematics operation,
+// converting the provided local-space transform into the target object-space transform
+TArray<FTransform> FBlendInterface::SPoseOpFK(FHierarchyState State)
 {
-	return Local;
+	KinematicsSolveForward(State);
+
+	TArray<FTransform> OutT;
+
+	for(int i = 0; i < State.GetObject().GetNumPoses(); ++i)
+	{
+		OutT.Add(State.GetObject().GetPose(i).GetTransform());
+	}
+
+	return OutT;
 }
 
-FSpatialPose FBlendInterface::SPoseOpIK(FHierarchy H, FSPose Object, FSPose Local)
+//Utility operation that performs the fundamental inverse kinematics operation,
+// converting the provided object-space transform into the target local-space transform
+TArray<FTransform> FBlendInterface::SPoseOpIK(FHierarchyState State)
 {
-	return Object;
+	KinematicsSolveInverse(State);
+
+	TArray<FTransform> OutT;
+
+	for(int i = 0; i < State.GetLocal().GetNumPoses(); ++i)
+	{
+		OutT.Add(State.GetLocal().GetPose(i).GetTransform());
+	}
+	
+	return OutT;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpSmoothstep(FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
+FHierarchyPose FBlendInterface::HPoseOpSmoothstep(FHPose PoseOut, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
 	const int FirstIndex)
 {
-	return Pose0;
+	for(int i = FirstIndex; i < NumPoses; ++i)
+	{
+		PoseOut.AddPose(SPoseOpSmoothstep(Pose0.GetPose(i), Pose1.GetPose(i), U));	
+	}
+	
+	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpDescale(FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
+FHierarchyPose FBlendInterface::HPoseOpDescale(FHPose PoseOut, FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
 {
-	return Pose;
+	for(int i = FirstIndex; i < NumPoses; ++i)
+	{
+		PoseOut.AddPose(SPoseOpDescale(Pose.GetPose(i), U));
+	}
+	
+	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpConvert(FHPose Pose, const int NumPoses, const int FirstIndex)
+FHierarchyPose FBlendInterface::HPoseOpConvert(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex)
 {
-	return Pose;
+	for(int i = FirstIndex; i < NumPoses; ++i)
+	{
+		PoseOut.AddPose(SPoseOpConvert(Pose.GetPose(i)));
+	}
+	
+	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpRestore(FHPose Pose, const int NumPoses, const int FirstIndex)
+FHierarchyPose FBlendInterface::HPoseOpRestore(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex)
 {
-	return Pose;
+	for(int i = FirstIndex; i < NumPoses; ++i)
+	{
+		PoseOut.AddPose(SPoseOpRestore(Pose.GetPose(i)));
+	}
+	
+	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpFK(FHierarchy H, FHPose Local, FHPose Object, const int NumPoses,
+/*
+TArray<FTransform> FBlendInterface::HPoseOpFK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses,
 	const int FirstIndex)
 {
-	return Local;
+	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpIK(FHierarchy H, FHPose Object, FHPose Local, const int NumPoses,
+TArray<FTransform> FBlendInterface::HPoseOpIK(TArray<FTransform> PoseOut, FHierarchy H, FHPose Object, FHPose Local, const int NumPoses,
 	const int FirstIndex)
 {
-	return Object;
+	return PoseOut;
 }
+*/
