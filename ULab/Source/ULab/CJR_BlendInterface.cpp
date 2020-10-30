@@ -2,14 +2,34 @@
 
 #include "CJR_Kinematics.h"
 
-FSpatialPose FBlendInterface::SPoseOpIdentity()
+void SpatialPoseOpExec0C0I(FBlendNode BlendNode)
+{
+	BlendNode.Operation(BlendNode.PoseOut);
+}
+
+void SpatialPoseOpExec1C1I(FBlendNode BlendNode)
+{
+	BlendNode.Operation(BlendNode.PoseOut, BlendNode.PoseControl[0], BlendNode.U[0]);
+}
+
+void SpatialPoseOpExec2C0I(FBlendNode BlendNode)
+{
+	BlendNode.Operation(BlendNode.PoseOut, BlendNode.PoseControl[0], BlendNode.PoseControl[1]);
+}
+
+void SpatialPoseOpExec2C1I(FBlendNode BlendNode)
+{
+	BlendNode.Operation(BlendNode.PoseOut, BlendNode.PoseControl[0], BlendNode.PoseControl[1], BlendNode.U[0]);
+}
+
+FSpatialPose SPoseOpIdentity()
 {
 	FSpatialPose OutPose;
 	OutPose.ResetPose();
 	return OutPose;
 }
 
-FSpatialPose FBlendInterface::SPoseOpConstruct(FSPose Pose, FVector T, FVector R, FVector S)
+FSpatialPose SPoseOpConstruct(FSPose Pose, FVector T, FVector R, FVector S)
 {
 	Pose.SetTranslation(T);
 	Pose.SetRotation(R);
@@ -18,7 +38,7 @@ FSpatialPose FBlendInterface::SPoseOpConstruct(FSPose Pose, FVector T, FVector R
 	return Pose;
 }
 
-FSpatialPose FBlendInterface::SPoseOpCopy(FSPose PoseOut, FSPose PoseIn)
+FSpatialPose SPoseOpCopy(FSPose PoseOut, FSPose PoseIn)
 {
 	PoseOut.SetTransform(PoseIn.GetTransform());
 	PoseOut.SetOrientation(PoseIn.GetOrientation());
@@ -30,7 +50,7 @@ FSpatialPose FBlendInterface::SPoseOpCopy(FSPose PoseOut, FSPose PoseIn)
 	return PoseOut;
 }
 
-FSpatialPose FBlendInterface::SPoseOpInvert(FSPose Pose)
+FSpatialPose SPoseOpInvert(FSPose Pose)
 {
 	Pose.SetTranslation(Pose.GetTranslation() * -1.0f);
 	Pose.SetRotation(Pose.GetRotation() * -1.0f);
@@ -39,7 +59,7 @@ FSpatialPose FBlendInterface::SPoseOpInvert(FSPose Pose)
 	return Pose;
 }
 
-FSpatialPose FBlendInterface::SPoseOpConcat(FSPose Lhs, FSPose Rhs)
+FSpatialPose SPoseOpConcat(FSPose Lhs, FSPose Rhs)
 {
 	Lhs.SetTranslation(Lhs.GetTranslation() + Rhs.GetTranslation());
 	Lhs.SetRotation(Lhs.GetRotation() + Rhs.GetRotation());
@@ -48,32 +68,32 @@ FSpatialPose FBlendInterface::SPoseOpConcat(FSPose Lhs, FSPose Rhs)
 	return Lhs;
 }
 
-FSpatialPose FBlendInterface::SPoseOpNearest(FSPose Pose0, FSPose Pose1, const float U)
+FSpatialPose SPoseOpNearest(FSPose Pose0, FSPose Pose1, const float U)
 {
 	return U < 0.5f ? Pose0 : Pose1;
 }
 
-FSpatialPose FBlendInterface::SPoseOpLerp(FSPose Pose0, FSPose Pose1, const float U)
+FSpatialPose SPoseOpLerp(FSPose Pose0, FSPose Pose1, const float U)
 {
 	Pose0.PoseLerp(Pose1, U, EInterpMode::Mode_Linear);
 
 	return Pose0;
 }
 
-FSpatialPose FBlendInterface::SPoseOpCubic(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3, const float U)
+FSpatialPose SPoseOpCubic(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3, const float U)
 {
 	// TODO: Figure out how Cubic works
 	return Pose0;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpIdentity(FHPose  OutPose, const int NumPoses)
+FHierarchyPose HPoseOpIdentity(FHPose  OutPose, const int NumPoses)
 {
 	OutPose.Init(NumPoses, SPoseOpIdentity());
 
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpConstruct(FHPose Pose, FVector T, FVector R, FVector S,
+FHierarchyPose HPoseOpConstruct(FHPose Pose, FVector T, FVector R, FVector S,
                                                   const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
@@ -84,7 +104,7 @@ FHierarchyPose FBlendInterface::HPoseOpConstruct(FHPose Pose, FVector T, FVector
 	return Pose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpCopy(FHPose PoseOut, FHPose PoseIn, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpCopy(FHPose PoseOut, FHPose PoseIn, const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -94,7 +114,7 @@ FHierarchyPose FBlendInterface::HPoseOpCopy(FHPose PoseOut, FHPose PoseIn, const
 	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpInvert(FHPose Pose, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpInvert(FHPose Pose, const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -103,7 +123,7 @@ FHierarchyPose FBlendInterface::HPoseOpInvert(FHPose Pose, const int NumPoses, c
 	return Pose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpConcat(FHPose Lhs, FHPose Rhs, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpConcat(FHPose Lhs, FHPose Rhs, const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -113,7 +133,7 @@ FHierarchyPose FBlendInterface::HPoseOpConcat(FHPose Lhs, FHPose Rhs, const int 
 	return Lhs;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpNearest(FHPose  OutPose, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
+FHierarchyPose HPoseOpNearest(FHPose  OutPose, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
                                                 const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
@@ -124,7 +144,7 @@ FHierarchyPose FBlendInterface::HPoseOpNearest(FHPose  OutPose, FHPose Pose0, FH
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpLerp(FHPose  OutPose, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
+FHierarchyPose HPoseOpLerp(FHPose  OutPose, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
                                              const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
@@ -135,7 +155,7 @@ FHierarchyPose FBlendInterface::HPoseOpLerp(FHPose  OutPose, FHPose Pose0, FHPos
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpCubic(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3, const float U,
+FHierarchyPose HPoseOpCubic(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3, const float U,
                                               const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
@@ -146,17 +166,17 @@ FHierarchyPose FBlendInterface::HPoseOpCubic(FHPose  OutPose, FHPose Pose0, FHPo
 	return OutPose;
 }
 
-FSpatialPose FBlendInterface::SPoseOpDeconcat(FSPose Lhs, FSPose Rhs)
+FSpatialPose SPoseOpDeconcat(FSPose Lhs, FSPose Rhs)
 {
 	return SPoseOpConcat(Lhs, SPoseOpInvert(Rhs));
 }
 
-FSpatialPose FBlendInterface::SPoseOpScale(FSPose Pose, const float U)
+FSpatialPose SPoseOpScale(FSPose Pose, const float U)
 {	
 	return SPoseOpLerp(SPoseOpIdentity(), Pose, U);
 }
 
-FSpatialPose FBlendInterface::SPoseOpTri(FSPose Pose0, FSPose Pose1, FSPose Pose2, const float U0, const float U1)
+FSpatialPose SPoseOpTri(FSPose Pose0, FSPose Pose1, FSPose Pose2, const float U0, const float U1)
 {
 	const float U = 1.0f - (U0 - U1);
 
@@ -167,20 +187,20 @@ FSpatialPose FBlendInterface::SPoseOpTri(FSPose Pose0, FSPose Pose1, FSPose Pose
 	);
 }
 
-FSpatialPose FBlendInterface::SPoseOpBinearest(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3,
+FSpatialPose SPoseOpBinearest(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3,
                                                 const float U0, const float U1, const float U)
 {
 	return SPoseOpNearest(
 		SPoseOpNearest(Pose0, Pose1, U0), SPoseOpNearest(Pose2, Pose3, U1), U);
 }
 
-FSpatialPose FBlendInterface::SPoseOpBilerp(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3,
+FSpatialPose SPoseOpBilerp(FSPose Pose0, FSPose Pose1, FSPose Pose2, FSPose Pose3,
                                              const float U0, const float U1, const float U)
 {
 	return SPoseOpLerp(SPoseOpLerp(Pose0, Pose1, U0), SPoseOpLerp(Pose2, Pose3, U1), U);
 }
 
-FSpatialPose FBlendInterface::SPoseOpBicubic(FSPose PoseP0, FSPose PoseP1, FSPose PoseP2, FSPose PoseP3,
+FSpatialPose SPoseOpBicubic(FSPose PoseP0, FSPose PoseP1, FSPose PoseP2, FSPose PoseP3,
                                               FSPose PoseN0, FSPose PoseN1, FSPose PoseN2, FSPose PoseN3,
                                               FSPose Pose00, FSPose Pose01, FSPose Pose02, FSPose Pose03,
                                               FSPose Pose10, FSPose Pose11, FSPose Pose12, FSPose Pose13,
@@ -193,7 +213,7 @@ FSpatialPose FBlendInterface::SPoseOpBicubic(FSPose PoseP0, FSPose PoseP1, FSPos
 	                    SPoseOpCubic(PoseP3, PoseN3, Pose03, Pose13, U3), U);
 }
 
-FHierarchyPose FBlendInterface::HPoseOpDeconcat(FHPose  OutPose, FHPose Lhs, FHPose Rhs, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpDeconcat(FHPose  OutPose, FHPose Lhs, FHPose Rhs, const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -203,7 +223,7 @@ FHierarchyPose FBlendInterface::HPoseOpDeconcat(FHPose  OutPose, FHPose Lhs, FHP
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpScale(FHPose  OutPose, FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpScale(FHPose  OutPose, FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -213,7 +233,7 @@ FHierarchyPose FBlendInterface::HPoseOpScale(FHPose  OutPose, FHPose Pose, const
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpTri(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, const float U0, const float U1,
+FHierarchyPose HPoseOpTri(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, const float U0, const float U1,
                                             const int NumPoses, const int FirstIndex)
 {
 	for (int i = FirstIndex; i < NumPoses; ++i)
@@ -224,7 +244,7 @@ FHierarchyPose FBlendInterface::HPoseOpTri(FHPose  OutPose, FHPose Pose0, FHPose
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpBinearest(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
+FHierarchyPose HPoseOpBinearest(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
                                                   const float U0, const float U1, const float U, const int NumPoses,
                                                   const int FirstIndex)
 {
@@ -237,7 +257,7 @@ FHierarchyPose FBlendInterface::HPoseOpBinearest(FHPose  OutPose, FHPose Pose0, 
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpBilerp(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
+FHierarchyPose HPoseOpBilerp(FHPose  OutPose, FHPose Pose0, FHPose Pose1, FHPose Pose2, FHPose Pose3,
                                                const float U0, const float U1, const float U, const int NumPoses,
                                                const int FirstIndex)
 {
@@ -250,7 +270,7 @@ FHierarchyPose FBlendInterface::HPoseOpBilerp(FHPose  OutPose, FHPose Pose0, FHP
 	return OutPose;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpBicubic(FHPose  OutPose, FHPose PoseP0, FHPose PoseP1, FHPose PoseP2, FHPose PoseP3,
+FHierarchyPose HPoseOpBicubic(FHPose  OutPose, FHPose PoseP0, FHPose PoseP1, FHPose PoseP2, FHPose PoseP3,
                                                 FHPose PoseN0, FHPose PoseN1, FHPose PoseN2, FHPose PoseN3,
                                                 FHPose Pose00, FHPose Pose01, FHPose Pose02,
                                                 FHPose Pose03, FHPose Pose10, FHPose Pose11, FHPose Pose12,
@@ -272,7 +292,7 @@ FHierarchyPose FBlendInterface::HPoseOpBicubic(FHPose  OutPose, FHPose PoseP0, F
 
 // an input of 0 results in P0; an input of 1 results in P1;
 // any other input between 0 and 1 results in an "easing" blend or mixture of the two control poses.
-FSpatialPose FBlendInterface::SPoseOpSmoothstep(FSPose Pose0, FSPose Pose1, const float U)
+FSpatialPose SPoseOpSmoothstep(FSPose Pose0, FSPose Pose1, const float U)
 {
 	if(U <= 0.0f)
 		return Pose0;
@@ -284,7 +304,7 @@ FSpatialPose FBlendInterface::SPoseOpSmoothstep(FSPose Pose0, FSPose Pose1, cons
 
 // an input of 0 results in the identity pose; an input of 1 results in the inverted control pose;
 // any other input between 0 and 1 results in some pose that is not identity but not quite the inverted control pose.
-FSpatialPose FBlendInterface::SPoseOpDescale(FSPose Pose, const float U)
+FSpatialPose SPoseOpDescale(FSPose Pose, const float U)
 {
 	if(U <= 0.0f)
 		return SPoseOpIdentity();
@@ -296,14 +316,14 @@ FSpatialPose FBlendInterface::SPoseOpDescale(FSPose Pose, const float U)
 
 // Utility operation that performs the "convert" step for a spatial/hierarchical pose
 // (convert raw components into transforms).
-FSpatialPose FBlendInterface::SPoseOpConvert(FSPose Pose)
+FSpatialPose SPoseOpConvert(FSPose Pose)
 {
 	Pose.PoseConvert();
 	return Pose;
 }
 
 // Utility operation that performs the opposite of convert (restore raw components from transforms)
-FSpatialPose FBlendInterface::SPoseOpRestore(FSPose Pose)
+FSpatialPose SPoseOpRestore(FSPose Pose)
 {
 	Pose.PoseRestore();
 	return Pose;
@@ -311,7 +331,7 @@ FSpatialPose FBlendInterface::SPoseOpRestore(FSPose Pose)
 
 // Utility operation that performs the fundamental forward kinematics operation,
 // converting the provided local-space transform into the target object-space transform
-TArray<FTransform> FBlendInterface::SPoseOpFK(FHierarchyState State)
+TArray<FTransform> SPoseOpFK(FHierarchyState State)
 {
 	KinematicsSolveForward(State);
 
@@ -327,7 +347,7 @@ TArray<FTransform> FBlendInterface::SPoseOpFK(FHierarchyState State)
 
 //Utility operation that performs the fundamental inverse kinematics operation,
 // converting the provided object-space transform into the target local-space transform
-TArray<FTransform> FBlendInterface::SPoseOpIK(FHierarchyState State)
+TArray<FTransform> SPoseOpIK(FHierarchyState State)
 {
 	KinematicsSolveInverse(State);
 
@@ -341,7 +361,7 @@ TArray<FTransform> FBlendInterface::SPoseOpIK(FHierarchyState State)
 	return OutT;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpSmoothstep(FHPose PoseOut, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
+FHierarchyPose HPoseOpSmoothstep(FHPose PoseOut, FHPose Pose0, FHPose Pose1, const float U, const int NumPoses,
 	const int FirstIndex)
 {
 	for(int i = FirstIndex; i < NumPoses; ++i)
@@ -352,7 +372,7 @@ FHierarchyPose FBlendInterface::HPoseOpSmoothstep(FHPose PoseOut, FHPose Pose0, 
 	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpDescale(FHPose PoseOut, FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpDescale(FHPose PoseOut, FHPose Pose, const float U, const int NumPoses, const int FirstIndex)
 {
 	for(int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -362,7 +382,7 @@ FHierarchyPose FBlendInterface::HPoseOpDescale(FHPose PoseOut, FHPose Pose, cons
 	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpConvert(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpConvert(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex)
 {
 	for(int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -372,7 +392,7 @@ FHierarchyPose FBlendInterface::HPoseOpConvert(FHPose PoseOut, FHPose Pose, cons
 	return PoseOut;
 }
 
-FHierarchyPose FBlendInterface::HPoseOpRestore(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex)
+FHierarchyPose HPoseOpRestore(FHPose PoseOut, FHPose Pose, const int NumPoses, const int FirstIndex)
 {
 	for(int i = FirstIndex; i < NumPoses; ++i)
 	{
@@ -383,13 +403,13 @@ FHierarchyPose FBlendInterface::HPoseOpRestore(FHPose PoseOut, FHPose Pose, cons
 }
 
 /*
-TArray<FTransform> FBlendInterface::HPoseOpFK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses,
+TArray<FTransform> HPoseOpFK(TArray<FTransform> PoseOut, FHierarchyState State, const int NumPoses,
 	const int FirstIndex)
 {
 	return PoseOut;
 }
 
-TArray<FTransform> FBlendInterface::HPoseOpIK(TArray<FTransform> PoseOut, FHierarchy H, FHPose Object, FHPose Local, const int NumPoses,
+TArray<FTransform> HPoseOpIK(TArray<FTransform> PoseOut, FHierarchy H, FHPose Object, FHPose Local, const int NumPoses,
 	const int FirstIndex)
 {
 	return PoseOut;

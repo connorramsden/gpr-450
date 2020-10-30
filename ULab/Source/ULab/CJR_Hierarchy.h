@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
 #include "CJR_Hierarchy.generated.h"
 
@@ -49,10 +48,9 @@ struct ULAB_API FHierarchy
 {
 	GENERATED_BODY()
 
-public:
 	/// PROPERTIES ///
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TArray<AHNode *> Nodes;
+	TArray<AHNode*> Nodes;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	int NumNodes;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
@@ -63,8 +61,8 @@ public:
 	~FHierarchy();
 
 	/// ACCESSORS ///
-	FORCEINLINE AHNode * GetNode(const int Index) {return Nodes[Index];}
-	
+	FORCEINLINE AHNode* GetNode(const int Index) { return Nodes[Index]; }
+
 	/// METHODS ///
 	void Init(int NodesToCreate);
 	void Init(int NodesToCreate, TArray<FString> Names);
