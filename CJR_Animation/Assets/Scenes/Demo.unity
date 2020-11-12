@@ -1189,7 +1189,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numNodesToInit: 10
   numStates: 3
-  hierarchy: {fileID: 0}
+  hierarchy:
+    nodePrefab: {fileID: 6864668915010121246, guid: 96a87be0cf114824c8f7a0202c2b0747, type: 3}
+    nodes: []
+    numNodes: 0
+    isInitialized: 0
   states: []
 --- !u!4 &1457892271
 Transform:

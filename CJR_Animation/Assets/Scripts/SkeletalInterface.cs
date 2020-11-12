@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class SkeletalInterface : MonoBehaviour
@@ -28,7 +29,7 @@ public class SkeletalInterface : MonoBehaviour
 
 		for (int i = 0; i < numStates; ++i)
 		{
-			HierarchyState tempState = gameObject.AddComponent<HierarchyState>();
+			HierarchyState tempState = new HierarchyState();
 
 			tempState.Init(hierarchy);
 			
@@ -39,9 +40,11 @@ public class SkeletalInterface : MonoBehaviour
 	private void Update()
 	{
 		// 1. Apply input from User
-		
+		// Acquire the value of the HierarchyState UI
+		int stateController = ui.stateDrop.value;
+
 		// 2. Update all Controllers
-		
+
 		// 3. Run the 4-step algorithm for each state
 	}
 

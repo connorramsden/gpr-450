@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HierarchyPose : MonoBehaviour
+[Serializable]
+public class HierarchyPose
 {
 	public List<SpatialPose> pose;
 
@@ -23,7 +24,7 @@ public class HierarchyPose : MonoBehaviour
 			SpatialPose tempPose = new SpatialPose();
 			pose.Add(tempPose);
 		}
-		
+
 		// If poses were successfully created, we are initialized.
 		isInitialized = pose.Count > 0;
 	}
@@ -38,7 +39,7 @@ public class HierarchyPose : MonoBehaviour
 		// If poses were successfully created, we are initialized.
 		isInitialized = pose.Count > 0;
 	}
-	
+
 	/// PER-POSE OPERATIONS ///
 	public void PoseReset(int nodeCount, int firstIndex)
 	{
@@ -57,7 +58,7 @@ public class HierarchyPose : MonoBehaviour
 		// Error Handling
 		if (pose.Count <= 0 || nodeCount <= 0 || pose.Count < nodeCount)
 			return;
-		
+
 		for (int i = firstIndex; i < nodeCount; ++i)
 		{
 			pose[i].PoseConvert(channel, order);
@@ -69,7 +70,7 @@ public class HierarchyPose : MonoBehaviour
 		// Error Handling
 		if (pose.Count <= 0 || nodeCount <= 0 || pose.Count < nodeCount)
 			return;
-		
+
 		for (int i = firstIndex; i < nodeCount; ++i)
 		{
 			pose[i].PoseRestore(channel, order);
@@ -79,9 +80,9 @@ public class HierarchyPose : MonoBehaviour
 	public void PoseCopy(HierarchyPose other, int nodeCount, int firstIndex)
 	{
 		// Error Handling
-		if (pose.Count <= 0 || nodeCount <= 0 || pose.Count < nodeCount || other==null)
+		if (pose.Count <= 0 || nodeCount <= 0 || pose.Count < nodeCount || other == null)
 			throw new ArgumentNullException();
-		
+
 		for (int i = firstIndex; i < nodeCount; ++i)
 		{
 			pose[i] = other.pose[i];
@@ -93,7 +94,7 @@ public class HierarchyPose : MonoBehaviour
 		// Error Handling
 		if (pose.Count <= 0 || nodeCount <= 0 || pose.Count < nodeCount || other == null)
 			throw new ArgumentNullException();
-		
+
 		for (int i = firstIndex; i < nodeCount; ++i)
 		{
 			pose[i].PoseConcat(other.pose[i]);
@@ -105,7 +106,7 @@ public class HierarchyPose : MonoBehaviour
 		// Error Handling
 		if (pose.Count <= 0 || nodeCount <= 0 || pose.Count < nodeCount || other == null)
 			throw new ArgumentNullException();
-		
+
 		for (int i = firstIndex; i < nodeCount; ++i)
 		{
 			pose[i].PoseLerp(other.pose[i], u);
@@ -113,7 +114,8 @@ public class HierarchyPose : MonoBehaviour
 	}
 }
 
-public class HierarchyPoseGroup : MonoBehaviour
+[Serializable]
+public class HierarchyPoseGroup
 {
 	public Hierarchy hierarchy;
 	public List<HierarchyPose> hierarchyPoses;
@@ -139,7 +141,8 @@ public class HierarchyPoseGroup : MonoBehaviour
 	}
 }
 
-public class HierarchyState : MonoBehaviour
+[Serializable]
+public class HierarchyState
 {
 	public Hierarchy hierarchy;
 	public HierarchyPose localSpace;
@@ -154,7 +157,7 @@ public class HierarchyState : MonoBehaviour
 		// Init poses to null
 		localSpace = objectSpace = objectSpaceInv = objectSpaceBindToCurrent = null;
 	}
-	
+
 	public void Init(Hierarchy newH, int poseCount = 4)
 	{
 		int nodeCount = newH.numNodes;
@@ -162,7 +165,7 @@ public class HierarchyState : MonoBehaviour
 		int sPoseCount = hPoseCount * nodeCount;
 
 		hierarchy = newH;
-		
+
 		// Init all other poses from this hierarchy.
 	}
 

@@ -52,7 +52,8 @@ public enum InterpMode
 	Mode_Smooth
 }
 
-public class SpatialPose : MonoBehaviour
+[Serializable]
+public class SpatialPose
 {
 	public Transform poseTransform;
 	public Vector4 orientation;

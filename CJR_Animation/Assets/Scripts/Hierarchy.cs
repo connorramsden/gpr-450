@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 /**
  * Effectively a Node pool
@@ -41,7 +42,7 @@ public class Hierarchy : MonoBehaviour
 		{
 			nodePrefab = (GameObject) AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Node.prefab", typeof(GameObject));
 		}
-		
+
 		List<string> names = new List<string>();
 
 		for (int i = 0; i < nodesToCreate; ++i)
@@ -68,7 +69,10 @@ public class Hierarchy : MonoBehaviour
 			GameObject tempNode = Instantiate(nodePrefab, Vector3.zero, Quaternion.identity);
 			tempNode.GetComponent<Node>().Init(names[i], i, i - 1);
 
-			nodes.Add(tempNode);
+			if (tempNode != null)
+				nodes.Add(tempNode);
+			else
+				throw new NullReferenceException();
 		}
 
 		if (numNodes <= 0)
