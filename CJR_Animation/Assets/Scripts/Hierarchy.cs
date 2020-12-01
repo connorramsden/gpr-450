@@ -81,6 +81,18 @@ public class Hierarchy : MonoBehaviour
 			isInitialized = true;
 	}
 
+	// Init this Hierarchy from a layout
+	public void Init(LayoutObj layout)
+	{
+		int nodesToCreate = layout.GetSize();
+
+		for (int i = 0; i < nodesToCreate; ++i)
+		{
+			// GameObject tempNode = Instantiate(nodePrefab, )
+		}
+	}
+
+	// Set nodes[index] with the passed values
 	public void SetNode(int index, int newPIndex, string newName)
 	{
 		Node tempNode = nodes[index].GetComponent<Node>();
