@@ -7,11 +7,12 @@ using UnityEngine;
 public class SkeletalInterface : MonoBehaviour
 {
 	private UI_Animation ui;
-	
-	public int numNodesToInit;
-	public int numStates;
 
-	public Hierarchy hierarchy;
+	// The Hierarchy associated with this Object
+	private Hierarchy hierarchy;
+
+	public LayoutObj hierarchyLayout;
+	public int numStates;
 
 	// Base pose, flip through all, and clip-controlled.
 	public List<HierarchyState> states;
@@ -25,7 +26,7 @@ public class SkeletalInterface : MonoBehaviour
 
 	private void Start()
 	{
-		hierarchy.Init(numNodesToInit);
+		hierarchy.Init(hierarchyLayout);
 
 		for (int i = 0; i < numStates; ++i)
 		{
