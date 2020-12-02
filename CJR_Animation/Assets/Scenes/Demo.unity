@@ -1187,13 +1187,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a68c4260273f2441b01b85b61ff9b7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numNodesToInit: 10
+  numNodesToInit: 20
   numStates: 3
-  hierarchy:
-    nodePrefab: {fileID: 6864668915010121246, guid: 96a87be0cf114824c8f7a0202c2b0747, type: 3}
-    nodes: []
-    numNodes: 0
-    isInitialized: 0
+  hierarchy: {fileID: 0}
   states: []
 --- !u!4 &1457892271
 Transform:
@@ -1539,7 +1535,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: Option A
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 0}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1764,10 +1760,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 18
+  m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
